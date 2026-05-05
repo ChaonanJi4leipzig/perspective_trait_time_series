@@ -16,9 +16,9 @@ Trait ecology has transformed how ecologists interpret ecosystem function, but m
 
 The manuscript is written for ecologists rather than remote-sensing specialists. It focuses on stress syndromes, resistance, recovery, legacy effects, dynamic functional diversity and model benchmarking. Remote sensing is treated as the observing infrastructure that makes these ecological variables measurable across space and time.
 
-## EcoSpectra role
+## Proof-of-concept role
 
-EcoSpectra appears as a short proof-of-concept demonstrating feasibility. The manuscript does not claim that the project has already solved operational trait monitoring.
+A European forest testbed appears as a short proof-of-concept demonstrating feasibility. The manuscript does not claim that this testbed has already solved operational trait monitoring.
 
 ## Figures
 

@@ -14,11 +14,11 @@ Operational ecosystem monitoring needs functional variables that can inform clim
 
 ## One Earth fit
 
-This version should emphasize monitoring infrastructure, climate resilience, conservation planning and policy-facing products. It can give more space to the EcoSpectra proof-of-concept and roadmap than the NREE/TREE versions.
+This version should emphasize monitoring infrastructure, climate resilience, conservation planning and policy-facing products. It can give more space to the European forest proof-of-concept and roadmap than the NREE/TREE versions.
 
-## EcoSpectra role
+## Proof-of-concept role
 
-EcoSpectra is framed as a European forest demonstrator for reconstructing selected hyperspectral-derived traits from Sentinel-2 temporal context.
+A European forest testbed is framed as a demonstrator for reconstructing selected hyperspectral-derived traits from Sentinel-2 temporal context.
 
 ## Roadmap emphasis
 

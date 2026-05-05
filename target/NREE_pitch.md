@@ -20,14 +20,14 @@ Spaceborne imaging spectroscopy is entering an operational phase through PRISMA,
 
 The manuscript does not review all hyperspectral methods. It reframes imaging spectroscopy as a trait-anchor system and argues that the next step is continuous trait-cube monitoring with uncertainty, provenance and ecological validation.
 
-## EcoSpectra role
+## Proof-of-concept role
 
-EcoSpectra is included as a compact proof-of-concept showing early reconstruction of five hyperspectral-derived traits from Sentinel-2 temporal context across European forest sites. It is not presented as a final benchmark.
+A European forest testbed is included as a compact proof-of-concept showing early reconstruction of selected hyperspectral-derived traits from Sentinel-2 temporal context. It is not presented as a final benchmark, and the internal project name should not be foregrounded in the manuscript.
 
 ## Proposed figures
 
 1. From greenness to function.
 2. Sparse spectroscopy plus dense multispectral time as a trait-cube framework.
-3. EcoSpectra proof-of-concept.
+3. European forest proof-of-concept.
 4. Trait anomalies for resistance, recovery and legacy effects.
 5. Roadmap for operational trait-cube monitoring.

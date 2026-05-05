@@ -19,10 +19,10 @@
 %\affil*[1]{\orgdiv{...}, \orgname{...}, \orgaddress{\country{...}}}
 
 \abstract{
-Ecosystem monitoring has become increasingly continuous in space and time, yet it still relies heavily on greenness and structural proxies whose ecological interpretation is often ambiguous. Imaging spectroscopy can make plant functional traits observable from space, but current and near-future hyperspectral missions remain too sparse in time to provide the continuous records needed for monitoring drought, heatwaves, recovery and legacy effects. Here we argue for a trait data cube perspective: sparse imaging-spectroscopy observations should be used to anchor plant functional traits, while dense multispectral archives should carry those traits through time. This shift moves remote sensing from spectral index monitoring towards continuous functional observables with explicit uncertainty. We outline the conceptual basis of trait data cubes, discuss how they can support stress attribution, resistance and recovery analysis, dynamic functional diversity and model benchmarking, and identify the guardrails required for operational use. As an early proof-of-concept, the EcoSpectra project shows that selected hyperspectral-derived traits can be partially reconstructed from Sentinel-2 temporal context across European forest sites, while also highlighting the trait-specific uncertainty that must accompany such products.
+Ecosystem monitoring has become increasingly continuous in space and time, yet it still relies heavily on greenness and structural proxies whose ecological interpretation is often ambiguous. Imaging spectroscopy can make plant functional traits observable from space, but current and near-future hyperspectral missions remain too sparse in time to provide the continuous records needed for monitoring drought, heatwaves, recovery and legacy effects. Here we argue for a trait data cube perspective: sparse imaging-spectroscopy observations should be used to anchor plant functional traits, while dense multispectral archives should carry those traits through time. This shift moves remote sensing from spectral index monitoring towards continuous functional observables with explicit uncertainty. We outline the conceptual basis of trait data cubes, discuss how they can support stress attribution, resistance and recovery analysis, dynamic functional diversity and model benchmarking, and identify the guardrails required for operational use. As an early proof-of-concept, a European forest testbed shows that selected hyperspectral-derived traits can be partially reconstructed from Sentinel-2 temporal context, while also highlighting the trait-specific uncertainty that must accompany such products.
 }
 
-\keywords{imaging spectroscopy, hyperspectral remote sensing, multispectral time series, plant traits, trait data cubes, ecosystem monitoring, vegetation resilience, EcoSpectra}
+\keywords{imaging spectroscopy, hyperspectral remote sensing, multispectral time series, plant traits, trait data cubes, ecosystem monitoring, vegetation resilience}
 
 \maketitle
 
@@ -55,7 +55,7 @@ Suggested design: left panel shows a greenness-based monitoring workflow in whic
 
 Imaging spectroscopy matters because it records narrow, contiguous spectral bands that are sensitive to biochemical and structural properties of vegetation. This information can be translated into plant traits through empirical models, radiative transfer model inversion, hybrid physical-statistical approaches or machine learning. Multi-trait retrieval studies have shown that heterogeneous spectral and trait datasets can support transferable models for a suite of plant functional traits \cite{cherif2023spectra}. Curated community datasets and trait databases provide an expanding foundation for this work \cite{kattge2020try,mederer2025plant}.
 
-Recent work also clarifies the limits of this promise. Transferability is not automatic. Models trained on one species set, plant functional type, season or region may fail elsewhere if the calibration domain does not cover the trait range, canopy structure or atmospheric conditions of application. Studies by Fujiang Ji and colleagues are useful here as objective field evidence, not as EcoSpectra project results. Their work on spectral-trait model transferability highlights that calibration diversity and domain awareness are central constraints for leaf trait estimation \cite{ji2024transferability}. Related transfer-learning approaches that combine radiative transfer model knowledge with field observations show how generalization may be improved \cite{ji2025transferlearning}. At canopy scale, recent PRISMA and NEON analyses indicate that spaceborne imaging spectroscopy can track seasonal variability in multiple plant traits across sites \cite{ji2025prisma}. Together, these studies suggest that the trait-anchor problem is becoming increasingly tractable, even though temporally continuous monitoring remains unresolved.
+Recent work also clarifies the limits of this promise. Transferability is not automatic. Models trained on one species set, plant functional type, season or region may fail elsewhere if the calibration domain does not cover the trait range, canopy structure or atmospheric conditions of application. Studies by Fujiang Ji and colleagues are useful here as objective field evidence, not as results from the proof-of-concept testbed described below. Their work on spectral-trait model transferability highlights that calibration diversity and domain awareness are central constraints for leaf trait estimation \cite{ji2024transferability}. Related transfer-learning approaches that combine radiative transfer model knowledge with field observations show how generalization may be improved \cite{ji2025transferlearning}. At canopy scale, recent PRISMA and NEON analyses indicate that spaceborne imaging spectroscopy can track seasonal variability in multiple plant traits across sites \cite{ji2025prisma}. Together, these studies suggest that the trait-anchor problem is becoming increasingly tractable, even though temporally continuous monitoring remains unresolved.
 
 These studies should be used in the manuscript as evidence of field maturity rather than as material to review exhaustively. They help establish a boundary condition for the Perspective: trait retrieval is no longer only a speculative aspiration, but neither is it a solved operational service. It is a rapidly improving capability that requires explicit attention to calibration domain, scale and uncertainty. That middle position is important. If the manuscript overstates retrieval reliability, the trait-cube argument will appear technologically naive. If it understates recent progress, the proposed monitoring framework will appear premature.
 
@@ -86,24 +86,24 @@ This measurement-system framing also changes how model complexity should be judg
 
 \noindent\fbox{%
 \begin{minipage}{0.94\textwidth}
-\textbf{Box 1. EcoSpectra as an early proof-of-concept.}
+\textbf{Box 1. A European forest proof-of-concept.}
 
-EcoSpectra is developing an end-to-end pipeline for reconstructing plant trait time series by linking hyperspectral-derived trait labels with Sentinel-2 temporal observations across European forest sites. In an early proof-of-concept, five traits were evaluated on common test samples: LMA, nitrogen, LAI, chlorophyll and lignin. Across 782 common test samples, a random forest model currently performs best among the tested linear regression, random forest, multilayer perceptron and transformer baselines. Its mean test $R^2$ across the five traits is approximately 0.39, with mean normalized RMSE of 11.37\%. LAI is the strongest early case ($R^2 \approx 0.63$, normalized RMSE $\approx 10.53\%$), while chlorophyll and lignin remain more uncertain. Relative to a linear baseline, random forest improves $R^2$ by approximately 0.09--0.26 depending on the trait. These results should be interpreted as an early feasibility demonstration, not as an operational benchmark. Their main value in this Perspective is to show that the sparse-to-dense trait-cube idea can already be implemented and tested with existing Earth observation archives, while preserving trait-specific uncertainty and failure modes.
+Our current testbed is developing an end-to-end pipeline for reconstructing plant trait time series by linking hyperspectral-derived trait labels with Sentinel-2 temporal observations across European forest sites. The broader analysis can target a suite of 20 hyperspectral-derived traits. For this Perspective, the proof-of-concept should highlight a smaller illustrative subset spanning canopy structure, pigments, nutrients, leaf economics and carbon-related traits, rather than presenting a complete benchmark. In an early common-test evaluation, five such traits were examined: LMA, nitrogen, LAI, chlorophyll and lignin. Across 782 common test samples, a random forest model currently performs best among the tested linear regression, random forest, multilayer perceptron and transformer baselines. Its mean test $R^2$ across these five traits is approximately 0.39, with mean normalized RMSE of 11.37\%. LAI is the strongest early case ($R^2 \approx 0.63$, normalized RMSE $\approx 10.53\%$), while chlorophyll and lignin remain more uncertain. Relative to a linear baseline, random forest improves $R^2$ by approximately 0.09--0.26 depending on the trait. These results demonstrate implementability, not operational readiness. Their main value in this Perspective is to show that the sparse-to-dense trait-cube idea can already be implemented and tested with existing Earth observation archives, while preserving trait-specific uncertainty and failure modes.
 \end{minipage}}
 
 \begin{figure}[t]
 \centering
 \begin{minipage}{0.48\textwidth}
 \centering
-\includegraphics[width=\textwidth]{figures/draft/fig3_ecospectra_performance_heatmap.png}
+\includegraphics[width=\textwidth]{figures/draft/fig3_proof_of_concept_performance_heatmap.png}
 \end{minipage}
 \hfill
 \begin{minipage}{0.48\textwidth}
 \centering
-\includegraphics[width=\textwidth]{figures/draft/fig3_ecospectra_lai_reconstruction.png}
+\includegraphics[width=\textwidth]{figures/draft/fig3_proof_of_concept_lai_reconstruction.png}
 \end{minipage}
-\caption{\textbf{EcoSpectra proof-of-concept placeholders.} Left: early common-test performance for five hyperspectral-derived traits reconstructed from Sentinel-2 temporal context. Right: an example LAI reconstruction. These panels use existing draft outputs and should be redrawn for the final target journal, with smaller typography, clearer captions, geographic context and uncertainty information.}
-\label{fig:ecospectra_poc}
+\caption{\textbf{Proof-of-concept placeholders.} Left: early common-test performance for five hyperspectral-derived traits reconstructed from Sentinel-2 temporal context in a European forest testbed. Right: an example LAI reconstruction. These panels use existing draft outputs and should be redrawn for the final target journal, with smaller typography, clearer captions, geographic context and uncertainty information.}
+\label{fig:proof_of_concept}
 \end{figure}
 
 \section{What trait cubes enable for ecosystem science}
@@ -134,7 +134,7 @@ This point is central for keeping the manuscript ecological rather than technolo
 \vspace{0.35cm}
 \textbf{Planned Figure 4: trait anomalies for disturbance ecology.}
 
-This figure should show multi-trait trajectories before, during and after an event such as drought or heatwave. The draft should mark resistance, recovery slope and legacy effect. If a robust EcoSpectra drought example is available, this should become a data-driven figure; otherwise it can remain conceptual for the Perspective version.
+This figure should show multi-trait trajectories before, during and after an event such as drought or heatwave. The draft should mark resistance, recovery slope and legacy effect. If a robust drought example is available from the current testbed, this should become a data-driven figure; otherwise it can remain conceptual for the Perspective version.
 \vspace{0.35cm}
 \end{minipage}}
 \caption{\textbf{Trait anomalies as ecological response metrics.} Planned conceptual or data-driven figure linking trait time series to stress syndromes, resistance, recovery and legacy effects.}
@@ -167,15 +167,15 @@ Validation should also move beyond pooled performance metrics. A single average 
 \end{itemize}
 \end{minipage}}
 
-\section{A roadmap for EcoSpectra and trait-based monitoring}
+\section{A roadmap for trait-based monitoring}
 
 The trait-cube perspective suggests a research programme rather than a single product. First, the field needs open spectra-trait-time benchmarks that link field traits, imaging spectroscopy, multispectral time series and environmental context. Existing trait databases, spectral biology efforts and Earth system data cube infrastructures provide important foundations \cite{kattge2020try,cavender2025spectral,mahecha2020earth,montero2024earth}. Second, cross-mission harmonization is essential. EnMAP, PRISMA, EMIT, DESIS, CHIME and SBG will differ in spectral response, noise, acquisition strategy and preprocessing. Trait products must therefore record sensor provenance and support cross-sensor comparison.
 
 Third, temporal reconstruction models should be benchmarked as monitoring tools. Linear models, tree ensembles, recurrent networks, transformers and self-supervised remote-sensing models may all be useful \cite{tseng2023lightweight}; the right choice will depend on trait, data volume, uncertainty needs and transferability. Fourth, trait cubes should be connected to ecological networks, flux towers, disturbance inventories and climate drivers. Their value will be highest when trait anomalies can be interpreted alongside drought intensity, carbon exchange, management history and field observations.
 
-Finally, trait-cube products should be co-designed with users. Ecologists may need trait distributions and uncertainty. Earth system modellers may need spatially aggregated constraints and temporal anomalies. Conservation agencies may need early-warning indicators, recovery metrics and interpretable maps. EcoSpectra can serve as one opening effort in this direction: a reproducible pipeline for testing how sparse hyperspectral trait information can be transformed into continuous functional monitoring.
+Finally, trait-cube products should be co-designed with users. Ecologists may need trait distributions and uncertainty. Earth system modellers may need spatially aggregated constraints and temporal anomalies. Conservation agencies may need early-warning indicators, recovery metrics and interpretable maps. The European forest testbed used here can serve as one opening effort in this direction: a reproducible pipeline for testing how sparse hyperspectral trait information can be transformed into continuous functional monitoring.
 
-For EcoSpectra specifically, this roadmap implies a staged manuscript and project strategy. The current Perspective should establish the conceptual framework and use early results only as proof-of-concept. Follow-up research papers can then provide the complete benchmark: full trait sets, cross-site and cross-year generalization, ERA5 climate-context ablations, uncertainty calibration and disturbance case studies. This separation is important. The Perspective should open the research programme; it should not overburden itself with every technical result that EcoSpectra will eventually produce.
+For the current manuscript, this roadmap implies a staged publication strategy. The present Perspective should establish the conceptual framework and use early results only as proof-of-concept. Follow-up research papers can then provide the complete benchmark: full trait sets, cross-site and cross-year generalization, climate-context ablations, uncertainty calibration and disturbance case studies. This separation is important. The Perspective should open the research programme; it should not overburden itself with every technical result that the broader project will eventually produce.
 
 \begin{figure}[t]
 \centering
@@ -195,10 +195,10 @@ Suggested layers: missions and field networks; trait-anchor retrieval; temporal 
 Imaging spectroscopy makes plant function observable from space, but its ecological value will depend on whether sparse observations can be transformed into continuous, validated and uncertainty-aware trait time series. Dense multispectral archives provide the temporal carrier for this transformation. Trait data cubes therefore offer a route from spectral snapshots to functional ecosystem monitoring. The task ahead is to make these cubes scientifically credible: anchored in spectral-trait evidence, explicit about uncertainty, validated across ecological contexts and designed around the questions that ecologists, modellers and decision-makers need to answer.
 
 \bmhead{Acknowledgements}
-Funding and project acknowledgements should be finalized before submission. Draft acknowledgement: the authors acknowledge support connected to the EcoSpectra and TEE Cube research context. This text should be checked against grant and journal requirements.
+Funding and project acknowledgements should be finalized before submission. Draft acknowledgement: the authors acknowledge support from the relevant MSCA and TEE Cube research context. This text should be checked against grant and journal requirements.
 
 \bmhead{Data and code availability}
-This Perspective includes an early proof-of-concept based on EcoSpectra draft outputs. Final data and code availability statements should be added once the analysis outputs and repository release are frozen.
+This Perspective includes an early proof-of-concept based on draft analysis outputs. Final data and code availability statements should be added once the analysis outputs and repository release are frozen.
 
 \bibliography{references}
 
