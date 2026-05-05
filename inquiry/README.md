@@ -5,10 +5,12 @@ This folder contains a lightweight LaTeX version of the presubmission inquiry:
 - `NREE_presubmission_inquiry.tex`
 - `NREE_proposal_synopsis.tex`
 - `NREE_proposal_synopsis.md`
+- `NREE_proposal_references.bib`
 
 It is designed as an Overleaf-ready subproject inside the same GitHub repository. The file reuses:
 
-- `../references.bib`
+- `NREE_proposal_references.bib` for the self-contained inquiry/proposal bibliography.
+- `../references.bib` remains the full manuscript bibliography.
 - `../figures/draft/fig1_spectra_original.png`
 - `../figures/generated/fig2_functional_observables_framework.pdf`
 - `../figures/generated/fig3_proof_of_concept_performance.pdf`
