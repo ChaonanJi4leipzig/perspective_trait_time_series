@@ -1,14 +1,14 @@
-# Trait-cube Perspective manuscript
+# Functional ecosystem monitoring Perspective manuscript
 
 This repository is an Overleaf-ready LaTeX project for the Perspective manuscript:
 
-**Trait data cubes for ecosystem monitoring**
+**From greenness to function in ecosystem monitoring**
 
 The manuscript is intended as an opening Perspective for an MSCA research programme on continuous ecosystem trait monitoring. The manuscript should not present the internal project name as if it were a recognized community initiative. It should also not read as a literature review or as a full research article. The current positioning is:
 
 - sparse imaging spectroscopy provides trait anchors;
 - dense multispectral archives provide temporal support;
-- the target product is an uncertainty-aware trait data cube;
+- the target output is a set of uncertainty-aware continuous functional observables;
 - a European forest testbed enters as an early proof-of-concept, not as a final benchmark.
 
 ## Main files

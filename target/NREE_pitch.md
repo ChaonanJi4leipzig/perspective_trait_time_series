@@ -2,7 +2,7 @@
 
 ## Proposed title
 
-Trait data cubes for ecosystem monitoring
+From greenness to function in ecosystem monitoring
 
 ## Article type
 
@@ -10,7 +10,7 @@ Perspective / Comment proposal.
 
 ## Core argument
 
-Ecosystem monitoring remains dominated by greenness and structural proxies, while climate extremes require functional observables that can distinguish stress pathways, recovery and legacy effects. Imaging spectroscopy can anchor plant functional traits, but hyperspectral observations remain sparse in time. We propose trait data cubes as a framework that uses sparse imaging-spectroscopy trait anchors and dense multispectral archives to build continuous, uncertainty-aware functional observables.
+Ecosystem monitoring remains dominated by greenness and structural proxies, while climate extremes require functional observables that can distinguish stress pathways, recovery and legacy effects. Imaging spectroscopy can anchor plant functional traits, but hyperspectral observations remain sparse in time. We propose a framework for moving from spectral snapshots to functional ecosystem monitoring by using sparse imaging-spectroscopy trait anchors and dense multispectral archives to build continuous, uncertainty-aware functional observables.
 
 ## Why now
 
@@ -18,7 +18,7 @@ Spaceborne imaging spectroscopy is entering an operational phase through PRISMA,
 
 ## What is new
 
-The manuscript does not review all hyperspectral methods. It reframes imaging spectroscopy as a trait-anchor system and argues that the next step is continuous trait-cube monitoring with uncertainty, provenance and ecological validation.
+The manuscript does not review all hyperspectral methods. It reframes imaging spectroscopy as a trait-anchor system and argues that the next step is continuous functional monitoring with uncertainty, provenance and ecological validation.
 
 ## Proof-of-concept role
 
@@ -27,7 +27,7 @@ A European forest testbed is included as a compact proof-of-concept showing earl
 ## Proposed figures
 
 1. From greenness to function.
-2. Sparse spectroscopy plus dense multispectral time as a trait-cube framework.
+2. Sparse spectroscopy plus dense multispectral time as a functional-observable framework.
 3. European forest proof-of-concept.
 4. Trait anomalies for resistance, recovery and legacy effects.
-5. Roadmap for operational trait-cube monitoring.
+5. Roadmap for functional ecosystem monitoring.

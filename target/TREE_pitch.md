@@ -2,7 +2,7 @@
 
 ## Proposed title
 
-Ecology needs trait time series
+From greenness to function in ecosystem monitoring
 
 ## Article type
 
@@ -10,7 +10,7 @@ Opinion / Review-style Perspective proposal.
 
 ## Core argument
 
-Trait ecology has transformed how ecologists interpret ecosystem function, but most large-scale monitoring still observes greenness rather than traits. Imaging spectroscopy can now retrieve plant traits, and dense multispectral archives can support temporal reconstruction. We argue that trait data cubes can move ecosystem monitoring from greenness anomalies to functional anomaly analysis.
+Trait ecology has transformed how ecologists interpret ecosystem function, but most large-scale monitoring still observes greenness rather than traits. Imaging spectroscopy can now retrieve plant traits, and dense multispectral archives can support temporal reconstruction. We argue that continuous functional observables can move ecosystem monitoring from greenness anomalies to functional anomaly analysis.
 
 ## TREE fit
 
@@ -25,6 +25,6 @@ A European forest testbed appears as a short proof-of-concept demonstrating feas
 TREE version should prioritize conceptual figures:
 
 1. Why greenness is not enough.
-2. Trait cube framework.
+2. Functional-observable framework.
 3. Trait anomaly trajectories.
 4. Minimum standards and uncertainty guardrails.
