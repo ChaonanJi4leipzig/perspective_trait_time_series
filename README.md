@@ -22,6 +22,7 @@ The manuscript is intended as an opening Perspective for an MSCA research progra
 - `archive/original_package/` - unmodified contents of `HS_perspective_v3.zip`.
 - `target/` - target-specific presubmission pitch drafts.
 - `cover_letters/NREE_presubmission_inquiry.md` - more formal NREE inquiry draft.
+- `inquiry/NREE_presubmission_inquiry.tex` - Overleaf-ready LaTeX presubmission inquiry package with optional references and figure previews.
 - `AUTHOR_NOTES.md` - current author block and affiliation details that need confirmation.
 
 ## Current status
