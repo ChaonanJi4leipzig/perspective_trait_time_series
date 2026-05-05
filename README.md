@@ -19,6 +19,8 @@ The manuscript is intended as an opening Perspective for an MSCA research progra
 - `tables/proof_of_concept_performance.csv` - early proof-of-concept metrics.
 - `archive/original_package/` - unmodified contents of `HS_perspective_v3.zip`.
 - `target/` - target-specific presubmission pitch drafts.
+- `cover_letters/NREE_presubmission_inquiry.md` - more formal NREE inquiry draft.
+- `AUTHOR_NOTES.md` - current author block and affiliation details that need confirmation.
 
 ## Current status
 
@@ -27,7 +29,7 @@ This is a structural rewrite and repository setup commit. The manuscript is not 
 Known next tasks:
 
 1. Replace placeholder author and affiliation metadata.
-2. Verify and complete the Fujiang Ji bibliographic entries in `references.bib`.
+2. Verify author spelling, detailed affiliations, and missing co-author emails in `AUTHOR_NOTES.md`.
 3. Redraw Figures 1-5 in a consistent target-journal style.
 4. Decide whether Figure 4 is conceptual or based on a drought/heatwave case study from the current testbed.
 5. Add a real data/code availability statement once the proof-of-concept outputs are frozen.
