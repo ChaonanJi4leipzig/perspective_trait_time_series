@@ -10,6 +10,7 @@ For NREE, the strongest route is a Reviews-style Perspective rather than a data 
 
 - The title, **From greenness to function in ecosystem monitoring**, is clear and journal-facing.
 - The manuscript now has a sharper central claim: functional time series are the missing layer between spectral trait retrievals and long-term ecological monitoring.
+- Box 3 now states five transferable principles, making the article easier to pitch as a Perspective rather than a methods review.
 - The scientific boundary is cleaner: imaging spectroscopy anchors biochemical and optical trait information; LiDAR, SAR and InSAR are the more direct sources for three-dimensional canopy structure.
 - The proof-of-concept is framed as illustrative rather than as the main evidence.
 - Figures 1-5 now have reproducible Nature-style exports in PDF, SVG, EPS, JPG and PNG.
@@ -30,7 +31,7 @@ The article should cite state-of-the-art trait, imaging spectroscopy and global 
 
 4. Proof-of-concept needs a frozen supplement.
 
-The proof-of-concept can remain compact in the main text, but reviewers will need enough support to judge it. Before full submission, prepare a short Supplementary Methods note with trait list, regions, sensors, training targets, train-test separation, uncertainty or domain flags, and the exact metrics shown in Figure 3.
+The proof-of-concept can remain compact in the main text, but reviewers will need enough support to judge it. Before full submission, prepare a short Supplementary Methods note with trait list, regions, sensors, training targets, train-test separation, uncertainty or domain flags, and the exact metrics shown in Figure 3. The current time-series panel is a schematic product-design panel and should be replaced by a real site-level example if available.
 
 5. Claims should stay conditional where the evidence is illustrative.
 

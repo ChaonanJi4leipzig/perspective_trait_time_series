@@ -298,11 +298,12 @@ def fig3_performance():
     lin = df[df["model"] == "LinearRegression"].set_index("trait").loc[trait_order]
     delta = rf["r2"] - lin["r2"]
 
-    fig = plt.figure(figsize=(FIG_W_DOUBLE, 4.15))
-    gs = fig.add_gridspec(2, 2, height_ratios=[1.0, 0.95], hspace=0.42, wspace=0.34)
+    fig = plt.figure(figsize=(FIG_W_DOUBLE, 5.75))
+    gs = fig.add_gridspec(3, 2, height_ratios=[1.0, 0.95, 0.70], hspace=0.62, wspace=0.34)
     ax1 = fig.add_subplot(gs[0, :])
     ax2 = fig.add_subplot(gs[1, 0])
     ax3 = fig.add_subplot(gs[1, 1])
+    ax4 = fig.add_subplot(gs[2, :])
 
     cmap = LinearSegmentedColormap.from_list("r2", ["#F6F6F6", "#CFE5D8", "#7CC4B0", BLUE])
     im = ax1.imshow(r2.values, vmin=0, vmax=0.7, cmap=cmap, aspect="auto")
@@ -340,6 +341,28 @@ def fig3_performance():
     ax3.legend(frameon=False, handlelength=1.4, labelspacing=0.3, fontsize=FS_LEG)
     style_axis(ax3)
     panel_label(ax3, "c", x=-0.14, y=1.06)
+
+    months = np.arange(1, 13)
+    seasonal = 0.55 + 0.18 * np.sin((months - 3) / 12 * 2 * np.pi)
+    stress = -0.13 * np.exp(-0.5 * ((months - 8) / 1.0) ** 2)
+    dense = seasonal + stress
+    uncertainty = 0.035 + 0.015 * np.cos((months - 1) / 12 * 2 * np.pi) ** 2
+    anchors_x = np.array([4, 8, 11])
+    anchors_y = dense[anchors_x - 1] + np.array([0.015, -0.02, 0.01])
+    ax4.fill_between(months, dense - uncertainty, dense + uncertainty, color="#CFEAF7", linewidth=0)
+    ax4.plot(months, dense, color=BLUE, lw=FIT_LW, label="Densified trait estimate")
+    ax4.scatter(anchors_x, anchors_y, s=22, color=VERMILION, edgecolor=BLACK, linewidth=AXIS_LW, zorder=3, label="Hyperspectral trait anchor")
+    ax4.axvspan(7.3, 8.7, color="#F8EEDB", lw=0, label="Domain flag")
+    ax4.text(8.0, 0.335, "domain flag", ha="center", va="bottom", fontsize=FS_NOTE, color=BLACK)
+    ax4.set_xlim(1, 12)
+    ax4.set_ylim(0.32, 0.78)
+    ax4.set_xticks([1, 4, 7, 10], ["Jan", "Apr", "Jul", "Oct"])
+    ax4.set_yticks([])
+    ax4.set_xlabel("Dense Sentinel-2 temporal carrier with sparse trait anchors")
+    figure_title(ax4, "Intended functional time-series product")
+    ax4.legend(frameon=False, ncol=3, loc="upper right", handlelength=1.4, labelspacing=0.3, fontsize=FS_LEG)
+    style_axis(ax4)
+    panel_label(ax4, "d", x=-0.06, y=1.08)
     save_publication_figure(fig, "fig3_proof_of_concept_performance")
 
 

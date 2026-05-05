@@ -18,7 +18,7 @@ Ecosystem monitoring has gained long temporal memory from spectral-index and mul
 2. **Imaging spectroscopy makes function observable, but not continuous.** What spectroscopy can and cannot directly constrain, including the boundary between biochemical trait anchors and structural information.
 3. **From trait snapshots to functional time series.** A sparse-to-dense framework that links imaging spectroscopy, multispectral time series, structural observations and uncertainty-aware product design.
 4. **What continuous functional observables enable.** Stress syndromes, resistance, recovery, legacy effects, dynamic functional diversity and model benchmarking.
-5. **Guardrails and roadmap.** Reporting standards, domain-of-applicability masks, uncertainty calibration, ecological validation and open spectra-trait-time benchmarks.
+5. **Principles and roadmap.** Five principles for credible functional time series, followed by open spectra-trait-time benchmarks, domain-of-applicability masks, uncertainty calibration and ecological validation.
 
 ## Display items
 
@@ -26,7 +26,7 @@ Ecosystem monitoring has gained long temporal memory from spectral-index and mul
 2. Complementary observing systems and sparse-to-dense monitoring framework.
 3. Compact European forest proof-of-concept.
 4. Trait anomalies for stress, resistance, recovery and legacy effects.
-5. Roadmap and reporting contract for credible functional ecosystem monitoring.
+5. Five principles and roadmap for credible functional ecosystem monitoring.
 
 ## Key references and why they matter
 

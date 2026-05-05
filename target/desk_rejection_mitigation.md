@@ -23,7 +23,7 @@ Mitigation:
 - Emphasize the shift from trait snapshots to functional time series.
 - Make clear that trait retrieval remains essential and active; the Perspective adds the monitoring layer that connects retrievals to dense archives.
 - Use key references selectively to establish maturity and limits, rather than reviewing all retrieval methods.
-- Keep the central novelty as the measurement contract: trait definition, uncertainty, provenance, domain masks and ecological validation.
+- Keep the central novelty as five principles for functional time series: anchoring, temporal carriers, observed/anchored/inferred/complemented variables, uncertainty/domain limits and ecological validation.
 
 ## Risk 4: The paper overclaims what hyperspectral imagery can measure
 
@@ -40,6 +40,7 @@ Mitigation:
 - Keep Figures 2-5 in consistent Nature-style formatting.
 - Reduce figure text and make each figure answer one editorial question.
 - Use figure captions to reinforce the Perspective argument rather than describe technical details.
+- Treat any schematic time-series panel as product design unless real site-level data are supplied.
 
 ## Risk 6: The proposal does not match NREE submission expectations
 

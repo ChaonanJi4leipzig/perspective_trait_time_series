@@ -133,9 +133,9 @@ This measurement-system framing also changes how model complexity should be judg
 
 \section{A European forest proof-of-concept}
 
-The proof-of-concept should be presented as a concise demonstration of feasibility, not as the evidential centre of the manuscript. Its role is to make the Perspective tangible: sparse hyperspectral information can be linked to dense multispectral temporal context, evaluated trait by trait and used to expose both promise and failure modes. This is enough for a high-impact Perspective. The complete benchmark, including all 20 traits, cross-site generalization, uncertainty calibration and event case studies, should remain for a follow-up research paper.
+The proof-of-concept is a concise feasibility demonstration, not the evidential centre. Its role is to make the Perspective tangible: sparse hyperspectral information can be linked to dense multispectral temporal context, evaluated trait by trait and used to expose promise and failure modes. A complete benchmark with all 20 traits, cross-site generalization, uncertainty calibration and event case studies belongs in a follow-up research paper.
 
-This framing also protects the manuscript from overclaiming. The current results do not need to prove that operational trait monitoring is solved. They only need to show that the proposed observing strategy can be implemented with present Earth observation archives and that the output can be judged by ecological criteria. A strong proof-of-concept figure should therefore show three things: the trait set and testbed context, trait-specific predictive skill, and one interpretable time-series example with uncertainty or domain flags. The most useful message is not that every trait is already reconstructed well. It is that functional observables can be built, tested and reported honestly.
+This framing protects the manuscript from overclaiming. The current results need not prove that operational trait monitoring is solved. They only need to show that the observing strategy can be implemented with present Earth observation archives and judged by ecological criteria. The useful message is not that every trait is already reconstructed well. It is that functional observables can be built, tested and reported honestly.
 
 \noindent\fbox{%
 \begin{minipage}{0.94\textwidth}
@@ -147,7 +147,7 @@ Our current testbed links hyperspectral-derived trait labels with Sentinel-2 tem
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/generated/fig3_proof_of_concept_performance.pdf}
-\caption{\textbf{Proof-of-concept performance.} Early common-test evaluation for five hyperspectral-derived traits reconstructed from Sentinel-2 temporal context in a European forest testbed. Across 782 common test samples, random forest is the strongest of the tested baselines, with strongest skill for LAI and weaker performance for chlorophyll. The figure reports trait-specific predictive skill, normalized error and the gain of random forest over a linear model. These panels should be interpreted as feasibility evidence, not as an operational benchmark.}
+\caption{\textbf{Proof-of-concept performance and intended product form.} Early common-test evaluation for five hyperspectral-derived traits reconstructed from Sentinel-2 temporal context in a European forest testbed. Across 782 common test samples, random forest is the strongest tested baseline, with strongest skill for LAI and weaker performance for chlorophyll. Panels a--c report trait-specific predictive skill, normalized error and the gain of random forest over a linear model. Panel d is a schematic of the intended time-series product: sparse trait anchors, densified estimates, uncertainty and domain flags. These panels should be interpreted as feasibility evidence and product design, not as an operational benchmark.}
 \label{fig:proof_of_concept}
 \end{figure}
 
@@ -192,18 +192,14 @@ Validation should also move beyond pooled performance metrics. A single average 
 
 \noindent\fbox{%
 \begin{minipage}{0.94\textwidth}
-\textbf{Box 3. Minimum reporting standards for continuous functional observables.}
+\textbf{Box 3. Five principles for functional ecosystem time series.}
 
 \begin{itemize}
-\item Define each trait, unit and biological interpretation.
-\item Identify the source of trait anchors: field measurements, airborne imaging spectroscopy, spaceborne imaging spectroscopy, or derived products.
-\item Distinguish traits that are spectrally anchored from traits inferred through trait covariation, temporal context or structural covariates.
-\item Report the training domain by site, year, vegetation type, season, trait range and sensor.
-\item Describe temporal inputs, window length, gap handling and whether predictions are interpolation or extrapolation.
-\item Validate by site, year and trait, not only by pooled average metrics.
-\item Provide uncertainty estimates and domain-of-applicability masks.
-\item Report known failure modes, including cloud gaps, canopy saturation, management disturbance and species-composition shifts.
-\item Preserve provenance so users can distinguish observed anchors from reconstructed values.
+\item \textbf{Anchor traits with imaging spectroscopy.} Define each trait, unit and biological interpretation, and identify whether the anchor comes from field measurements, airborne imaging spectroscopy, spaceborne imaging spectroscopy or a derived product.
+\item \textbf{Use multispectral archives as temporal carriers.} Report temporal inputs, window length, gap handling and whether the product is densifying contemporary trait anchors or reconstructing trait-relevant states retrospectively.
+\item \textbf{Separate observed, anchored, inferred and complemented variables.} State which variables are directly observed optical signals, which traits are spectrally anchored, which are inferred through covariation or temporal context, and which structural dimensions require LiDAR, SAR or InSAR.
+\item \textbf{Make uncertainty and domain limits part of the product.} Report training domain by site, year, vegetation type, season, trait range and sensor, and provide uncertainty plus domain-of-applicability masks.
+\item \textbf{Validate ecological use, not only accuracy.} Evaluate by site, year, trait and disturbance context; preserve provenance so users can distinguish observed anchors from densified estimates and retrospective predictions.
 \end{itemize}
 \end{minipage}}
 

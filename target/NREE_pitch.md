@@ -18,7 +18,7 @@ Spaceborne imaging spectroscopy is entering an operational phase through PRISMA,
 
 ## What is new
 
-The manuscript does not review all hyperspectral methods. It treats trait retrieval as essential and active, then asks how retrieved trait snapshots can be organized into functional time series with uncertainty, provenance, domain-of-applicability masks and ecological validation. A key boundary is the distinction between spectrally anchored traits and traits inferred through trait covariation, temporal context, canopy state and ecological correlation.
+The manuscript does not review all hyperspectral methods. It treats trait retrieval as essential and active, then asks how retrieved trait snapshots can be organized into functional time series with uncertainty, provenance, domain-of-applicability masks and ecological validation. A key boundary is the distinction between spectrally anchored traits and traits inferred through trait covariation, temporal context, canopy state and ecological correlation. The transferable output is a set of five principles for credible functional ecosystem time series.
 
 ## Proof-of-concept role
 
@@ -30,4 +30,4 @@ A European forest testbed is included as a compact proof-of-concept showing earl
 2. Complementary observation systems and sparse-to-dense functional-observable framework.
 3. European forest proof-of-concept.
 4. Trait anomalies for resistance, recovery and legacy effects.
-5. Roadmap for functional ecosystem monitoring.
+5. Five principles and roadmap for functional ecosystem monitoring.
