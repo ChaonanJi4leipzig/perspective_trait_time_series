@@ -67,6 +67,8 @@ The next step is therefore not simply higher spatial resolution or more frequent
 
 However, a central gap remains. Field trait networks are ecologically rich but spatially sparse. Multispectral satellites are temporally dense but spectrally limited. Imaging spectroscopy is information-rich but temporally sparse. None of these observation systems alone provides the continuous functional records needed for ecological monitoring. The opportunity is to treat them as complementary parts of one observing system.
 
+This Perspective makes three claims. First, greenness-based monitoring is indispensable for detection but insufficient for diagnosing functional change. Second, imaging spectroscopy should be understood not only as a trait-retrieval technology, but as a source of functional anchors for ecological monitoring. Third, dense multispectral archives can provide the temporal carrier needed to transform sparse trait snapshots into continuous, uncertainty-aware functional observables. The novelty is therefore not another review of hyperspectral trait retrieval. It is a shift from retrieving traits at observation times to building ecological monitoring variables that can be used for stress attribution, recovery assessment, legacy-effect analysis and model evaluation.
+
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.88\textwidth]{figures/draft/fig1_spectra_original.png}
@@ -76,13 +78,13 @@ However, a central gap remains. Field trait networks are ecologically rich but s
 
 \section{Imaging spectroscopy makes function observable, but not continuous}
 
-Imaging spectroscopy matters because it records narrow, contiguous spectral bands that are sensitive to biochemical and structural properties of vegetation. This information can be translated into plant traits through empirical models, radiative transfer model inversion, hybrid physical-statistical approaches or machine learning. Multi-trait retrieval studies have shown that heterogeneous spectral and trait datasets can support transferable models for a suite of plant functional traits \cite{cherif2023spectra}. Curated community datasets and trait databases provide an expanding foundation for this work \cite{kattge2020try,mederer2025plant}.
+Imaging spectroscopy matters because it records narrow, contiguous spectral bands that are sensitive to biochemical and structural properties of vegetation. This information can be translated into plant traits through empirical models, radiative transfer model inversion, hybrid physical-statistical approaches or machine learning. Multi-trait retrieval studies have shown that heterogeneous spectral and trait datasets can support transferable models for a suite of plant functional traits \cite{cherif2023spectra}. Curated community datasets and trait databases provide an expanding foundation for this work \cite{kattge2020try,mederer2025plant,wu2026gsti}.
 
 Recent work also clarifies the limits of this promise. Transferability is not automatic. Models trained on one species set, plant functional type, season or region may fail elsewhere if the calibration domain does not cover the trait range, canopy structure or atmospheric conditions of application. Studies by Fujiang Ji and colleagues are useful here as objective field evidence, not as results from the proof-of-concept testbed described below. Their work on spectral-trait model transferability highlights that calibration diversity and domain awareness are central constraints for leaf trait estimation \cite{ji2024transferability}. Related transfer-learning approaches that combine radiative transfer model knowledge with field observations show how generalization may be improved \cite{ji2025transferlearning}. At canopy scale, recent PRISMA and NEON analyses indicate that spaceborne imaging spectroscopy can track seasonal variability in multiple plant traits across sites \cite{ji2025prisma}. Together, these studies suggest that the trait-anchor problem is becoming increasingly tractable, even though temporally continuous monitoring remains unresolved.
 
 These studies should be used in the manuscript as evidence of field maturity rather than as material to review exhaustively. They help establish a boundary condition for the Perspective: trait retrieval is no longer only a speculative aspiration, but neither is it a solved operational service. It is a rapidly improving capability that requires explicit attention to calibration domain, scale and uncertainty. That middle position is important. If the manuscript overstates retrieval reliability, the functional-monitoring argument will appear technologically naive. If it understates recent progress, the proposed monitoring framework will appear premature.
 
-This distinction is important for the framing of this Perspective. The central question is not whether imaging spectroscopy can retrieve traits. It increasingly can, with appropriate validation and domain constraints. The key question is how sparse trait retrievals can be embedded into continuous ecological time series. Current and upcoming missions such as PRISMA, EnMAP, EMIT, CHIME and the Surface Biology and Geology mission will expand the availability of imaging spectroscopy, but revisit frequency, clouds, tasking strategies and the short historical archive mean that hyperspectral imagery alone will not provide multi-decadal trait time series for most ecosystems.
+This distinction is important for the framing of this Perspective. The central question is not whether imaging spectroscopy can retrieve traits. It increasingly can, with appropriate validation and domain constraints. The key question is how sparse trait retrievals can be embedded into continuous ecological time series. Spaceborne imaging spectroscopy is now entering a more mature mission phase through PRISMA, EnMAP, EMIT and the planning of CHIME and the Surface Biology and Geology mission \cite{chabrillat2024enmap,nieke2018towards,cawse2021nasa}. These missions explicitly strengthen the observational basis for vegetation functional traits, but revisit frequency, clouds, tasking strategies and the short historical archive mean that hyperspectral imagery alone will not provide multi-decadal trait time series for most ecosystems.
 
 The highest ecological value of imaging spectroscopy may therefore be as a functional anchor. It can define what should be monitored: a set of physiologically interpretable traits with physical units and ecological meaning. Dense multispectral archives can then provide the temporal support needed to follow those variables between sparse hyperspectral observations.
 
@@ -94,12 +96,12 @@ There are two possible routes from sparse imaging spectroscopy to such observabl
 
 The distinction is practical as well as conceptual. A full reconstructed hyperspectral cube may be the right target when downstream users need spectra for multiple unknown future applications. Trait-level reconstruction is preferable when the scientific question is already framed in terms of vegetation function, disturbance response, biodiversity monitoring or model constraints. In this case, spectra are the measurement pathway rather than the final ecological variable. The model can be trained and evaluated around the traits that matter, and uncertainty can be expressed in the units that users interpret.
 
-In this framework, imaging spectroscopy supplies sparse but information-rich trait anchors. Sentinel-2, Landsat and related archives supply dense temporal carriers. Climate reanalysis, topography, land cover and disturbance data can provide contextual covariates. Models then learn the relationship between temporal multispectral context and hyperspectral-derived trait labels, while preserving the distinction between observed trait anchors, reconstructed trait estimates and extrapolated predictions outside the training domain.
+In this framework, imaging spectroscopy supplies sparse but information-rich trait anchors. Sentinel-2, Landsat and related archives supply dense temporal carriers. Recent Sentinel-2 trait and phenology studies already show that multispectral temporal context contains useful trait information \cite{liu2024spectraphenology}; the unresolved challenge is to make such reconstructions explicitly anchored, validated and uncertainty-aware. Climate reanalysis, topography, land cover and disturbance data can provide contextual covariates. Models then learn the relationship between temporal multispectral context and hyperspectral-derived trait labels, while preserving the distinction between observed trait anchors, reconstructed trait estimates and extrapolated predictions outside the training domain.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.88\textwidth]{figures/draft/fig2_sparse_dense_original.png}
-\caption{\textbf{Sparse-to-dense framework for continuous functional observables.} Imaging spectroscopy provides sparse, information-rich trait anchors, while multispectral archives provide dense temporal support. The goal is not necessarily to reconstruct full hyperspectral spectra at every date, but to reconstruct ecologically interpretable trait variables with uncertainty and provenance. This draft figure is carried over from the original manuscript package and should be redesigned before submission.}
+\includegraphics[width=\textwidth]{figures/generated/fig2_functional_observables_framework.pdf}
+\caption{\textbf{Sparse-to-dense framework for continuous functional observables.} Field traits, imaging spectroscopy and multispectral time series each solve only part of the monitoring problem. Continuous functional observables combine their strengths by using imaging spectroscopy as a source of trait anchors, dense multispectral records as temporal carriers and an explicit measurement contract that records trait definitions, training domain, validation design, uncertainty and provenance.}
 \label{fig:framework}
 \end{figure}
 
@@ -117,21 +119,13 @@ This framing also protects the manuscript from overclaiming. The current results
 \begin{minipage}{0.94\textwidth}
 \textbf{Box 1. A European forest proof-of-concept.}
 
-Our current testbed is developing an end-to-end pipeline for reconstructing plant trait time series by linking hyperspectral-derived trait labels with Sentinel-2 temporal observations across European forest sites. The broader analysis can target a suite of 20 hyperspectral-derived traits. For this Perspective, the proof-of-concept should highlight a smaller illustrative subset spanning canopy structure, pigments, nutrients, leaf economics and carbon-related traits, rather than presenting a complete benchmark. In an early common-test evaluation, five such traits were examined: LMA, nitrogen, LAI, chlorophyll and lignin. Across 782 common test samples, a random forest model currently performs best among the tested linear regression, random forest, multilayer perceptron and transformer baselines. Its mean test $R^2$ across these five traits is approximately 0.39, with mean normalized RMSE of 11.37\%. LAI is the strongest early case ($R^2 \approx 0.63$, normalized RMSE $\approx 10.53\%$), while chlorophyll and lignin remain more uncertain. Relative to a linear baseline, random forest improves $R^2$ by approximately 0.09--0.26 depending on the trait. These results demonstrate implementability, not operational readiness. Their main value in this Perspective is to show that the sparse-to-dense idea can already be implemented and tested with existing Earth observation archives, while preserving trait-specific uncertainty and failure modes.
+Our current testbed is developing an end-to-end pipeline for reconstructing plant trait time series by linking hyperspectral-derived trait labels with Sentinel-2 temporal observations across European forest sites. The broader analysis can target a suite of 20 hyperspectral-derived traits. For this Perspective, the proof-of-concept highlights five illustrative traits spanning canopy structure, pigments, nutrients, leaf economics and carbon-related traits: LAI, chlorophyll, nitrogen, LMA and lignin. The point is not to present a complete benchmark. It is to show that sparse-to-dense functional monitoring can be implemented with existing Earth observation archives and evaluated trait by trait. The results are strongest for LAI, intermediate for LMA, nitrogen and lignin, and weaker for chlorophyll. This trait-specific pattern is scientifically useful because it demonstrates why continuous functional observables must be distributed with uncertainty, provenance and domain-of-applicability information rather than as visually authoritative maps alone.
 \end{minipage}}
 
 \begin{figure}[t]
 \centering
-\begin{minipage}{0.48\textwidth}
-\centering
-\includegraphics[width=\textwidth]{figures/draft/fig3_proof_of_concept_performance_heatmap.png}
-\end{minipage}
-\hfill
-\begin{minipage}{0.48\textwidth}
-\centering
-\includegraphics[width=\textwidth]{figures/draft/fig3_proof_of_concept_lai_reconstruction.png}
-\end{minipage}
-\caption{\textbf{Proof-of-concept placeholders.} Left: early common-test performance for five hyperspectral-derived traits reconstructed from Sentinel-2 temporal context in a European forest testbed. Right: an example LAI reconstruction. These panels use existing draft outputs and should be redrawn for the final target journal, with smaller typography, clearer captions, geographic context and uncertainty information.}
+\includegraphics[width=\textwidth]{figures/generated/fig3_proof_of_concept_performance.pdf}
+\caption{\textbf{Proof-of-concept performance.} Early common-test evaluation for five hyperspectral-derived traits reconstructed from Sentinel-2 temporal context in a European forest testbed. Across 782 common test samples, random forest is the strongest of the tested baselines, with strongest skill for LAI and weaker performance for chlorophyll. The figure reports trait-specific predictive skill, normalized error and the gain of random forest over a linear model. These panels should be interpreted as feasibility evidence, not as an operational benchmark.}
 \label{fig:proof_of_concept}
 \end{figure}
 
@@ -159,14 +153,8 @@ This point is central for keeping the manuscript ecological rather than technolo
 
 \begin{figure}[t]
 \centering
-\fbox{\begin{minipage}{0.88\textwidth}
-\vspace{0.35cm}
-\textbf{Planned Figure 4: trait anomalies for disturbance ecology.}
-
-This figure should show multi-trait trajectories before, during and after an event such as drought or heatwave. The draft should mark resistance, recovery slope and legacy effect. If a robust drought example is available from the current testbed, this should become a data-driven figure; otherwise it can remain conceptual for the Perspective version.
-\vspace{0.35cm}
-\end{minipage}}
-\caption{\textbf{Trait anomalies as ecological response metrics.} Planned conceptual or data-driven figure linking trait time series to stress syndromes, resistance, recovery and legacy effects.}
+\includegraphics[width=\textwidth]{figures/generated/fig4_trait_anomaly_syndromes.pdf}
+\caption{\textbf{Trait anomalies as ecological response metrics.} Multi-trait time series can separate stress pathways that would be collapsed in a single greenness anomaly. Conceptual trajectories illustrate how water-related traits, chlorophyll, LAI, nitrogen and LMA could respond with different timing, resistance, recovery and legacy effects. The state-space panel emphasizes that apparent greenness recovery need not imply functional recovery.}
 \label{fig:anomalies}
 \end{figure}
 
@@ -208,20 +196,14 @@ For the current manuscript, this roadmap implies a staged publication strategy. 
 
 \begin{figure}[t]
 \centering
-\fbox{\begin{minipage}{0.88\textwidth}
-\vspace{0.35cm}
-\textbf{Planned Figure 5: roadmap for functional ecosystem monitoring.}
-
-Suggested layers: missions and field networks; trait-anchor retrieval; temporal reconstruction; uncertainty and domain masks; ecological indicators; users in modelling, conservation and climate adaptation.
-\vspace{0.35cm}
-\end{minipage}}
-\caption{\textbf{A roadmap from spectral observations to ecological monitoring.} Planned synthesis figure for the final Perspective version.}
+\includegraphics[width=\textwidth]{figures/generated/fig5_monitoring_roadmap.pdf}
+\caption{\textbf{A roadmap from spectral observations to ecological monitoring.} The transition from mission-driven spectral products to ecology-facing functional monitoring requires open spectra-trait-time benchmarks, cross-mission harmonization, calibrated uncertainty and domain masks, and explicit links to climate drivers, flux towers, field networks, ecosystem models and user needs.}
 \label{fig:roadmap}
 \end{figure}
 
 \section{Conclusion}
 
-The next generation of ecosystem monitoring should not ask only whether vegetation is greener or browner. It should ask which functional dimensions are changing, when they change, whether they recover and how confidently they can be interpreted. Imaging spectroscopy makes plant function observable from space, but its ecological value will depend on whether sparse observations can be transformed into continuous, validated and uncertainty-aware trait time series. Dense multispectral archives provide the temporal carrier for this transformation. The task ahead is to make these functional observables scientifically credible: anchored in spectral-trait evidence, explicit about uncertainty, validated across ecological contexts and designed around the questions that ecologists, modellers and decision-makers need to answer.
+The next generation of ecosystem monitoring should not ask only whether vegetation is greener or browner. It should ask which functional dimensions are changing, when they change, whether they recover and how confidently they can be interpreted. Imaging spectroscopy makes plant function observable from space, but its ecological value will depend on whether sparse observations can be transformed into continuous, validated and uncertainty-aware trait time series. Dense multispectral archives provide the temporal carrier for this transformation. The practical target is clear: monitoring systems should report trait anomalies, uncertainty, provenance and domain flags alongside greenness anomalies. The task ahead is to make these functional observables scientifically credible: anchored in spectral-trait evidence, explicit about uncertainty, validated across ecological contexts and designed around the questions that ecologists, modellers and decision-makers need to answer.
 
 \bmhead{Acknowledgements}
 Funding and project acknowledgements should be finalized before submission. Draft acknowledgement: the authors acknowledge support from the relevant MSCA and TEE Cube research context. This text should be checked against grant and journal requirements.
