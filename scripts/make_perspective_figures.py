@@ -81,21 +81,28 @@ def fig2_framework():
     ax1 = fig.add_subplot(gs[0, 0])
     ax2 = fig.add_subplot(gs[0, 1])
 
-    systems = ["Field traits", "Imaging\nspectroscopy", "Sentinel-2 /\nLandsat", "Functional\nobservables"]
-    dims = ["Trait\nmeaning", "Spectral\ninfo", "Temporal\nrecords", "Spatial\ncoverage", "Uncertainty\ntrace"]
+    systems = [
+        "Field traits",
+        "Imaging\nspectroscopy",
+        "LiDAR / SAR /\nInSAR",
+        "Sentinel-2 /\nLandsat",
+        "Functional\nobservables",
+    ]
+    dims = ["Meaning", "Spectral", "3D", "Temporal", "Spatial", "Uncert."]
     values = np.array(
         [
-            [5, 2, 1, 1, 4],
-            [4, 5, 2, 3, 3],
-            [2, 2, 5, 5, 3],
-            [5, 4, 4, 4, 5],
+            [5, 2, 2, 1, 1, 4],
+            [4, 5, 2, 2, 3, 3],
+            [3, 1, 5, 3, 3, 4],
+            [2, 2, 2, 5, 5, 3],
+            [5, 4, 5, 4, 4, 5],
         ]
     )
     cmap = LinearSegmentedColormap.from_list(
         "functional", ["#f7f3e8", "#d2e5cf", "#7bb6a4", "#2f6f73"]
     )
     im = ax1.imshow(values, vmin=1, vmax=5, cmap=cmap, aspect="auto")
-    ax1.set_xticks(np.arange(len(dims)), dims)
+    ax1.set_xticks(np.arange(len(dims)), dims, rotation=25, ha="right")
     ax1.set_yticks(np.arange(len(systems)), systems)
     ax1.tick_params(length=0)
     for i in range(values.shape[0]):
@@ -116,15 +123,17 @@ def fig2_framework():
 
     boxes = {
         "spectra": ((0.05, 0.68), (0.24, 0.16), "Sparse imaging\nspectroscopy\ntrait anchors", "#d9e8f5"),
-        "time": ((0.05, 0.31), (0.24, 0.16), "Dense multispectral\ntime series", "#e8efd3"),
-        "model": ((0.38, 0.50), (0.24, 0.18), "Temporal\nreconstruction\nmodel", "#f4dfc5"),
+        "structure": ((0.05, 0.43), (0.24, 0.14), "LiDAR / SAR / InSAR\nstructure covariates", "#e7e0d0"),
+        "time": ((0.05, 0.20), (0.24, 0.16), "Dense multispectral\ntime series", "#e8efd3"),
+        "model": ((0.38, 0.48), (0.24, 0.18), "Temporal\nreconstruction\nmodel", "#f4dfc5"),
         "unc": ((0.68, 0.50), (0.25, 0.18), "Trait estimates\n+ uncertainty\n+ provenance", "#d9eadf"),
         "eco": ((0.68, 0.18), (0.25, 0.16), "Stress, recovery\nand legacy\nmetrics", "#eadce8"),
     }
     for xy, wh, label, color in boxes.values():
         add_box(ax2, xy, wh, label, color)
     arrow(ax2, (0.29, 0.76), (0.38, 0.60))
-    arrow(ax2, (0.29, 0.39), (0.38, 0.57))
+    arrow(ax2, (0.29, 0.50), (0.38, 0.56))
+    arrow(ax2, (0.29, 0.28), (0.38, 0.55))
     arrow(ax2, (0.62, 0.59), (0.68, 0.59))
     arrow(ax2, (0.80, 0.50), (0.80, 0.34))
     ax2.text(0.50, 0.87, "measurement contract", ha="center", fontweight="bold", color="#374b5c")
