@@ -2,30 +2,32 @@
 
 Dear Editors,
 
-We would like to inquire whether the proposed Perspective, **"From greenness to function in ecosystem monitoring"**, may be suitable for consideration in *Nature Reviews Earth & Environment*.
+We would like to ask whether the proposed Perspective, **"From greenness to function in ecosystem monitoring"**, would be of interest to *Nature Reviews Earth & Environment*.
 
-Ecosystem monitoring has become increasingly continuous in space and time, yet much operational interpretation still relies on greenness and structural proxies. These variables are invaluable, but they often conflate canopy structure, pigment dynamics, water limitation, phenology and viewing geometry. At the same time, imaging spectroscopy is making plant functional traits observable from space, while multispectral missions provide dense temporal archives. Our Perspective argues that the next step is to move from spectral snapshots to functional ecosystem monitoring by building continuous, uncertainty-aware functional observables anchored by sparse imaging spectroscopy and carried through time by dense multispectral records.
+Operational ecosystem monitoring has become increasingly continuous in space and time, but much of its ecological interpretation still rests on greenness and broad structural proxies. These variables are indispensable, yet they often conflate pigment dynamics, canopy state, water limitation, phenology, disturbance history and viewing geometry. At the same time, spaceborne imaging spectroscopy is entering a new phase through PRISMA, EnMAP, EMIT and forthcoming CHIME/SBG-class missions, while Landsat and Sentinel-2 provide dense temporal archives. We argue that the next step is to move from spectral snapshots to functional ecosystem monitoring: continuous, uncertainty-aware functional observables that are anchored by imaging spectroscopy, reconstructed through time with dense multispectral records and interpreted using explicit ecological guardrails.
 
-The manuscript is not intended as a broad literature review of hyperspectral remote sensing. Instead, it develops a forward-looking framework for trait-based ecosystem monitoring. We focus on four conceptual contributions:
+The manuscript is not a literature review of hyperspectral remote sensing and is not a case-study paper. It is a forward-looking Perspective that defines what would make trait-enabled ecosystem monitoring scientifically credible. Its central contribution is a measurement framework that distinguishes traits that are directly or strongly anchored by spectroscopy from traits that are inferred through trait covariation, temporal context, canopy state and ecological correlation. It also makes explicit that canopy structure should be constrained by complementary observations such as LiDAR, SAR and InSAR rather than implied as a direct hyperspectral product.
 
-1. why ecosystem monitoring needs functional observables beyond greenness;
-2. how imaging spectroscopy can provide trait anchors while multispectral archives provide temporal support;
-3. how continuous functional observables could enable stress-syndrome attribution, resistance, recovery, legacy-effect analysis and dynamic functional diversity monitoring;
-4. which guardrails are needed for operational products, including uncertainty reporting, domain-of-applicability masks and validation across sites, years and ecological contexts.
+We develop four main ideas:
 
-An early European forest proof-of-concept is included only as an illustration that the sparse-to-dense framework is technically implementable with current Earth observation archives. It is not presented as a complete benchmark or as the main contribution of the article. The broader argument is global and conceptual: continuous functional observables could provide a route from spectral snapshots to functional ecosystem monitoring as PRISMA, EnMAP, EMIT, CHIME and SBG expand the imaging-spectroscopy record.
+1. ecosystem monitoring needs functional observables that go beyond greenness anomalies;
+2. imaging spectroscopy is best framed as a trait-anchor system, while multispectral archives provide temporal continuity and LiDAR/SAR/InSAR constrain structural state;
+3. continuous functional observables could support stress-syndrome attribution, resistance, recovery, legacy-effect analysis, dynamic functional diversity and Earth-system model evaluation;
+4. operational products need a reporting contract, including trait definitions, uncertainty calibration, provenance, domain-of-applicability masks and validation across sites, years and ecological contexts.
 
-We believe the manuscript is timely for *Nature Reviews Earth & Environment* because the field is approaching a transition from mission-driven spectral data products to ecology-facing functional monitoring products. The article would speak to remote sensing scientists, ecologists, Earth system modellers and environmental monitoring communities.
+An early European forest proof-of-concept is included only to show that the sparse-to-dense framework is technically implementable with current Earth observation archives. It is presented as an illustration, not as a complete benchmark or as the main claim of the manuscript. The broader argument is global and conceptual.
 
-The planned article length is approximately 3,500--4,500 words, with four to five figures:
+We believe this article would be timely for *Nature Reviews Earth & Environment* because the field is approaching a transition from mission-driven spectral data products to ecology-facing functional monitoring products. The article would speak to remote sensing scientists, ecologists, Earth-system modellers and environmental monitoring communities.
+
+The planned article length is approximately 4,000--4,500 words, with five display items:
 
 1. the conceptual shift from greenness proxies to functional observables;
-2. the sparse-to-dense framework for continuous functional observables;
+2. a complementary-observation framework linking imaging spectroscopy, LiDAR/SAR/InSAR and dense multispectral archives;
 3. a compact European forest proof-of-concept;
 4. trait anomalies for stress, resistance, recovery and legacy effects;
-5. a roadmap for functional ecosystem monitoring.
+5. a roadmap and reporting contract for credible functional ecosystem monitoring.
 
-We would be grateful for your advice on whether this Perspective would be of interest to the journal.
+We would be grateful for your advice on whether this proposed Perspective fits the scope and commissioning priorities of the journal.
 
 Sincerely,
 

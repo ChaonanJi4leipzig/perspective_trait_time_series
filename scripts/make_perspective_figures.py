@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -11,18 +12,53 @@ ROOT = Path(__file__).resolve().parents[1]
 FIG_DIR = ROOT / "figures" / "generated"
 TABLE_DIR = ROOT / "tables"
 
+FIG_W_DOUBLE = 183 / 25.4
+FIG_H_MAX = 170 / 25.4
+
+FS_PANEL = 8.0
+FS_AXIS = 8.0
+FS_TICK = 7.0
+FS_TITLE = 7.0
+FS_LEG = 7.0
+FS_NOTE = 7.0
+
+AXIS_LW = 0.5
+REF_LW = 0.5
+FIT_LW = 1.0
+
+BLACK = "#000000"
+ORANGE = "#E69F00"
+SKY = "#56B4E9"
+GREEN = "#009E73"
+YELLOW = "#F0E442"
+BLUE = "#0072B2"
+VERMILION = "#D55E00"
+PURPLE = "#CC79A7"
+GREY = "#666666"
+LIGHT_GREY = "#D9D9D9"
+
 
 def setup():
     FIG_DIR.mkdir(parents=True, exist_ok=True)
+    mpl.rcParams["pdf.fonttype"] = 42
+    mpl.rcParams["ps.fonttype"] = 42
+    mpl.rcParams["svg.fonttype"] = "none"
     plt.rcParams.update(
         {
-            "font.family": "DejaVu Sans",
-            "font.size": 8,
-            "axes.titlesize": 9,
-            "axes.labelsize": 8,
-            "xtick.labelsize": 7,
-            "ytick.labelsize": 7,
-            "legend.fontsize": 7,
+            "font.family": "sans-serif",
+            "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans"],
+            "font.size": FS_AXIS,
+            "axes.titlesize": FS_TITLE,
+            "axes.labelsize": FS_AXIS,
+            "xtick.labelsize": FS_TICK,
+            "ytick.labelsize": FS_TICK,
+            "legend.fontsize": FS_LEG,
+            "axes.grid": False,
+            "axes.linewidth": AXIS_LW,
+            "xtick.major.width": AXIS_LW,
+            "ytick.major.width": AXIS_LW,
+            "xtick.major.size": 3.0,
+            "ytick.major.size": 3.0,
             "figure.dpi": 180,
             "savefig.dpi": 300,
             "axes.spines.top": False,
@@ -31,18 +67,49 @@ def setup():
     )
 
 
-def save(fig, name):
-    fig.savefig(FIG_DIR / f"{name}.png", bbox_inches="tight")
-    fig.savefig(FIG_DIR / f"{name}.pdf", bbox_inches="tight")
+def style_axis(ax, keep_all_spines=False):
+    if keep_all_spines:
+        for spine in ax.spines.values():
+            spine.set_visible(True)
+            spine.set_linewidth(AXIS_LW)
+    else:
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.spines["left"].set_linewidth(AXIS_LW)
+        ax.spines["bottom"].set_linewidth(AXIS_LW)
+    ax.tick_params(axis="both", labelsize=FS_TICK, width=AXIS_LW, length=3)
+    ax.grid(False)
+
+
+def panel_label(ax, letter, x=0.0, y=1.02):
+    ax.text(
+        x,
+        y,
+        letter,
+        transform=ax.transAxes,
+        ha="left",
+        va="bottom",
+        fontsize=FS_PANEL,
+        fontweight="bold",
+        color=BLACK,
+    )
+
+
+def save_publication_figure(fig, stem):
+    FIG_DIR.mkdir(parents=True, exist_ok=True)
+    for ext in ("pdf", "svg", "eps"):
+        fig.savefig(FIG_DIR / f"{stem}.{ext}", bbox_inches="tight")
+    fig.savefig(FIG_DIR / f"{stem}.jpg", dpi=300, bbox_inches="tight")
+    fig.savefig(FIG_DIR / f"{stem}.png", dpi=300, bbox_inches="tight")
     plt.close(fig)
 
 
-def add_box(ax, xy, wh, text, fc, ec="#2f3a45", lw=0.9, fontsize=8):
+def add_box(ax, xy, wh, text, fc, ec=BLACK, lw=AXIS_LW, fontsize=FS_NOTE):
     patch = FancyBboxPatch(
         xy,
         wh[0],
         wh[1],
-        boxstyle="round,pad=0.018,rounding_size=0.025",
+        boxstyle="round,pad=0.012,rounding_size=0.018",
         facecolor=fc,
         edgecolor=ec,
         linewidth=lw,
@@ -55,19 +122,19 @@ def add_box(ax, xy, wh, text, fc, ec="#2f3a45", lw=0.9, fontsize=8):
         ha="center",
         va="center",
         fontsize=fontsize,
-        color="#14212b",
-        linespacing=1.2,
+        color=BLACK,
+        linespacing=1.15,
     )
     return patch
 
 
-def arrow(ax, start, end, color="#405466", rad=0.0, lw=1.1):
+def arrow(ax, start, end, color=BLACK, rad=0.0, lw=AXIS_LW):
     ax.add_patch(
         FancyArrowPatch(
             start,
             end,
             arrowstyle="-|>",
-            mutation_scale=10,
+            mutation_scale=8,
             linewidth=lw,
             color=color,
             connectionstyle=f"arc3,rad={rad}",
@@ -75,9 +142,13 @@ def arrow(ax, start, end, color="#405466", rad=0.0, lw=1.1):
     )
 
 
+def figure_title(ax, text):
+    ax.set_title(text, loc="left", fontsize=FS_TITLE, fontweight="normal", pad=5)
+
+
 def fig2_framework():
-    fig = plt.figure(figsize=(8.0, 4.2))
-    gs = fig.add_gridspec(1, 2, width_ratios=[1.05, 1.35], wspace=0.34)
+    fig = plt.figure(figsize=(FIG_W_DOUBLE, 3.65))
+    gs = fig.add_gridspec(1, 2, width_ratios=[1.00, 1.35], wspace=0.30)
     ax1 = fig.add_subplot(gs[0, 0])
     ax2 = fig.add_subplot(gs[0, 1])
 
@@ -98,52 +169,47 @@ def fig2_framework():
             [5, 4, 5, 4, 4, 5],
         ]
     )
-    cmap = LinearSegmentedColormap.from_list(
-        "functional", ["#f7f3e8", "#d2e5cf", "#7bb6a4", "#2f6f73"]
-    )
+    cmap = LinearSegmentedColormap.from_list("functional", ["#F6F6F6", "#CFE5D8", "#7CC4B0", BLUE])
     im = ax1.imshow(values, vmin=1, vmax=5, cmap=cmap, aspect="auto")
     ax1.set_xticks(np.arange(len(dims)), dims, rotation=25, ha="right")
     ax1.set_yticks(np.arange(len(systems)), systems)
     ax1.tick_params(length=0)
     for i in range(values.shape[0]):
         for j in range(values.shape[1]):
-            ax1.text(j, i, str(values[i, j]), ha="center", va="center", color="#1f2a33")
-    ax1.set_title("Complementary observations", loc="left", fontweight="bold")
-    for spine in ax1.spines.values():
-        spine.set_visible(False)
-    cbar = fig.colorbar(im, ax=ax1, fraction=0.046, pad=0.04)
+            ax1.text(j, i, str(values[i, j]), ha="center", va="center", fontsize=FS_TICK, color=BLACK)
+    figure_title(ax1, "Complementary observations")
+    style_axis(ax1, keep_all_spines=True)
+    cbar = fig.colorbar(im, ax=ax1, fraction=0.040, pad=0.03)
     cbar.set_ticks([1, 3, 5])
     cbar.set_ticklabels(["Low", "Medium", "High"])
-    cbar.outline.set_visible(False)
+    cbar.ax.tick_params(labelsize=FS_TICK, width=AXIS_LW, length=3)
+    cbar.outline.set_linewidth(AXIS_LW)
+    panel_label(ax1, "a", x=-0.38, y=1.10)
 
     ax2.set_xlim(0, 1)
     ax2.set_ylim(0, 1)
     ax2.axis("off")
-    ax2.set_title("Sparse-to-dense monitoring", loc="left", fontweight="bold")
-
+    figure_title(ax2, "Sparse-to-dense monitoring")
     boxes = {
-        "spectra": ((0.05, 0.68), (0.24, 0.16), "Sparse imaging\nspectroscopy\ntrait anchors", "#d9e8f5"),
-        "structure": ((0.05, 0.43), (0.24, 0.14), "LiDAR / SAR / InSAR\nstructure covariates", "#e7e0d0"),
-        "time": ((0.05, 0.20), (0.24, 0.16), "Dense multispectral\ntime series", "#e8efd3"),
-        "model": ((0.38, 0.48), (0.24, 0.18), "Temporal\nreconstruction\nmodel", "#f4dfc5"),
-        "unc": ((0.68, 0.50), (0.25, 0.18), "Trait estimates\n+ uncertainty\n+ provenance", "#d9eadf"),
-        "eco": ((0.68, 0.18), (0.25, 0.16), "Stress, recovery\nand legacy\nmetrics", "#eadce8"),
+        "spectra": ((0.03, 0.68), (0.23, 0.14), "Imaging\nspectroscopy\ntrait anchors", "#DCEAF6"),
+        "structure": ((0.03, 0.44), (0.23, 0.13), "LiDAR/SAR/InSAR\n3D covariates", "#E8E4D6"),
+        "time": ((0.03, 0.22), (0.23, 0.14), "Multispectral\ntime series", "#E6EFD5"),
+        "model": ((0.38, 0.47), (0.20, 0.18), "Temporal\nreconstruction", "#F2DEC3"),
+        "unc": ((0.70, 0.50), (0.24, 0.15), "Trait estimates\nuncertainty\nprovenance", "#DCECDF"),
+        "eco": ((0.70, 0.20), (0.24, 0.13), "Stress, recovery,\nlegacy metrics", "#E8DCE8"),
     }
     for xy, wh, label, color in boxes.values():
-        add_box(ax2, xy, wh, label, color)
-    arrow(ax2, (0.29, 0.76), (0.38, 0.60))
-    arrow(ax2, (0.29, 0.50), (0.38, 0.56))
-    arrow(ax2, (0.29, 0.28), (0.38, 0.55))
-    arrow(ax2, (0.62, 0.59), (0.68, 0.59))
-    arrow(ax2, (0.80, 0.50), (0.80, 0.34))
-    ax2.text(0.50, 0.87, "measurement contract", ha="center", fontweight="bold", color="#374b5c")
-    ax2.plot([0.36, 0.95], [0.83, 0.83], color="#738899", lw=0.9)
-    for x, label in [(0.45, "definition"), (0.61, "domain"), (0.77, "validation"), (0.91, "flags")]:
-        ax2.text(x, 0.80, label, ha="center", color="#405466", fontsize=7)
-
-    fig.text(0.01, 0.98, "a", fontweight="bold", fontsize=11, va="top")
-    fig.text(0.43, 0.98, "b", fontweight="bold", fontsize=11, va="top")
-    save(fig, "fig2_functional_observables_framework")
+        add_box(ax2, xy, wh, label, color, fontsize=5.8)
+    arrow(ax2, (0.26, 0.75), (0.38, 0.57))
+    arrow(ax2, (0.26, 0.50), (0.38, 0.56))
+    arrow(ax2, (0.26, 0.29), (0.38, 0.55))
+    arrow(ax2, (0.58, 0.56), (0.70, 0.57))
+    arrow(ax2, (0.82, 0.50), (0.82, 0.33))
+    ax2.text(0.67, 0.87, "Measurement contract", ha="center", fontsize=FS_NOTE, fontweight="bold", color=BLACK)
+    ax2.plot([0.42, 0.94], [0.83, 0.83], color=BLACK, lw=AXIS_LW)
+    ax2.text(0.68, 0.79, "definition | domain | validation | flags", ha="center", color=BLACK, fontsize=6.0)
+    panel_label(ax2, "b", x=-0.30, y=1.10)
+    save_publication_figure(fig, "fig2_functional_observables_framework")
 
 
 def fig3_performance():
@@ -158,55 +224,54 @@ def fig3_performance():
     lin = df[df["model"] == "LinearRegression"].set_index("trait").loc[trait_order]
     delta = rf["r2"] - lin["r2"]
 
-    fig = plt.figure(figsize=(7.2, 4.4))
-    gs = fig.add_gridspec(2, 2, height_ratios=[1.05, 0.95], hspace=0.45, wspace=0.32)
+    fig = plt.figure(figsize=(FIG_W_DOUBLE, 4.15))
+    gs = fig.add_gridspec(2, 2, height_ratios=[1.0, 0.95], hspace=0.42, wspace=0.34)
     ax1 = fig.add_subplot(gs[0, :])
     ax2 = fig.add_subplot(gs[1, 0])
     ax3 = fig.add_subplot(gs[1, 1])
 
-    cmap = LinearSegmentedColormap.from_list(
-        "r2", ["#f6eee6", "#d7e6cf", "#8fc0a9", "#347c7b"]
-    )
+    cmap = LinearSegmentedColormap.from_list("r2", ["#F6F6F6", "#CFE5D8", "#7CC4B0", BLUE])
     im = ax1.imshow(r2.values, vmin=0, vmax=0.7, cmap=cmap, aspect="auto")
     ax1.set_xticks(np.arange(len(model_labels)), model_labels)
     ax1.set_yticks(np.arange(len(trait_order)), trait_order)
-    ax1.set_title("Trait- and model-specific skill", loc="left", fontweight="bold")
+    figure_title(ax1, "Trait- and model-specific skill")
     ax1.tick_params(length=0)
     for i in range(r2.shape[0]):
         for j in range(r2.shape[1]):
-            ax1.text(j, i, f"{r2.iloc[i, j]:.2f}", ha="center", va="center", color="#1f2a33")
-    for spine in ax1.spines.values():
-        spine.set_visible(False)
+            ax1.text(j, i, f"{r2.iloc[i, j]:.2f}", ha="center", va="center", fontsize=FS_TICK, color=BLACK)
+    style_axis(ax1, keep_all_spines=True)
     cb = fig.colorbar(im, ax=ax1, fraction=0.025, pad=0.02)
-    cb.set_label("$R^2$")
-    cb.outline.set_visible(False)
+    cb.set_label("$R^2$", fontsize=FS_AXIS)
+    cb.ax.tick_params(labelsize=FS_TICK, width=AXIS_LW, length=3)
+    cb.outline.set_linewidth(AXIS_LW)
+    panel_label(ax1, "a", x=-0.15, y=1.06)
 
-    colors = ["#2f6f73", "#5b8fb9", "#a76571", "#8c6bb1", "#c6893f"]
-    ax2.barh(trait_order, delta.loc[trait_order], color=colors)
-    ax2.axvline(0, color="#333333", lw=0.8)
-    ax2.set_xlabel(r"$\Delta R^2$ RF - Linear")
-    ax2.set_title("Gain over linear baseline", loc="left", fontweight="bold")
+    colors = [BLUE, SKY, VERMILION, PURPLE, ORANGE]
+    ax2.barh(trait_order, delta.loc[trait_order], color=colors, edgecolor=BLACK, linewidth=AXIS_LW)
+    ax2.axvline(0, color=BLACK, lw=REF_LW)
+    ax2.set_xlabel(r"$\Delta R^2$ (RF - linear)")
+    figure_title(ax2, "Gain over linear baseline")
     ax2.invert_yaxis()
     for y, val in enumerate(delta.loc[trait_order]):
-        ax2.text(val + 0.008, y, f"{val:.2f}", va="center", fontsize=7)
+        ax2.text(val + 0.006, y, f"{val:.2f}", va="center", fontsize=FS_NOTE, color=BLACK)
+    style_axis(ax2)
+    panel_label(ax2, "b", x=-0.15, y=1.06)
 
     x = np.arange(len(trait_order))
-    ax3.plot(x, rf["nrmse_pct"], marker="o", color="#2f6f73", lw=1.5, label="RF")
-    ax3.plot(x, nrmse["LinearRegression"], marker="s", color="#9a6b47", lw=1.1, label="Linear")
+    ax3.plot(x, rf["nrmse_pct"], marker="o", ms=3.6, color=BLUE, lw=FIT_LW, label="RF")
+    ax3.plot(x, nrmse["LinearRegression"], marker="s", ms=3.6, color=ORANGE, lw=FIT_LW, label="Linear")
     ax3.set_xticks(x, trait_order, rotation=35, ha="right")
     ax3.set_ylabel("nRMSE (%)")
-    ax3.set_title("Normalized error remains trait-specific", loc="left", fontweight="bold")
-    ax3.legend(frameon=False)
-    ax3.grid(axis="y", color="#d8d8d8", lw=0.6)
-
-    fig.text(0.01, 0.98, "a", fontweight="bold", fontsize=11, va="top")
-    fig.text(0.01, 0.45, "b", fontweight="bold", fontsize=11, va="top")
-    fig.text(0.52, 0.45, "c", fontweight="bold", fontsize=11, va="top")
-    save(fig, "fig3_proof_of_concept_performance")
+    figure_title(ax3, "Trait-specific normalized error")
+    ax3.legend(frameon=False, handlelength=1.4, labelspacing=0.3, fontsize=FS_LEG)
+    style_axis(ax3)
+    panel_label(ax3, "c", x=-0.14, y=1.06)
+    save_publication_figure(fig, "fig3_proof_of_concept_performance")
 
 
 def fig4_anomalies():
     t = np.arange(-4, 11)
+
     def logistic_drop(center, scale, depth):
         return -depth / (1 + np.exp(-(t - center) / scale))
 
@@ -218,100 +283,99 @@ def fig4_anomalies():
     lma = 0.12 * np.exp(-0.5 * ((t - 3) / 2.0) ** 2) + 0.08 * (t > 4)
 
     series = {
-        "Water trait": (water, "#3978a8"),
-        "Chlorophyll": (chl, "#3f8f5b"),
-        "LAI": (lai, "#7b5ba7"),
-        "Nitrogen": (nitrogen, "#b45b5b"),
-        "LMA": (lma, "#c18a35"),
+        "Water trait": (water, BLUE),
+        "Chlorophyll": (chl, GREEN),
+        "LAI": (lai, PURPLE),
+        "Nitrogen": (nitrogen, VERMILION),
+        "LMA": (lma, ORANGE),
     }
 
-    fig = plt.figure(figsize=(7.2, 4.2))
-    gs = fig.add_gridspec(1, 2, width_ratios=[1.45, 1.0], wspace=0.28)
+    fig = plt.figure(figsize=(FIG_W_DOUBLE, 4.05))
+    gs = fig.add_gridspec(1, 2, width_ratios=[1.45, 1.0], wspace=0.30)
     ax1 = fig.add_subplot(gs[0, 0])
     ax2 = fig.add_subplot(gs[0, 1])
 
-    ax1.axvspan(0, 3, color="#f1d2bf", alpha=0.55, lw=0)
-    ax1.axhline(0, color="#343434", lw=0.8)
+    ax1.axvspan(0, 3, color="#F8EEDB", lw=0)
+    ax1.axhline(0, color=BLACK, lw=REF_LW)
     for label, (y, color) in series.items():
-        ax1.plot(t, y, marker="o", ms=3, lw=1.4, label=label, color=color)
+        ax1.plot(t, y, marker="o", ms=3.2, lw=FIT_LW, label=label, color=color)
     ax1.set_xlabel("Time relative to event")
     ax1.set_ylabel("Trait anomaly")
-    ax1.set_title("Multi-trait anomalies separate stress pathways", loc="left", fontweight="bold")
-    ax1.text(1.5, 0.12, "disturbance", ha="center", color="#8a4f31", fontweight="bold")
-    ax1.annotate("resistance", xy=(1, -0.67), xytext=(-3.5, -0.62), arrowprops=dict(arrowstyle="->", lw=0.8), fontsize=7)
-    ax1.annotate("recovery", xy=(7, -0.26), xytext=(4.0, -0.80), arrowprops=dict(arrowstyle="->", lw=0.8), fontsize=7)
-    ax1.annotate("legacy", xy=(10, -0.18), xytext=(7.5, 0.18), arrowprops=dict(arrowstyle="->", lw=0.8), fontsize=7)
+    figure_title(ax1, "Multi-trait anomalies separate stress pathways")
+    ax1.text(1.5, 0.12, "disturbance", ha="center", color=BLACK, fontsize=FS_NOTE)
+    ax1.annotate("resistance", xy=(1, -0.67), xytext=(-3.5, -0.62), arrowprops=dict(arrowstyle="->", lw=REF_LW), fontsize=FS_NOTE)
+    ax1.annotate("recovery", xy=(7, -0.26), xytext=(4.0, -0.80), arrowprops=dict(arrowstyle="->", lw=REF_LW), fontsize=FS_NOTE)
+    ax1.annotate("legacy", xy=(10, -0.18), xytext=(7.5, 0.18), arrowprops=dict(arrowstyle="->", lw=REF_LW), fontsize=FS_NOTE)
     ax1.set_ylim(-0.9, 0.28)
-    ax1.legend(frameon=False, ncol=3, loc="upper center", bbox_to_anchor=(0.50, -0.13))
-    ax1.grid(axis="y", color="#dddddd", lw=0.6)
+    ax1.legend(frameon=False, ncol=3, loc="upper center", bbox_to_anchor=(0.50, -0.16), handlelength=1.4, labelspacing=0.3)
+    style_axis(ax1)
+    panel_label(ax1, "a", x=-0.12, y=1.06)
 
     states = {
-        "pre-event": (-0.05, -0.03, "#526d82"),
-        "stress": (-0.55, -0.42, "#b45b5b"),
-        "apparent\ngreenness\nrecovery": (-0.18, -0.48, "#c18a35"),
-        "functional\nrecovery": (-0.05, -0.10, "#3f8f5b"),
+        "pre-event": (-0.05, -0.03, GREY),
+        "stress": (-0.55, -0.42, VERMILION),
+        "apparent\ngreenness\nrecovery": (-0.18, -0.48, ORANGE),
+        "functional\nrecovery": (-0.05, -0.10, GREEN),
     }
-    ax2.axhline(0, color="#777777", lw=0.7)
-    ax2.axvline(0, color="#777777", lw=0.7)
+    ax2.axhline(0, color=BLACK, lw=REF_LW)
+    ax2.axvline(0, color=BLACK, lw=REF_LW)
     for label, (xv, yv, color) in states.items():
-        ax2.scatter(xv, yv, s=90, color=color, edgecolor="white", zorder=3)
-        ax2.text(xv + 0.03, yv + 0.03, label, fontsize=7, va="bottom")
-    arrow(ax2, states["pre-event"][:2], states["stress"][:2], "#606060")
-    arrow(ax2, states["stress"][:2], states["apparent\ngreenness\nrecovery"][:2], "#606060")
-    arrow(ax2, states["apparent\ngreenness\nrecovery"][:2], states["functional\nrecovery"][:2], "#606060")
+        ax2.scatter(xv, yv, s=28, color=color, edgecolor=BLACK, linewidth=AXIS_LW, zorder=3)
+        ax2.text(xv + 0.03, yv + 0.03, label, fontsize=FS_NOTE, va="bottom", color=BLACK)
+    arrow(ax2, states["pre-event"][:2], states["stress"][:2], GREY)
+    arrow(ax2, states["stress"][:2], states["apparent\ngreenness\nrecovery"][:2], GREY)
+    arrow(ax2, states["apparent\ngreenness\nrecovery"][:2], states["functional\nrecovery"][:2], GREY)
     ax2.set_xlim(-0.75, 0.25)
     ax2.set_ylim(-0.72, 0.18)
-    ax2.set_xlabel("Canopy structure anomaly")
+    ax2.set_xlabel("Greenness anomaly")
     ax2.set_ylabel("Biochemical anomaly")
-    ax2.set_title("Same greenness, different function", loc="left", fontweight="bold")
-
-    fig.text(0.01, 0.98, "a", fontweight="bold", fontsize=11, va="top")
-    fig.text(0.62, 0.98, "b", fontweight="bold", fontsize=11, va="top")
-    fig.subplots_adjust(bottom=0.20)
-    save(fig, "fig4_trait_anomaly_syndromes")
+    figure_title(ax2, "Same greenness, different function")
+    style_axis(ax2)
+    panel_label(ax2, "b", x=-0.14, y=1.06)
+    fig.subplots_adjust(bottom=0.22)
+    save_publication_figure(fig, "fig4_trait_anomaly_syndromes")
 
 
 def fig5_roadmap():
-    fig, ax = plt.subplots(figsize=(7.2, 4.1))
+    fig, ax = plt.subplots(figsize=(FIG_W_DOUBLE, 3.35))
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     ax.axis("off")
 
     columns = [
-        ("Observation\nsystems", 0.11, "#d9e8f5"),
-        ("Trait anchors", 0.27, "#e8efd3"),
-        ("Temporal\nreconstruction", 0.43, "#f4dfc5"),
-        ("Product\ncontract", 0.59, "#d9eadf"),
-        ("Ecological\nindicators", 0.75, "#eadce8"),
-        ("Users and\nmodels", 0.89, "#e8e2cf"),
+        ("Observation\nsystems", 0.11, "#DCEAF6"),
+        ("Trait anchors", 0.27, "#E6EFD5"),
+        ("Temporal\nreconstruction", 0.43, "#F2DEC3"),
+        ("Product\ncontract", 0.59, "#DCECDF"),
+        ("Ecological\nindicators", 0.75, "#E8DCE8"),
+        ("Users and\nmodels", 0.89, "#E8E4D6"),
     ]
-    y0, h, w = 0.58, 0.22, 0.12
+    y0, h, w = 0.57, 0.18, 0.12
     for label, x, color in columns:
-        add_box(ax, (x - w / 2, y0), (w, h), label, color, fontsize=7.5)
+        add_box(ax, (x - w / 2, y0), (w, h), label, color, fontsize=FS_NOTE)
     for i in range(len(columns) - 1):
         arrow(ax, (columns[i][1] + w / 2, y0 + h / 2), (columns[i + 1][1] - w / 2, y0 + h / 2))
 
     rows = [
-        ("Open spectra-trait-time benchmarks", 0.40, "#2f6f73"),
-        ("Cross-mission harmonization and sensor provenance", 0.31, "#5b8fb9"),
-        ("Uncertainty calibration and domain-of-applicability masks", 0.22, "#b45b5b"),
-        ("Links to climate drivers, flux towers and field networks", 0.13, "#8c6bb1"),
+        ("Open spectra-trait-time benchmarks", 0.40, BLUE),
+        ("Cross-mission harmonization and sensor provenance", 0.31, SKY),
+        ("Uncertainty calibration and domain-of-applicability masks", 0.22, VERMILION),
+        ("Links to climate drivers, flux towers and field networks", 0.13, PURPLE),
     ]
-    for text, y, color in rows:
-        ax.add_patch(Rectangle((0.08, y - 0.02), 0.025, 0.04, facecolor=color, edgecolor="none"))
-        ax.text(0.12, y, text, va="center", ha="left", fontsize=8)
-
-    ax.text(0.06, 0.91, "Roadmap from spectral data products to ecosystem insight", fontsize=11, fontweight="bold", ha="left")
+    ax.text(0.06, 0.88, "Roadmap from spectral data products to ecosystem insight", fontsize=FS_AXIS, fontweight="bold", ha="left", color=BLACK)
     ax.text(
         0.06,
-        0.85,
-        "The critical advance is not only more hyperspectral imagery, but a validated product chain that turns sparse trait anchors into usable monitoring variables.",
-        fontsize=8,
+        0.81,
+        "The critical advance is a validated product chain that turns sparse trait anchors into usable monitoring variables.",
+        fontsize=FS_NOTE,
         ha="left",
-        color="#394b59",
+        color=BLACK,
     )
-    ax.text(0.08, 0.49, "Minimum requirements for credibility", fontsize=9, fontweight="bold", ha="left")
-    save(fig, "fig5_monitoring_roadmap")
+    ax.text(0.08, 0.48, "Minimum requirements for credibility", fontsize=FS_AXIS, fontweight="bold", ha="left", color=BLACK)
+    for text, y, color in rows:
+        ax.add_patch(Rectangle((0.08, y - 0.015), 0.020, 0.030, facecolor=color, edgecolor=BLACK, linewidth=AXIS_LW))
+        ax.text(0.12, y, text, va="center", ha="left", fontsize=FS_NOTE, color=BLACK)
+    save_publication_figure(fig, "fig5_monitoring_roadmap")
 
 
 def main():
