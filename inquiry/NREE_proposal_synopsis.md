@@ -10,19 +10,19 @@ Perspective, approximately 4,000-4,500 words, five display items.
 
 ## Abstract
 
-Ecosystem monitoring is becoming continuous in space and time, but much ecological interpretation still relies on greenness and broad structural proxies. These indicators are indispensable for detecting change, yet they often conflate pigment dynamics, canopy state, water limitation, phenology, disturbance history and viewing geometry. We propose a Perspective on the transition from spectral snapshots to functional ecosystem monitoring. The core argument is that imaging spectroscopy should be treated as a source of plant functional trait anchors, not as a complete monitoring system on its own. Dense multispectral archives can provide temporal continuity, while LiDAR, SAR and InSAR should constrain canopy structure where three-dimensional information is needed. The resulting target is a set of continuous functional observables: spatially and temporally explicit trait estimates with uncertainty, provenance and domain-of-applicability information. The article will distinguish spectrally anchored traits from traits inferred through covariation, temporal context and ecological correlation. It will also show how such observables could support stress-syndrome attribution, resistance, recovery, legacy-effect analysis, dynamic functional diversity and Earth-system model evaluation. A compact European forest proof-of-concept will be used only as an illustrative demonstration, not as a case-study centrepiece.
+Ecosystem monitoring has gained long temporal memory from spectral-index and multispectral archives, but it still often lacks functional specificity. Greenness time series are indispensable for detecting vegetation change, phenology and disturbance, yet they rarely identify which functional dimensions changed or whether apparent recovery represents physiological recovery. Imaging spectroscopy is now making plant traits observable from space, and future CHIME/SBG-class missions will make trait observations more systematic. Yet long-term monitoring also depends on the existing archive: Sentinel-2 observations since 2015 and Landsat-era records extending through past decades. We propose a Perspective on moving from trait snapshots to functional time series. Hyperspectral trait retrievals should act as functional anchors, dense multispectral archives as temporal carriers, and LiDAR/SAR/InSAR as structural complements. The resulting target is a set of continuous, uncertainty-aware functional observables with provenance and domain-of-applicability information. The article will distinguish spectrally anchored traits from traits inferred through covariation, temporal context and ecological correlation. It will also show how such observables could support stress-syndrome attribution, resistance, recovery, legacy-effect analysis, dynamic functional diversity and Earth-system model evaluation. A compact European forest proof-of-concept will be used only as an illustrative demonstration, not as a case-study centrepiece.
 
 ## Proposed main sections
 
 1. **Greenness is not enough.** Why detection-oriented greenness monitoring is insufficient for functional diagnosis under climate extremes.
 2. **Imaging spectroscopy makes function observable, but not continuous.** What spectroscopy can and cannot directly constrain, including the boundary between biochemical trait anchors and structural information.
-3. **From spectral snapshots to continuous functional observables.** A sparse-to-dense framework that links imaging spectroscopy, multispectral time series, structural observations and uncertainty-aware product design.
+3. **From trait snapshots to functional time series.** A sparse-to-dense framework that links imaging spectroscopy, multispectral time series, structural observations and uncertainty-aware product design.
 4. **What continuous functional observables enable.** Stress syndromes, resistance, recovery, legacy effects, dynamic functional diversity and model benchmarking.
 5. **Guardrails and roadmap.** Reporting standards, domain-of-applicability masks, uncertainty calibration, ecological validation and open spectra-trait-time benchmarks.
 
 ## Display items
 
-1. Conceptual shift from greenness proxies to functional observables.
+1. From trait snapshots to functional time series.
 2. Complementary observing systems and sparse-to-dense monitoring framework.
 3. Compact European forest proof-of-concept.
 4. Trait anomalies for stress, resistance, recovery and legacy effects.
@@ -32,6 +32,8 @@ Ecosystem monitoring is becoming continuous in space and time, but much ecologic
 
 - Pettorelli et al.: establishes the ecological importance and limitations of satellite biodiversity and ecosystem monitoring.
 - Zeng et al.: summarizes the power and interpretive ambiguity of optical vegetation indices.
+- Smith et al. and Yan et al.: show the value of long optical archives for resilience and recovery analysis, while motivating more functionally specific observables.
+- Jetz et al., Schweiger et al. and Schweiger & Laliberté: establish the biodiversity and functional-diversity motivation for spectral trait monitoring.
 - Cavender-Bares et al.: frames spectral biology as a bridge between spectra and biological organization.
 - Cherif et al.: demonstrates transferable multi-trait modelling from heterogeneous spectra-trait data.
 - Mederer et al.: shows the importance of curated trait data for hyperspectral trait retrieval.

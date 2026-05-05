@@ -146,6 +146,80 @@ def figure_title(ax, text):
     ax.set_title(text, loc="left", fontsize=FS_TITLE, fontweight="normal", pad=5)
 
 
+def fig1_trait_snapshots_to_time_series():
+    fig = plt.figure(figsize=(FIG_W_DOUBLE, 4.45))
+    gs = fig.add_gridspec(2, 3, height_ratios=[0.85, 1.12], hspace=0.32, wspace=0.28)
+    axes = [fig.add_subplot(gs[0, i]) for i in range(3)]
+    ax_bottom = fig.add_subplot(gs[1, :])
+
+    panels = [
+        (
+            "Spectral-index archives",
+            "Long temporal memory\nLandsat + Sentinel-2\ncontinuity since past decades",
+            "Detect change, phenology\nand disturbance",
+            "#E6EFD5",
+        ),
+        (
+            "Imaging-spectroscopy traits",
+            "Functional specificity\nPRISMA, EnMAP, EMIT\nand future CHIME / SBG",
+            "Retrieve biochemical\nand optical trait snapshots",
+            "#DCEAF6",
+        ),
+        (
+            "Functional time series",
+            "Trait anchors + time carriers\n+ structural complements\n+ uncertainty contract",
+            "Monitor stress, recovery\nlegacy and model constraints",
+            "#DCECDF",
+        ),
+    ]
+    for i, (title, main, sub, color) in enumerate(panels):
+        ax = axes[i]
+        ax.set_xlim(0, 1)
+        ax.set_ylim(0, 1)
+        ax.axis("off")
+        panel_label(ax, chr(ord("a") + i), x=0.00, y=1.02)
+        ax.text(0.08, 1.02, title, ha="left", va="center", fontsize=FS_TITLE, color=BLACK)
+        add_box(ax, (0.08, 0.44), (0.84, 0.34), main, color, fontsize=6.2)
+        ax.text(0.50, 0.25, sub, ha="center", va="center", fontsize=FS_NOTE, color=BLACK, linespacing=1.12)
+        if i < 2:
+            arrow(ax, (0.94, 0.61), (1.12, 0.61), color=BLACK)
+
+    ax_bottom.set_xlim(0, 1)
+    ax_bottom.set_ylim(0, 1)
+    ax_bottom.axis("off")
+    ax_bottom.text(
+        0.04,
+        0.93,
+        "From trait snapshots to functional time series",
+        ha="left",
+        va="center",
+        fontsize=FS_TITLE,
+        color=BLACK,
+    )
+
+    y = 0.46
+    ax_bottom.plot([0.08, 0.92], [y, y], color=BLACK, lw=FIT_LW)
+    milestones = [
+        (0.10, "1980s+\nLandsat\nretrospective\ncontext", "#E6EFD5"),
+        (0.34, "2015+\nSentinel-2\ndense temporal\ncarrier", "#E6EFD5"),
+        (0.58, "Now\nspaceborne\ntrait anchors", "#DCEAF6"),
+        (0.82, "Next\nCHIME / SBG\nmore systematic\ntrait snapshots", "#DCEAF6"),
+    ]
+    for x, label, color in milestones:
+        ax_bottom.scatter(x, y, s=42, color=color, edgecolor=BLACK, linewidth=AXIS_LW, zorder=3)
+        ax_bottom.text(x, y + 0.11, label, ha="center", va="bottom", fontsize=5.8, linespacing=1.05)
+    add_box(
+        ax_bottom,
+        (0.19, 0.08),
+        (0.62, 0.18),
+        "Densify sparse hyperspectral trait retrievals\nand reconstruct trait-relevant functional states through existing archives",
+        "#F2DEC3",
+        fontsize=6.4,
+    )
+    arrow(ax_bottom, (0.50, 0.36), (0.50, 0.26), color=BLACK)
+    save_publication_figure(fig, "fig1_from_trait_snapshots_to_functional_time_series")
+
+
 def fig2_framework():
     fig = plt.figure(figsize=(FIG_W_DOUBLE, 3.65))
     gs = fig.add_gridspec(1, 2, width_ratios=[1.00, 1.35], wspace=0.30)
@@ -380,6 +454,7 @@ def fig5_roadmap():
 
 def main():
     setup()
+    fig1_trait_snapshots_to_time_series()
     fig2_framework()
     fig3_performance()
     fig4_anomalies()

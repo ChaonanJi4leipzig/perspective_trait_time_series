@@ -2,7 +2,7 @@
 
 ## Proposed title
 
-From spectral snapshots to functional ecosystem monitoring
+From trait snapshots to functional time series
 
 ## Article type
 
@@ -10,7 +10,7 @@ Perspective.
 
 ## Core argument
 
-Operational ecosystem monitoring needs functional variables that can inform climate adaptation, conservation and Earth system modelling. Imaging spectroscopy provides trait-rich snapshots, while multispectral archives provide temporal continuity. Continuous functional observables offer a route from remote-sensing data streams to actionable ecosystem intelligence, provided that uncertainty and domain-of-applicability are reported as core product layers.
+Operational ecosystem monitoring needs functional variables that can inform climate adaptation, conservation and Earth system modelling. Imaging spectroscopy provides trait-rich snapshots, while Sentinel-2 and Landsat-era archives provide temporal continuity. Functional time series offer a route from remote-sensing data streams to actionable ecosystem intelligence, provided that uncertainty and domain-of-applicability are reported as core product layers.
 
 ## One Earth fit
 

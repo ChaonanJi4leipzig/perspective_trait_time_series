@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="416.423622pt" height="270.685804pt" viewBox="0 0 416.423622 270.685804" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-05-05T18:40:35.817444</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.6, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 270.685804
+L 416.423622 270.685804
+L 416.423622 0
+L 0 0
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 16.911807 69.267489
+L 110.416177 69.267489
+Q 112.448881 69.267489 112.448881 67.615716
+L 112.448881 37.516735
+Q 112.448881 35.864962 110.416177 35.864962
+L 16.911807 35.864962
+Q 14.879103 35.864962 14.879103 37.516735
+L 14.879103 67.615716
+Q 14.879103 69.267489 16.911807 69.267489
+z
+" clip-path="url(#p00c2e976e7)" style="fill: #e6efd5; stroke: #000000; stroke-width: 0.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 115.352255 52.566226
+Q 123.515773 52.566226 131.120274 52.566226
+" clip-path="url(#p00c2e976e7)" style="fill: none; stroke: #000000; stroke-width: 0.5; stroke-linecap: round"/>
+    <path d="M 127.920274 50.966226
+L 131.120274 52.566226
+L 127.920274 54.166226
+z
+" clip-path="url(#p00c2e976e7)" style="stroke: #000000; stroke-width: 0.5; stroke-linecap: round"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif; text-anchor: start" x="7.2" y="13.27875" transform="rotate(-0 7.2 13.27875)">a</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 7px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif; text-anchor: start" x="16.234239" y="16.874062" transform="rotate(-0 16.234239 16.874062)">Spectral-index archives</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 6.2px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(27.195882 47.569946)">Long temporal memory</text>
+    <text style="font-size: 6.2px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(31.065554 54.277038)">Landsat + Sentinel-2</text>
+    <text style="font-size: 6.2px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(17.504507 60.98413)">continuity since past decades</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 7px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(17.414226 83.826777)">Detect change, phenology</text>
+    <text style="font-size: 7px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(35.257117 91.239733)">and disturbance</text>
+   </g>
+  </g>
+  <g id="axes_2">
+   <g id="patch_4">
+    <path d="M 161.459626 69.267489
+L 254.963996 69.267489
+Q 256.9967 69.267489 256.9967 67.615716
+L 256.9967 37.516735
+Q 256.9967 35.864962 254.963996 35.864962
+L 161.459626 35.864962
+Q 159.426922 35.864962 159.426922 37.516735
+L 159.426922 67.615716
+Q 159.426922 69.267489 161.459626 69.267489
+z
+" clip-path="url(#p8bed54e643)" style="fill: #dceaf6; stroke: #000000; stroke-width: 0.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 259.900074 52.566226
+Q 268.063592 52.566226 275.668093 52.566226
+" clip-path="url(#p8bed54e643)" style="fill: none; stroke: #000000; stroke-width: 0.5; stroke-linecap: round"/>
+    <path d="M 272.468093 50.966226
+L 275.668093 52.566226
+L 272.468093 54.166226
+z
+" clip-path="url(#p8bed54e643)" style="stroke: #000000; stroke-width: 0.5; stroke-linecap: round"/>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif; text-anchor: start" x="151.747819" y="13.27875" transform="rotate(-0 151.747819 13.27875)">b</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 7px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif; text-anchor: start" x="160.782058" y="16.874062" transform="rotate(-0 160.782058 16.874062)">Imaging-spectroscopy traits</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 6.2px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(175.656967 47.569946)">Functional specificity</text>
+    <text style="font-size: 6.2px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(174.540483 54.277038)">PRISMA, EnMAP, EMIT</text>
+    <text style="font-size: 6.2px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(171.559639 60.98413)">and future CHIME / SBG</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 7px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(171.454155 83.826777)">Retrieve biochemical</text>
+    <text style="font-size: 7px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(161.453452 91.239733)">and optical trait snapshots</text>
+   </g>
+  </g>
+  <g id="axes_3">
+   <g id="patch_6">
+    <path d="M 306.007445 69.267489
+L 399.511815 69.267489
+Q 401.544519 69.267489 401.544519 67.615716
+L 401.544519 37.516735
+Q 401.544519 35.864962 399.511815 35.864962
+L 306.007445 35.864962
+Q 303.974741 35.864962 303.974741 37.516735
+L 303.974741 67.615716
+Q 303.974741 69.267489 306.007445 69.267489
+z
+" clip-path="url(#pdfb516249b)" style="fill: #dcecdf; stroke: #000000; stroke-width: 0.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif; text-anchor: start" x="296.295638" y="13.27875" transform="rotate(-0 296.295638 13.27875)">c</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 7px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif; text-anchor: start" x="305.329877" y="16.874062" transform="rotate(-0 305.329877 16.874062)">Functional time series</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 6.2px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(308.454333 47.569946)">Trait anchors + time carriers</text>
+    <text style="font-size: 6.2px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(312.12299 54.277038)">+ structural complements</text>
+    <text style="font-size: 6.2px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(317.509724 60.98413)">+ uncertainty contract</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 7px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(310.447365 83.826777)">Monitor stress, recovery</text>
+    <text style="font-size: 7px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(301.001193 91.239733)">legacy and model constraints</text>
+   </g>
+  </g>
+  <g id="axes_4">
+   <g id="patch_7">
+    <path d="M 85.99663 255.263643
+L 330.426992 255.263643
+Q 337.663417 255.263643 337.663417 253.087189
+L 337.663417 232.773616
+Q 337.663417 230.597162 330.426992 230.597162
+L 85.99663 230.597162
+Q 78.760205 230.597162 78.760205 232.773616
+L 78.760205 253.087189
+Q 78.760205 255.263643 85.99663 255.263643
+z
+" clip-path="url(#p31df7c9be3)" style="fill: #f2dec3; stroke: #000000; stroke-width: 0.5; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 208.211811 221.955226
+Q 208.211811 226.003723 208.211811 229.493203
+" clip-path="url(#p31df7c9be3)" style="fill: none; stroke: #000000; stroke-width: 0.5; stroke-linecap: round"/>
+    <path d="M 209.811811 226.293203
+L 208.211811 229.493203
+L 206.611811 226.293203
+z
+" clip-path="url(#p31df7c9be3)" style="stroke: #000000; stroke-width: 0.5; stroke-linecap: round"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 39.36189 207.865306
+L 377.061732 207.865306
+" clip-path="url(#p31df7c9be3)" style="fill: none; stroke: #000000; stroke-linecap: square"/>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 7px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif; text-anchor: start" x="23.280945" y="152.967229" transform="rotate(-0 23.280945 152.967229)">From trait snapshots to functional time series</text>
+   </g>
+   <g id="PathCollection_1">
+    <defs>
+     <path id="mb8eade0b4c" d="M 0 3.24037
+C 0.859356 3.24037 1.683631 2.898944 2.291288 2.291288
+C 2.898944 1.683631 3.24037 0.859356 3.24037 0
+C 3.24037 -0.859356 2.898944 -1.683631 2.291288 -2.291288
+C 1.683631 -2.898944 0.859356 -3.24037 0 -3.24037
+C -0.859356 -3.24037 -1.683631 -2.898944 -2.291288 -2.291288
+C -2.898944 -1.683631 -3.24037 -0.859356 -3.24037 0
+C -3.24037 0.859356 -2.898944 1.683631 -2.291288 2.291288
+C -1.683631 2.898944 -0.859356 3.24037 0 3.24037
+z
+" style="stroke: #000000; stroke-width: 0.5"/>
+    </defs>
+    <g clip-path="url(#p31df7c9be3)">
+     <use xlink:href="#mb8eade0b4c" x="47.402362" y="207.865306" style="fill: #e6efd5; stroke: #000000; stroke-width: 0.5"/>
+    </g>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(36.081034 175.857532)">1980s+</text>
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(35.905675 181.691199)">Landsat</text>
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(28.278675 187.524866)">retrospective</text>
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(36.471628 193.358533)">context</text>
+   </g>
+   <g id="PathCollection_2">
+    <g clip-path="url(#p31df7c9be3)">
+     <use xlink:href="#mb8eade0b4c" x="143.888031" y="207.865306" style="fill: #e6efd5; stroke: #000000; stroke-width: 0.5"/>
+    </g>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(134.077422 175.857532)">2015+</text>
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(129.162828 181.691199)">Sentinel-2</text>
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(121.071375 187.524866)">dense temporal</text>
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(134.4005 193.358533)">carrier</text>
+   </g>
+   <g id="PathCollection_3">
+    <defs>
+     <path id="me939f48ae4" d="M 0 3.24037
+C 0.859356 3.24037 1.683631 2.898944 2.291288 2.291288
+C 2.898944 1.683631 3.24037 0.859356 3.24037 0
+C 3.24037 -0.859356 2.898944 -1.683631 2.291288 -2.291288
+C 1.683631 -2.898944 0.859356 -3.24037 0 -3.24037
+C -0.859356 -3.24037 -1.683631 -2.898944 -2.291288 -2.291288
+C -2.898944 -1.683631 -3.24037 -0.859356 -3.24037 0
+C -3.24037 0.859356 -2.898944 1.683631 -2.291288 2.291288
+C -1.683631 2.898944 -0.859356 3.24037 0 3.24037
+z
+" style="stroke: #000000; stroke-width: 0.5"/>
+    </defs>
+    <g clip-path="url(#p31df7c9be3)">
+     <use xlink:href="#me939f48ae4" x="240.373701" y="207.865306" style="fill: #dceaf6; stroke: #000000; stroke-width: 0.5"/>
+    </g>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(234.058045 181.691199)">Now</text>
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(223.486638 187.524866)">spaceborne</text>
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(221.878498 193.358533)">trait anchors</text>
+   </g>
+   <g id="PathCollection_4">
+    <g clip-path="url(#p31df7c9be3)">
+     <use xlink:href="#me939f48ae4" x="336.85937" y="207.865306" style="fill: #dceaf6; stroke: #000000; stroke-width: 0.5"/>
+    </g>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(330.102823 175.857532)">Next</text>
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(318.616104 181.691199)">CHIME / SBG</text>
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(312.628964 187.524866)">more systematic</text>
+    <text style="font-size: 5.8px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(315.151511 193.358533)">trait snapshots</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 6.4px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(137.740311 241.234677)">Densify sparse hyperspectral trait retrievals</text>
+    <text style="font-size: 6.4px; font-family: 'Arial', 'Helvetica', 'DejaVu Sans', sans-serif" transform="translate(91.555311 248.158127)">and reconstruct trait-relevant functional states through existing archives</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p00c2e976e7">
+   <rect x="7.2" y="16.777804" width="112.927984" height="91.765185"/>
+  </clipPath>
+  <clipPath id="p8bed54e643">
+   <rect x="151.747819" y="16.777804" width="112.927984" height="91.765185"/>
+  </clipPath>
+  <clipPath id="pdfb516249b">
+   <rect x="296.295638" y="16.777804" width="112.927984" height="91.765185"/>
+  </clipPath>
+  <clipPath id="p31df7c9be3">
+   <rect x="7.2" y="142.571678" width="402.023622" height="120.914126"/>
+  </clipPath>
+ </defs>
+</svg>

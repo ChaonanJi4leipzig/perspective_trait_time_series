@@ -20,7 +20,8 @@ Mitigation:
 
 Mitigation:
 - Lead with the monitoring problem, not with hyperspectral methods.
-- Emphasize the shift from trait snapshots to continuous functional observables.
+- Emphasize the shift from trait snapshots to functional time series.
+- Make clear that trait retrieval remains essential and active; the Perspective adds the monitoring layer that connects retrievals to dense archives.
 - Use key references selectively to establish maturity and limits, rather than reviewing all retrieval methods.
 - Keep the central novelty as the measurement contract: trait definition, uncertainty, provenance, domain masks and ecological validation.
 
@@ -35,7 +36,7 @@ Mitigation:
 ## Risk 5: The display-item package does not look mature enough for a Nature Reviews journal
 
 Mitigation:
-- Redraw Figure 1 as the flagship conceptual figure.
+- Use the generated Figure 1 as the current flagship concept and refine it visually before submission.
 - Keep Figures 2-5 in consistent Nature-style formatting.
 - Reduce figure text and make each figure answer one editorial question.
 - Use figure captions to reinforce the Perspective argument rather than describe technical details.
@@ -52,6 +53,6 @@ Mitigation:
 
 1. Confirm author order, affiliations and whether all listed co-authors agree to be included in the proposal.
 2. Confirm which 20 traits exist, which five to eight traits are strongest, and which should remain supplementary.
-3. Provide the editable source for the current Figure 1 if available.
+3. Decide whether the generated Figure 1 is strong enough for inquiry or whether Chaonan's original hyperspectral-trait concept should be redrawn into the same visual system.
 4. Ask two or three senior co-authors for a 15-minute read of the proposal synopsis before submission.
 5. Decide whether to include display-item previews in the NREE proposal attachment.

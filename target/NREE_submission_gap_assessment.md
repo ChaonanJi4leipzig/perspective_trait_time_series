@@ -4,15 +4,15 @@
 
 The manuscript is suitable for a serious presubmission inquiry after minor pitch polishing. It is not yet ready for full submission to *Nature Reviews Earth & Environment*.
 
-For NREE, the strongest route is a Reviews-style Perspective rather than a data paper, method paper or broad hyperspectral literature review. The article should be pitched as a timely framework for moving ecosystem monitoring from greenness anomalies to functional observables, with the European forest analysis used only as a proof-of-concept.
+For NREE, the strongest route is a Reviews-style Perspective rather than a data paper, method paper or broad hyperspectral literature review. The article should be pitched as a timely framework for moving ecosystem monitoring from trait snapshots to functional time series, with the European forest analysis used only as a proof-of-concept.
 
 ## What is already strong
 
 - The title, **From greenness to function in ecosystem monitoring**, is clear and journal-facing.
-- The manuscript now has a sharper central claim: continuous functional observables are the missing layer between spectral data products and ecological interpretation.
+- The manuscript now has a sharper central claim: functional time series are the missing layer between spectral trait retrievals and long-term ecological monitoring.
 - The scientific boundary is cleaner: imaging spectroscopy anchors biochemical and optical trait information; LiDAR, SAR and InSAR are the more direct sources for three-dimensional canopy structure.
 - The proof-of-concept is framed as illustrative rather than as the main evidence.
-- Figures 2-5 now have reproducible Nature-style exports in PDF, SVG, EPS, JPG and PNG.
+- Figures 1-5 now have reproducible Nature-style exports in PDF, SVG, EPS, JPG and PNG.
 
 ## Main gaps before full NREE submission
 
@@ -20,9 +20,9 @@ For NREE, the strongest route is a Reviews-style Perspective rather than a data 
 
 NREE publishes many invited or editor-shaped articles. The current package should first be used to ask whether the editors want the Perspective. A polished inquiry is more important than making a perfect full manuscript before contact.
 
-2. Figure 1 still needs a flagship redesign.
+2. Figure 1 still needs flagship-level visual refinement.
 
-The original hyperspectral-trait conceptual figure can be used as the scientific base, but it needs to become the first-viewport figure of the article: simple, visual, and immediately communicating the shift from greenness to function. Current generated Figures 2-5 are improving, but Figure 1 remains the biggest visual gap.
+The generated Figure 1 now communicates the shift from trait snapshots to functional time series. Before full submission it should still be refined as the first-viewport figure of the article: simpler, more visual and less text-heavy. Chaonan's original hyperspectral-trait concept can still be folded into this figure if it improves the visual explanation of spectral trait anchors.
 
 3. Novelty must be protected from becoming a literature review.
 
@@ -34,7 +34,7 @@ The proof-of-concept can remain compact in the main text, but reviewers will nee
 
 5. Claims should stay conditional where the evidence is illustrative.
 
-The manuscript can argue that continuous functional observables are a needed direction. It should not claim that the current reconstruction pipeline is already optimal, global, operational or validated across all biomes.
+The manuscript can argue that functional time series are a needed direction. It should not claim that the current reconstruction pipeline is already optimal, global, operational or validated across all biomes.
 
 6. Author and journal formatting still need final checks.
 
@@ -42,7 +42,7 @@ Affiliations, author order, acknowledgements, funding, competing interests, data
 
 ## Optional upgrades with high return
 
-- Add a compact Box or Table: **Observed, anchored, inferred**. This would state which information is directly observed by imaging spectroscopy, which traits are strongly anchored, which traits are inferred through covariance or temporal context, and where LiDAR/SAR/InSAR should be used.
+- Keep the compact Box: **Observed, anchored, inferred and complemented**. It states which information is directly observed by imaging spectroscopy, which traits are strongly anchored, which traits are inferred through covariance or temporal context, and where LiDAR/SAR/InSAR should be used.
 - Decide whether Figure 4 remains conceptual or becomes semi-data-driven using an actual drought or heatwave example from the European forest testbed.
 - Replace the current Figure 5 roadmap with a more editorial figure if NREE invites the full manuscript.
 
@@ -51,7 +51,7 @@ Affiliations, author order, acknowledgements, funding, competing interests, data
 - Concept novelty: 7.5--8 / 10.
 - NREE fit now: 6.5--7 / 10.
 - NREE fit after inquiry, Figure 1 redesign and supplement: about 8 / 10.
-- Figure maturity now: about 6.5 / 10; Figure 1 is still the limiting figure.
+- Figure maturity now: about 7 / 10; Figure 1 is improved but still the limiting figure for a Nature Reviews package.
 - Proof-of-concept strength as evidence: about 5.5 / 10.
 - Proof-of-concept strength as illustration: about 7 / 10.
 
