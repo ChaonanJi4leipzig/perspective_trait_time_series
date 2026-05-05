@@ -23,6 +23,7 @@ The manuscript is intended as an opening Perspective for an MSCA research progra
 - `target/` - target-specific presubmission pitch drafts.
 - `cover_letters/NREE_presubmission_inquiry.md` - more formal NREE inquiry draft.
 - `inquiry/NREE_presubmission_inquiry.tex` - Overleaf-ready LaTeX presubmission inquiry package with optional references and figure previews.
+- `inquiry/NREE_proposal_synopsis.tex` - NREE-style proposal synopsis with abstract, outline, key references and author affiliations.
 - `AUTHOR_NOTES.md` - current author block and affiliation details that need confirmation.
 
 ## Current status
