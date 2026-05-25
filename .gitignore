@@ -11,3 +11,9 @@
 *.lot
 *.run.xml
 *.bcf
+.ipynb_checkpoints/
+__pycache__/
+scripts/icos_token.txt
+tables/fig3_site43_44/model_cache/
+tables/fig3_site43_44/fluxnet/
+tables/fig3_all_sites_cap2000_flux_traits/fluxnet/
