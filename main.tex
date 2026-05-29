@@ -200,28 +200,8 @@ The testbed links hyperspectral-derived trait labels (EnMAP, with PRISMA as a co
 
 \begin{figure}[t]
 \centering
-\small
-\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.13\textwidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.13\textwidth}>{\raggedright\arraybackslash}X}
-\toprule
-\textbf{Trait dimension} & \textbf{Ecological process} & \textbf{Greenness ambiguity resolved} & \textbf{Observation readiness} & \textbf{Main uncertainty} \\
-\midrule
-Leaf-level EWT (hyperspectral) & Hydraulic stress; leaf water regulation & Drought stress vs.~seasonal water variation & Medium--high & SWIR SNR variability; atmospheric correction over closed canopies \\
-\addlinespace
-Canopy water content (multispectral) & Coarse drought/defoliation proxy & Defoliation vs.~biochemical water status & Medium & Mixed-pixel effects; not equivalent to leaf-level EWT \\
-\addlinespace
-Chlorophyll & Photosynthetic capacity; pigment stress & Stress-induced vs.~phenology-driven browning & Medium & Saturation in dense canopies; overlap with photoprotective pigment dynamics \\
-\addlinespace
-Leaf area index (LAI) & Canopy area; defoliation; structural memory & Seasonal phenology vs.~structural damage & High & Sub-pixel heterogeneity; saturation at high LAI \\
-\addlinespace
-Nitrogen & Photosynthetic capacity (Rubisco); nutrient status & Senescence vs.~stress-driven nutrient decline & Medium & Trait covariation with LMA and chlorophyll; spectral mixing \\
-\addlinespace
-Leaf mass per area (LMA) & Leaf economics; stress strategy; functional legacy & Greenness recovery vs.~persistent functional legacy & Medium & Calibration domain; sensitivity outside LES core species pool \\
-\addlinespace
-Lignin & Structural chemistry; decomposition; defence & Defoliation vs.~structural retention & Low & Spectral overlap with cellulose, water and other C-compounds; cross-site $R^2$ commonly $<0.3$ \\
-\bottomrule
-\end{tabularx}
-\caption{\textbf{Trait readiness mapped to ecological interpretation.} Each anchored trait corresponds to a different ecological process and resolves a different ambiguity that greenness alone cannot. Observation readiness combines spectral anchor strength, calibration-domain coverage and temporal-reconstruction stability; main uncertainty identifies the dominant source of residual ambiguity for each trait in the European forest illustration. The trait-by-trait variation is itself part of the framework's intended output: the observable reports trait-specific readiness across ecological processes, not a single accuracy number.}
-% Author note: model-performance heatmaps (Linear/RF/MLP/Transformer across five traits) from the prior version of this figure have been moved to Supplementary Fig. S1, where they support the trait-specific feasibility claim of this Perspective and provide the numerical basis for the readiness ratings shown above.
+\includegraphics[width=\textwidth]{figures/generated/fig3_proof_of_concept_performance.pdf}
+\caption{\textbf{Trait readiness and generalisation in the European forest testbed.} \textbf{a}, The current all-trait testbed covers 37 forest sites, 99 site-years, approximately 490,000 sample rows and 20 hyperspectral-derived traits. \textbf{b}, Held-out in-domain skill varies strongly by trait and model, so the product should report trait-specific readiness rather than a single mean score. \textbf{c}, The same all-trait Transformer that performs well in-domain loses skill under temporal transfer, whereas spatial transfer is more stable in the balanced-site setting. \textbf{d}, ERA5 climate context provides a small in-domain gain but does not produce a universal temporal-transfer improvement. \textbf{e}, Trait classes differ in current readiness, with canopy/leaf-economics dimensions generally more defensible than the weakest nutrient and pigment dimensions. The purpose of this figure is not to rank architectures, but to show how the measurement contract exposes trait-specific and split-specific limits.}
 \label{fig:proof_of_concept}
 \end{figure}
 
@@ -271,7 +251,7 @@ The trait-space logic extends beyond European temperate forests, but only throug
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/generated/fig4_trait_anomaly_syndromes.pdf}
-\caption{\textbf{Recovery timelines in trait and index space.} \textbf{a,b}, Recovery trajectories for Le Bray and Bilos, respectively, expressed as the percentage return from the drought-trough state to the pre-event baseline. In these panels, 0\% is the median state during 23 July--20 August 2022 and 100\% is the pre-event baseline from 14 May--25 June 2022. The plotted variables are ERA5-Land soil water, Sentinel-2 NDVI and NDWI, and XGBoost-inferred LAI and LMA; the full recovery table also retains the other inferred traits for audit. \textbf{c}, ERA5-Land soil-water-content departures for the same sites, with maximum temperature departures shown on the secondary axis as a heat-demand proxy. \textbf{d}, Sentinel-2 spectral-index departures for NDVI, NDWI and MSI, expressed relative to the same pre-event baseline. The drought window is shaded consistently across panels. The figure shows how a canopy can appear to recover in greenness or water-index space while retaining a displaced leaf-economics signal in trait space.}
+\caption{\textbf{A 2022 drought illustration in trait and index space.} \textbf{a}, ERA5-Land near-surface soil-water trajectories for Le Bray and Bilos from January 2022 to August 2023; the shaded window marks the drought-trough baseline used for the recovery calculations. \textbf{b,c}, XGBoost-inferred raw trait trajectories for Le Bray and Bilos, respectively, using Sentinel-2 temporal context and the five drought-anchor traits LAI, LMA, nitrogen, EWT and chlorophyll. \textbf{d}, Sentinel-2 NDVI, NDWI and MSI trajectories for the same two sites. \textbf{e}, Leaf-economics recovery trajectories in nitrogen--LMA space, where 100\% denotes the pre-event baseline and 0\% denotes the drought-trough state. Together, the panels show how greenness and water-related indices can move back toward baseline while the inferred leaf-economics state remains displaced.}
 \label{fig:anomalies}
 \end{figure}
 
@@ -299,7 +279,6 @@ Beyond ecology proper, trait observables may also provide a future empirical han
 \centering
 \includegraphics[width=\textwidth]{figures/generated/fig5_monitoring_roadmap.pdf}
 \caption{\textbf{Trait-space recovery scenarios under continued climate forcing.} Three idealized trajectories of a community in nitrogen--LMA trait space following a climate extreme: (i) \textit{functional recovery}---return to the pre-disturbance trait state within uncertainty; (ii) \textit{functional legacy}---greenness recovers but trait state remains shifted along the leaf-economics axis; (iii) \textit{regime shift / reorganization}---persistent displacement to a new region of trait space, typically with altered species composition. The 2026--2030 hyperspectral window (PRISMA, EnMAP and EMIT operational; CHIME and SBG launching) is the period in which these scenarios become empirically distinguishable across the European trait-anchor archive. The opportunity is ecological: trait observables let resilience theory be tested in the same state space in which plant ecology has long explained ecosystem function.}
-% Author note: regenerate this figure as a three-scenario LES-plane trajectory schematic; current placeholder PDF retains earlier monitoring-roadmap layout.
 \label{fig:roadmap}
 \end{figure}
 
