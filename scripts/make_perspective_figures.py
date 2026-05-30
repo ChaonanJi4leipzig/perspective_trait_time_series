@@ -287,6 +287,13 @@ def load_fig3_data():
     return per_trait, formal
 
 
+def load_trait_dynamics_summary():
+    path = TABLE_DIR / "trait_greenness_divergence_2022_2023aug" / "trait_greenness_trait_summary.csv"
+    if not path.exists():
+        raise FileNotFoundError(path)
+    return pd.read_csv(path)
+
+
 def draw_trait_space(ax, title=None, show_green_arrow=True):
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
@@ -439,16 +446,25 @@ def fig2_framework():
 
 def fig3_performance():
     per_trait, synth = load_fig3_data()
+    dynamics = load_trait_dynamics_summary()
     tdf = per_trait[per_trait["model_label"] == "Transformer"].copy()
     order = tdf.sort_values("r2", ascending=True)["trait"].tolist()
 
     fig = plt.figure(figsize=(FIG_W_DOUBLE, 6.25))
-    gs = fig.add_gridspec(2, 3, height_ratios=[1.03, 1.05], width_ratios=[0.70, 1.56, 1.02], hspace=0.52, wspace=0.72)
+    gs = fig.add_gridspec(
+        2,
+        4,
+        height_ratios=[1.03, 1.05],
+        width_ratios=[0.70, 1.50, 0.98, 0.92],
+        hspace=0.52,
+        wspace=0.78,
+    )
     ax_sample = fig.add_subplot(gs[0, 0])
     ax_trait = fig.add_subplot(gs[:, 1])
     ax_regime = fig.add_subplot(gs[0, 2])
     ax_delta = fig.add_subplot(gs[1, 0])
     ax_group = fig.add_subplot(gs[1, 2])
+    ax_dyn = fig.add_subplot(gs[:, 3])
 
     sample_labels = ["sites", "site-years", "rows (x10k)", "traits"]
     sample_vals = [37, 99, 49.0144, 20]
@@ -504,7 +520,7 @@ def fig3_performance():
     ax_regime.set_xlabel("Mean $R^2$")
     ax_regime.set_xlim(0, 0.64)
     ax_regime.invert_yaxis()
-    figure_title(ax_regime, "Generalization is the bottleneck")
+    figure_title(ax_regime, "Transfer bottleneck")
     style_axis(ax_regime)
     panel_label(ax_regime, "c", x=-0.22)
 
@@ -522,8 +538,9 @@ def fig3_performance():
     ax_delta.set_yticks(yy, labels)
     ax_delta.set_xlabel(r"$\Delta R^2$ with ERA5")
     ax_delta.set_xlim(-0.04, 0.04)
+    ax_delta.set_xticks([-0.02, 0.00, 0.02])
     ax_delta.invert_yaxis()
-    figure_title(ax_delta, "ERA5 contribution")
+    figure_title(ax_delta, "ERA5 delta")
     style_axis(ax_delta)
     panel_label(ax_delta, "d", x=-0.28)
 
@@ -534,9 +551,32 @@ def fig3_performance():
         ax_group.text(row["mean_r2"] + 0.012, yi, f"{row['mean_r2']:.2f}  n={int(row['n'])}", va="center", fontsize=FS_NOTE)
     ax_group.set_xlim(0, 0.72)
     ax_group.set_xlabel("Mean Transformer $R^2$")
-    figure_title(ax_group, "Readiness depends on trait class")
+    figure_title(ax_group, "Readiness by class")
     style_axis(ax_group)
     panel_label(ax_group, "e", x=-0.22)
+
+    dyn_by_trait = dynamics.set_index("trait")
+    dyn_specs = [
+        ("LAI", "recovery check", "frac_consistent_sites", GREEN),
+        ("Nitrogen", "recovery check", "frac_consistent_sites", GREEN),
+        ("EWT", "leading indicator", "frac_early_warning_sites", ORANGE),
+        ("LMA", "leading indicator", "frac_early_warning_sites", ORANGE),
+        ("Chlorophyll", "functional legacy", "frac_legacy_effect_sites", PURPLE),
+    ]
+    y = np.arange(len(dyn_specs))
+    vals = np.array([float(dyn_by_trait.loc[trait, col]) * 100.0 for trait, _kind, col, _color in dyn_specs])
+    labels = ["LAI\ncheck", "N\ncheck", "EWT\nlead", "LMA\nlead", "Chl\nlegacy"]
+    colors = [color for _trait, _kind, _col, color in dyn_specs]
+    ax_dyn.barh(y, vals, color=colors, edgecolor=BLACK, linewidth=AXIS_LW)
+    for yi, val in enumerate(vals):
+        ax_dyn.text(val + 1.1, yi, f"{val:.1f}%", va="center", fontsize=FS_NOTE)
+    ax_dyn.set_yticks(y, labels)
+    ax_dyn.set_xlim(0, 47)
+    ax_dyn.invert_yaxis()
+    ax_dyn.set_xlabel("Sites showing\npattern (%)")
+    figure_title(ax_dyn, "Trait dynamics")
+    style_axis(ax_dyn)
+    panel_label(ax_dyn, "f", x=-0.28)
 
     save_publication_figure(fig, "fig3_proof_of_concept_performance")
 
@@ -621,11 +661,10 @@ def fig4_anomalies():
     panel_label(ax_idx, "d", x=-0.04)
 
     stage_order = ["pre-event", "drought trough", "apparent recovery", "2023 recovery"]
-    stage_labels = ["pre", "trough", "apparent", "2023"]
     for sid, color, marker in [(43, BLUE, "o"), (44, ORANGE, "s")]:
         sub = recovery[
             (recovery["site_id"] == sid)
-            & (recovery["variable"].isin(["LMA", "Nitrogen"]))
+            & (recovery["variable"].isin(["NDVI", "Chlorophyll"]))
             & (recovery["stage"].isin(stage_order))
         ].copy()
         piv = (
@@ -633,17 +672,28 @@ def fig4_anomalies():
             .reindex(stage_order)
             .dropna()
         )
-        ax_space.plot(piv["Nitrogen"], piv["LMA"], color=color, lw=FIT_LW, marker=marker, ms=3.6, label=site_names[sid])
+        ax_space.plot(piv["NDVI"], piv["Chlorophyll"], color=color, lw=FIT_LW, marker=marker, ms=3.6, label=site_names[sid])
         for i in range(len(piv) - 1):
-            arrow(ax_space, (piv["Nitrogen"].iloc[i], piv["LMA"].iloc[i]), (piv["Nitrogen"].iloc[i + 1], piv["LMA"].iloc[i + 1]), color=color, lw=0.45, mutation_scale=6)
-        for label, (_, row) in zip(stage_labels, piv.iterrows()):
-            ax_space.text(row["Nitrogen"] + 2.0, row["LMA"] + 1.5, label, fontsize=5.8, color=BLACK)
+            arrow(
+                ax_space,
+                (piv["NDVI"].iloc[i], piv["Chlorophyll"].iloc[i]),
+                (piv["NDVI"].iloc[i + 1], piv["Chlorophyll"].iloc[i + 1]),
+                color=color,
+                lw=0.45,
+                mutation_scale=6,
+            )
+    ax_space.text(2.0, 4.0, "trough", fontsize=5.8, color=BLACK, ha="left", va="bottom")
+    ax_space.text(86.0, 62.0, "pre-event", fontsize=5.8, color=BLACK, ha="left", va="bottom")
+    ax_space.text(76.0, 6.0, "2023 recovery", fontsize=5.8, color=BLACK, ha="left", va="bottom")
     ax_space.axhline(100, color=GREY, lw=REF_LW, ls="--")
     ax_space.axvline(100, color=GREY, lw=REF_LW, ls="--")
-    ax_space.set_xlabel("Nitrogen recovery (%)")
-    ax_space.set_ylabel("LMA recovery (%)")
-    figure_title(ax_space, "Leaf-economics trajectory")
-    ax_space.legend(frameon=False, loc="lower right", handlelength=1.2)
+    ax_space.axhline(70, color=LIGHT_GREY, lw=REF_LW, ls=":")
+    ax_space.axvline(70, color=LIGHT_GREY, lw=REF_LW, ls=":")
+    ax_space.set_xlim(-5, 105)
+    ax_space.set_ylim(-5, 105)
+    ax_space.set_xlabel("NDVI recovery (%)")
+    ax_space.set_ylabel("Chlorophyll recovery (%)")
+    figure_title(ax_space, "Greenness--pigment recovery")
     style_axis(ax_space)
     panel_label(ax_space, "e", x=-0.12)
 
