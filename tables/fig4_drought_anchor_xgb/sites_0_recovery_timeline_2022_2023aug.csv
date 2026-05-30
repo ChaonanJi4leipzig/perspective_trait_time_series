@@ -1,0 +1,17 @@
+site_id,site_name,date,relative_days,stage,variable,variable_label,value,baseline_median,trough_median,recovery_pct,recovery_pct_clipped,recovery_interpretable,variable_family
+0,Neustift,2022-07-09,-28,other,SWC,SWC,0.32722400980336325,,,,,False,climate
+0,Neustift,2023-08-05,364,2023 recovery,SWC,SWC,0.34919198070253643,,,,,False,climate
+0,Neustift,2022-07-09,-28,other,NDVI,NDVI,0.44771313667297363,,,,,False,index
+0,Neustift,2023-08-05,364,2023 recovery,NDVI,NDVI,0.4412757605314255,,,,,False,index
+0,Neustift,2022-07-09,-28,other,NDWI,NDWI,0.19660453498363495,,,,,False,index
+0,Neustift,2023-08-05,364,2023 recovery,NDWI,NDWI,0.1942262202501297,,,,,False,index
+0,Neustift,2022-07-09,-28,other,Chlorophyll,Chlorophyll,33.576479167645566,,,,,False,trait
+0,Neustift,2023-08-05,364,2023 recovery,Chlorophyll,Chlorophyll,34.63176494285471,,,,,False,trait
+0,Neustift,2022-07-09,-28,other,EWT,EWT,12.295692703496043,,,,,False,trait
+0,Neustift,2023-08-05,364,2023 recovery,EWT,EWT,12.448797389409728,,,,,False,trait
+0,Neustift,2022-07-09,-28,other,LAI,LAI,3.209574385970092,,,,,False,trait
+0,Neustift,2023-08-05,364,2023 recovery,LAI,LAI,3.1972156680077273,,,,,False,trait
+0,Neustift,2022-07-09,-28,other,LMA,LMA,93.22111466896737,,,,,False,trait
+0,Neustift,2023-08-05,364,2023 recovery,LMA,LMA,94.86737583939454,,,,,False,trait
+0,Neustift,2022-07-09,-28,other,Nitrogen,Nitrogen,0.17458554460601114,,,,,False,trait
+0,Neustift,2023-08-05,364,2023 recovery,Nitrogen,Nitrogen,0.17283125584384743,,,,,False,trait

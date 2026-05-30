@@ -1,0 +1,62 @@
+{
+  "figure": "fig4_trait_anomaly_syndromes",
+  "model": "local XGBoost single-trait models",
+  "train_fraction": 1.0,
+  "window_pixels": 30,
+  "smoke": false,
+  "task_manifest": "/home/chaonan.ji/data/projects/ecospectra/output_data/traits_model/outputs/ablations/technical_report_all20_main_cap5000_20260522/trait_relation_task_manifest_xgb_multioutput.csv",
+  "feature_names_count": 178,
+  "traits": [
+    {
+      "short": "EWT",
+      "name": "EWT (mg/cm²)",
+      "label": "EWT"
+    },
+    {
+      "short": "Chlorophyll",
+      "name": "Chl content (μg/cm²)",
+      "label": "Chlorophyll"
+    },
+    {
+      "short": "LAI",
+      "name": "LAI (m²/m²)",
+      "label": "LAI"
+    },
+    {
+      "short": "Nitrogen",
+      "name": "N content (mg/cm²)",
+      "label": "Nitrogen"
+    },
+    {
+      "short": "LMA",
+      "name": "LMA (g/m²)",
+      "label": "LMA"
+    }
+  ],
+  "anchor_sites": {
+    "43": "Le Bray",
+    "44": "Bilos"
+  },
+  "event_date": "2022-08-06",
+  "analysis_window": [
+    "2022-01-08",
+    "2023-08-19"
+  ],
+  "baseline_window": [
+    "2022-05-14",
+    "2022-06-25"
+  ],
+  "drought_trough_window": [
+    "2022-07-23",
+    "2022-08-20"
+  ],
+  "recovery_window": [
+    "2022-09-17",
+    "2022-10-29"
+  ],
+  "true_recovery_window": [
+    "2023-07-08",
+    "2023-08-19"
+  ],
+  "atmospheric_demand_note": "ERA5-Land local zarrs do not include humidity or dew-point fields; Fig. 4 panel c uses Tmax departure as a heat-demand proxy rather than VPD."
+}

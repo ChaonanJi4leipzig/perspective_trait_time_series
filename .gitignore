@@ -17,3 +17,7 @@ scripts/icos_token.txt
 tables/fig3_site43_44/model_cache/
 tables/fig3_site43_44/fluxnet/
 tables/fig3_all_sites_cap2000_flux_traits/fluxnet/
+tables/**/model_cache/
+tables/**/model_artifacts/
+*.joblib
+*.pt

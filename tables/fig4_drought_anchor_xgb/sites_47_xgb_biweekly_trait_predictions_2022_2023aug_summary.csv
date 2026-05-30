@@ -1,0 +1,216 @@
+site_id,site_label,date,model,model_label,trait,trait_name,trait_label,prediction_median,prediction_p10,prediction_p90,n_pixels,valid_obs_median
+47,"site 47, Alice Holt / Straits Inclosure",2022-01-08,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,32.88112289235855,31.62505110642978,33.60580443444705,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-01-08,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.54875616372616,11.768665110549584,13.054853286870571,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-01-08,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.7469008068469822,2.398699921744876,3.169538391151577,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-01-08,xgb,XGBoost,LMA,LMA (g/m²),LMA,82.84489487312237,66.20226580012884,89.59754267798398,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-01-08,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.14400736941837844,0.1341380903684214,0.1522178945681409,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-01-22,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.10147101597421,31.68538003980152,33.68178367749754,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-01-22,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.166355734832761,11.34849870941187,12.87592366639566,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-01-22,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.667066888158832,2.2059730437249856,3.297282359767178,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-01-22,xgb,XGBoost,LMA,LMA (g/m²),LMA,87.94520685401986,66.91226489232031,95.62127577344151,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-01-22,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15625015958811023,0.13807454962556845,0.1640602971639207,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-02-05,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,32.63899965156605,30.46556494052827,33.66396052972659,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-02-05,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.972870367738153,11.08268814705496,12.974841043592885,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-02-05,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.6012535143237523,2.1697405820320514,3.130822216714613,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-02-05,xgb,XGBoost,LMA,LMA (g/m²),LMA,86.81661037957016,63.925315446794194,94.26026535941449,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-02-05,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15138109257771626,0.13261119828788215,0.16395386635372758,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-02-19,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.547698726248285,31.08762846928765,34.59448615632561,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-02-19,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.235599688105395,11.207451945933663,13.275257775216465,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-02-19,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.3425629392482827,1.9672287128460924,3.045394595252191,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-02-19,xgb,XGBoost,LMA,LMA (g/m²),LMA,86.38517201574226,66.47546087083867,95.97773690107637,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-02-19,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15096908857612815,0.13208518934374855,0.16151693462581618,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-03-05,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,32.41339167499626,30.56327002170761,33.402000170823335,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-03-05,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.667160733819122,11.051863307464595,12.491779832328225,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-03-05,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.5370716743205426,2.15282984080559,3.1805999519712476,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-03-05,xgb,XGBoost,LMA,LMA (g/m²),LMA,83.02931229868884,65.93170415292475,95.9127908597292,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-03-05,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.14960948864111745,0.13438700542130413,0.1621874573439224,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-03-19,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,32.520462801073606,30.93798037360565,33.69572383445509,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-03-19,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.663316487643826,11.08882444852918,12.243263293396222,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-03-19,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.4658047958246745,2.117198578764148,3.054390087197018,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-03-19,xgb,XGBoost,LMA,LMA (g/m²),LMA,83.60886075215419,66.05503815790412,93.65087396763684,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-03-19,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.14932292990682583,0.13499019481570146,0.15971797965572274,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-04-02,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,32.8877143379215,31.178577647268266,34.527671036954416,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-04-02,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.586126295031427,10.892072667104365,12.346789228835998,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-04-02,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.6183979871675156,2.122307901080327,3.32637940284797,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-04-02,xgb,XGBoost,LMA,LMA (g/m²),LMA,79.74810286881103,65.51342070292068,93.3085065086092,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-04-02,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15334249199907318,0.1391522463993115,0.16876648044377524,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-04-16,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,34.00358076482769,31.953363878024902,36.38639520821391,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-04-16,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.707168812098626,10.807335490373578,12.513413280560032,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-04-16,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.7254422432132825,2.1752425638131987,3.435914118510024,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-04-16,xgb,XGBoost,LMA,LMA (g/m²),LMA,79.64688655782783,65.21448805453403,97.3893263391706,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-04-16,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15819501553852244,0.13993821756575553,0.17527797738688866,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-04-30,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.10982394955951,31.211730073525906,34.8078829829734,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-04-30,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.066114524065988,11.103591547230916,12.775713646153008,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-04-30,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.8842006375819995,2.2879395320585525,3.6554421671390878,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-04-30,xgb,XGBoost,LMA,LMA (g/m²),LMA,80.57971860767341,66.58514376150352,96.6304624676652,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-04-30,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1598323693111504,0.13922458222528877,0.17404374141425746,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-05-14,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,32.913104127959,31.08565727895736,34.23052185977101,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-05-14,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.068869884513607,11.27853642478206,12.706698408766469,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-05-14,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.0218333800533363,2.5568902612775513,3.719083525228014,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-05-14,xgb,XGBoost,LMA,LMA (g/m²),LMA,77.88766077377905,69.03207676359698,90.68383316659455,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-05-14,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15643303524208302,0.140554443079584,0.16847064240208473,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-05-28,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,34.372308873005615,32.527180107796866,36.81803277600159,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-05-28,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.138506498931685,11.558184847343789,12.901089447961589,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-05-28,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.235641813312931,2.555485406449512,3.8059211703273395,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-05-28,xgb,XGBoost,LMA,LMA (g/m²),LMA,85.78480628363653,68.32717932105204,97.02378794558126,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-05-28,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1689216153255192,0.1428830242208488,0.1835455978005027,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-06-11,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,34.798519864418395,32.40546855869396,37.32567106562917,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-06-11,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.201685282857154,11.228455621179872,13.031527642937704,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-06-11,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.3214495519953697,2.521226587925365,3.98376766459921,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-06-11,xgb,XGBoost,LMA,LMA (g/m²),LMA,87.00345983675751,67.10196042525398,100.22574963494756,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-06-11,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.17813486173661333,0.14675599948965595,0.18881469574741588,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-06-25,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,35.635351932454924,32.07584137610101,37.796545367153584,300,5.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-06-25,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.899114791116924,11.21491028428109,12.892434540941526,300,5.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-06-25,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.363724266244062,2.431129884074001,3.8051880440275796,300,5.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-06-25,xgb,XGBoost,LMA,LMA (g/m²),LMA,90.51993841292925,67.69972623141324,101.47644943695335,300,5.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-06-25,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1800141124920237,0.14424989218163642,0.19164541070831045,300,5.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-07-09,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,36.151556778707175,32.454339325002444,38.266233363317134,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-07-09,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.798165757645677,11.159863681444104,13.00327259107544,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-07-09,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.1894958943026293,2.262031783891564,3.713904351327242,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-07-09,xgb,XGBoost,LMA,LMA (g/m²),LMA,90.93607544240464,67.71140886308876,103.91212368033284,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-07-09,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.18057843595740497,0.14781069340894254,0.19171203815666873,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-07-23,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,35.222392729078614,31.319106036469957,37.433101577879725,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-07-23,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.727623348405231,11.106795175988477,13.015567794881685,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-07-23,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.149845097766635,2.1685502204324663,3.734821733817873,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-07-23,xgb,XGBoost,LMA,LMA (g/m²),LMA,92.49615447885074,66.89081557483796,107.7228051640438,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-07-23,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.175061702742557,0.1387403208307249,0.19268038605604806,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-08-06,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,35.44383208742134,31.525609510582484,36.57875247033554,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-08-06,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.606271430624485,10.89304263025775,12.724719782266375,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-08-06,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.0130784529733905,1.9711754123799021,3.5120945955878673,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-08-06,xgb,XGBoost,LMA,LMA (g/m²),LMA,90.7863252478693,64.9957925106937,103.9167673868507,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-08-06,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1662521228653756,0.1357599796685493,0.18165500832672962,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-08-20,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,34.52603634765858,32.388488581258216,36.113683933893924,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-08-20,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.83203603657068,11.020619470411125,12.909239806998352,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-08-20,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.965682143229545,1.990589798483878,3.556608766884554,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-08-20,xgb,XGBoost,LMA,LMA (g/m²),LMA,88.71647205162947,66.45148892946973,110.28006123237927,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-08-20,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.16378988397935623,0.13685591033258002,0.19060633505754837,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-09-03,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.54041213216619,30.9391587522704,35.24659928215376,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-09-03,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.627927684221735,10.96674519380062,12.765105884627008,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-09-03,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.827447616702266,1.9452729838358276,3.4629761096822556,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-09-03,xgb,XGBoost,LMA,LMA (g/m²),LMA,84.29670468032324,63.96383048235724,103.17701831062003,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-09-03,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15459045216246714,0.12715824783961344,0.179083557415594,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-09-17,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.82912658021564,31.791740206584173,35.094987944145885,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-09-17,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.02042059104311,11.319413704748147,12.878033726476955,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-09-17,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.896687618610833,2.01172728722776,3.5034702748477184,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-09-17,xgb,XGBoost,LMA,LMA (g/m²),LMA,86.85256925789933,65.52836605412996,102.13329004986183,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-09-17,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1578473113720859,0.1304455213024176,0.17916182840148004,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-10-01,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.45742990525936,31.14633483069649,34.585540315105604,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-10-01,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.276182446670532,11.39057236459742,13.049055616884289,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-10-01,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.0977902293698225,2.2596810315575744,3.6007521001385125,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-10-01,xgb,XGBoost,LMA,LMA (g/m²),LMA,90.01918354254511,68.59154062729594,105.00932506838804,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-10-01,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1637712163431815,0.13661399700958896,0.18515627890587405,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-10-15,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.48066434068356,31.09059933248172,34.751764758869136,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-10-15,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.255702927268484,11.370025658908496,12.939442036897741,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-10-15,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.1219919634999975,2.3471748658537086,3.5999598547304927,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-10-15,xgb,XGBoost,LMA,LMA (g/m²),LMA,88.1332589666338,69.04064269074073,99.23480808782521,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-10-15,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.16124279734716043,0.13664656076770673,0.18049965020543066,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-10-29,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.552974595958425,31.602164319844277,35.952503148840876,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-10-29,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.575377268637663,11.693215272423776,13.216772625143475,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-10-29,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.146428720764172,2.5820424145931535,3.5077259073691476,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-10-29,xgb,XGBoost,LMA,LMA (g/m²),LMA,90.05272798408348,69.01779864368584,100.54404329998478,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-10-29,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.160542344011616,0.13975198018618937,0.17373629434754057,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-11-12,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.3679194474807,31.50253208553521,35.1960454495538,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-11-12,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.240529911301733,11.293581300130839,12.967279799212054,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-11-12,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.969852499659245,2.516839722500306,3.324545660277673,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-11-12,xgb,XGBoost,LMA,LMA (g/m²),LMA,84.9844607489752,65.84232622295248,94.09944808664319,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-11-12,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15040402980135753,0.1367412294005542,0.16274853589453903,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-11-26,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.443451041733354,31.494812619977175,34.50220152892974,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-11-26,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.6098104824771,11.637343475733378,13.24320394420172,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-11-26,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.8059593598383445,2.438300351871755,3.2524547529979113,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-11-26,xgb,XGBoost,LMA,LMA (g/m²),LMA,88.52390009473339,67.14822685329302,97.5735251230407,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-11-26,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1579389900933605,0.13944723054131045,0.17141130260544304,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-12-10,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,34.0289042832066,31.922913901121152,35.552975675184726,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-12-10,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.717090796111702,11.700507323951195,13.336840508544979,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-12-10,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.7399581299639304,2.3838871410810434,3.1975722308149432,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-12-10,xgb,XGBoost,LMA,LMA (g/m²),LMA,88.74256954912852,67.11407451694507,98.7497531226457,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-12-10,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15797842520631122,0.1380466074726469,0.1713984124585425,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-12-24,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,32.73349467652454,30.91709313162538,34.81021291312444,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-12-24,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.932377204412493,12.149536165812373,13.458127942856034,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-12-24,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.8357628625524836,2.5432824273031387,3.229572905059056,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-12-24,xgb,XGBoost,LMA,LMA (g/m²),LMA,82.36875601162834,66.25907050305364,89.2668915629191,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2022-12-24,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15834690830004877,0.14301637874332238,0.16761982952450918,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-01-07,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,32.967808878672514,29.585892681174904,33.5327591059588,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-01-07,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.135134843527826,11.215451765238674,13.067238833308462,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-01-07,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.808297649447518,2.35909458879028,3.218754947321889,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-01-07,xgb,XGBoost,LMA,LMA (g/m²),LMA,87.46912225606668,65.432812691639,92.51801585925772,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-01-07,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1560192808575378,0.13737646818310723,0.16283432884170967,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-01-21,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,32.63222950020213,29.600728728809784,33.60143840526293,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-01-21,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.895186530992348,11.08768170405642,13.183946064775752,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-01-21,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.631259930489249,2.2919607611546313,3.212368624846542,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-01-21,xgb,XGBoost,LMA,LMA (g/m²),LMA,89.95464348016412,65.90022804251937,95.98642150119717,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-01-21,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15421677263479927,0.14133637118324968,0.16268518523982595,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-02-04,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,32.72219643552705,30.373612793996614,34.121114575297426,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-02-04,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.994817160364612,11.09087084040773,13.098101219396028,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-02-04,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.3646361386944426,2.026568634815056,2.976546832414423,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-02-04,xgb,XGBoost,LMA,LMA (g/m²),LMA,82.5140932561362,64.34741804801098,89.97030638058641,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-02-04,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.14995573568182635,0.13321697973452953,0.15803462529906548,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-02-18,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,32.66202478598906,30.08659891880155,34.00134427447462,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-02-18,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.941030186407323,10.892362758427659,12.929906204928832,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-02-18,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.3820699962826533,2.1275633320497795,2.9408243076489176,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-02-18,xgb,XGBoost,LMA,LMA (g/m²),LMA,85.51161140976063,65.17697164706274,95.93516866084158,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-02-18,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15131376398585944,0.13176134977971174,0.1647754433547405,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-03-04,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,32.611734516034446,30.67993141306156,33.86048786259261,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-03-04,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.90296539361075,11.131735015303175,12.709739260497297,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-03-04,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.3695726390756846,1.9978160236075773,3.0678388082337915,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-03-04,xgb,XGBoost,LMA,LMA (g/m²),LMA,82.54323369464475,64.21646792916036,92.21647870406177,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-03-04,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.14598646924696837,0.1294151685501919,0.16174685106819373,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-03-18,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.07284200572465,31.63642654037818,34.80925940829351,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-03-18,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.641138518476009,11.091703595516577,12.74124781334504,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-03-18,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.5531226630273762,2.073868846187927,3.2848977401769557,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-03-18,xgb,XGBoost,LMA,LMA (g/m²),LMA,81.66620299561745,65.62900861204669,96.27860052628783,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-03-18,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.16145238366208287,0.1443654188432495,0.1743638314450822,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-04-01,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.37772717129478,32.4219846681468,36.65515917254797,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-04-01,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.756183158104895,11.063357830698024,13.081646833176588,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-04-01,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.5531226630273762,2.0701525905250926,3.41616520490282,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-04-01,xgb,XGBoost,LMA,LMA (g/m²),LMA,84.95216682930092,68.76434336971984,94.00969130500165,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-04-01,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15586045972375345,0.14212600156611613,0.16761982952450918,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-04-15,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,34.619961019842094,32.760857049036105,36.65515917254797,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-04-15,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.926748858294864,11.392801857140299,13.081646833176588,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-04-15,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.5531226630273762,2.1873601876904654,3.1365742207727187,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-04-15,xgb,XGBoost,LMA,LMA (g/m²),LMA,86.56916183353482,70.55239999484337,95.9677278589967,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-04-15,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.16025611356697095,0.14595753281710824,0.17192578239350947,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-04-29,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,32.60233150829906,31.643481939157343,33.23171080223451,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-04-29,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.745456179679415,11.283840579143119,12.156325569812608,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-04-29,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.750437238689771,2.393732013651852,3.2796529841002884,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-04-29,xgb,XGBoost,LMA,LMA (g/m²),LMA,71.0651089130243,64.1254245692541,81.10012292801895,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-04-29,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.14668186198236954,0.13721198011641497,0.15458907809946684,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-05-13,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.28854310375138,32.31936051802068,34.479111013469456,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-05-13,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.29579531658607,11.42471552304058,13.016898885363375,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-05-13,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.0884457495962856,2.359777957421277,3.9635813847579713,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-05-13,xgb,XGBoost,LMA,LMA (g/m²),LMA,77.55509246026577,67.41343891165123,89.47574469356434,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-05-13,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15998449665370246,0.14050280069190704,0.17050376355466831,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-05-27,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,35.04028334969341,32.9813285691494,36.77579544685762,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-05-27,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.273291033370178,11.105348411563988,13.10621201449536,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-05-27,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.2960117870286854,2.3704149218439796,4.124265377051719,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-05-27,xgb,XGBoost,LMA,LMA (g/m²),LMA,83.91610485717689,67.06744734596003,99.48700162039202,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-05-27,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.17600396335027574,0.14607002336892214,0.18795551668301036,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-06-10,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,36.45543441574516,33.37320876984534,38.75609309639073,300,5.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-06-10,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.15154159263758,11.228598279076646,12.992722964991449,300,5.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-06-10,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.3586422028822063,2.2757710043257315,3.9573787483134297,300,5.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-06-10,xgb,XGBoost,LMA,LMA (g/m²),LMA,85.69874564988379,67.20624133345456,102.65624965063544,300,5.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-06-10,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.18012693321508394,0.14602926227279717,0.19011140221932424,300,5.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-06-24,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,35.89143017145183,32.21875956473817,37.883676008446024,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-06-24,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.948461012949979,11.214756588499007,12.955571963455954,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-06-24,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.330636842395945,2.3545019554151754,3.833326765266636,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-06-24,xgb,XGBoost,LMA,LMA (g/m²),LMA,87.29685497355923,67.54776770312537,105.8905447875117,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-06-24,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.17926995859337297,0.14629561926052154,0.1931851848151617,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-07-08,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,35.60068861825722,32.26879532808465,37.43895531510004,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-07-08,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.717417270283379,11.055779064986982,12.768179938449503,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-07-08,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.102127195909326,2.3864593542526755,3.5795887755765396,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-07-08,xgb,XGBoost,LMA,LMA (g/m²),LMA,87.61214359259557,66.06164605250211,105.00342004992689,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-07-08,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.17414925905436585,0.14222586044342092,0.1904948136286549,300,4.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-07-22,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,34.29272277547323,31.531673006932937,36.65515917254797,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-07-22,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.843601413410415,11.230911553424999,12.857910705345152,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-07-22,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.1991280724453093,2.320506515808818,3.6749670697801387,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-07-22,xgb,XGBoost,LMA,LMA (g/m²),LMA,88.95122731313266,66.53746141740145,104.84877412984333,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-07-22,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.16889846471596387,0.13795283765030691,0.18660431274333145,300,3.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-08-05,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,34.09335580316802,32.490604229567815,36.65515917254797,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-08-05,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.159286548269318,11.473586636317792,13.081646833176588,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-08-05,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.1834443433750668,2.3975148742840577,3.6862459755848778,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-08-05,xgb,XGBoost,LMA,LMA (g/m²),LMA,86.56225331981517,67.83594892335384,102.36391745294472,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-08-05,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.16727611026456296,0.14181010433379998,0.18636027955060458,300,2.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-08-19,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.736190090382806,32.37410202559111,36.65515917254797,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-08-19,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.48580268754279,11.680253843526962,13.081646833176588,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-08-19,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.992707124976252,2.5531226630273762,3.617086737171682,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-08-19,xgb,XGBoost,LMA,LMA (g/m²),LMA,88.95122731313266,68.58169463530179,103.50588675429347,300,1.0
+47,"site 47, Alice Holt / Straits Inclosure",2023-08-19,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.16761982952450918,0.1434243222525762,0.18380991899629215,300,1.0

@@ -1,0 +1,216 @@
+site_id,site_label,date,model,model_label,trait,trait_name,trait_label,prediction_median,prediction_p10,prediction_p90,n_pixels,valid_obs_median
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-01-08,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,31.06361475653431,29.32881660183,32.74637898122512,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-01-08,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.210504894181181,11.195661350910287,13.109846170525119,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-01-08,xgb,XGBoost,LAI,LAI (m²/m²),LAI,3.2894340732955283,2.7665032690417046,3.6431243060743617,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-01-08,xgb,XGBoost,LMA,LMA (g/m²),LMA,80.54336856660618,74.39170993854181,86.03158087023151,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-01-08,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15156059125523427,0.14251387553594547,0.1580958334181927,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-01-22,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,31.34782303588734,30.304663152449088,33.3812511310737,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-01-22,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.327546205459619,11.133298028502747,13.251593687721599,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-01-22,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.90509691480291,2.4252414344302253,3.2883907279756,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-01-22,xgb,XGBoost,LMA,LMA (g/m²),LMA,81.32981735607896,71.8638851264006,87.270946257711,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-01-22,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.14911169854410525,0.1429220014613468,0.15844031888537735,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-02-05,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,29.542387876165584,28.532125571443668,31.727740488434907,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-02-05,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.749136819742954,10.897300446152848,12.612051250576329,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-02-05,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.3477171602786857,2.053513188456277,2.6541736166454526,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-02-05,xgb,XGBoost,LMA,LMA (g/m²),LMA,74.41527747561615,68.61904956735916,85.022850061327,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-02-05,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.14345841763291833,0.13740049264721493,0.15465544058886604,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-02-19,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,30.92393458063757,28.934885034687653,33.25882513166253,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-02-19,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,10.768893537126111,10.208555239611112,11.836641880250674,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-02-19,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.0006462878478644,1.770706574536874,2.3506250032671594,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-02-19,xgb,XGBoost,LMA,LMA (g/m²),LMA,67.42227296242109,62.235754672754815,79.37645707567329,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-02-19,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.13649622708490686,0.13033316919673518,0.1498823356626238,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-03-05,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,31.426747074950278,29.67311185144602,33.01055537019099,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-03-05,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,10.61788526179058,10.145831397870955,11.47000878068852,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-03-05,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.1227002644013395,1.9186132932595772,2.385649438921946,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-03-05,xgb,XGBoost,LMA,LMA (g/m²),LMA,69.53952055259,63.13745986719599,82.29229489126774,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-03-05,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.13018601185243417,0.1234334210230357,0.14731844323685286,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-03-19,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,30.455307170730045,29.218529950395606,32.66523870611911,300,4.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-03-19,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,10.871282553106337,10.351523656362122,11.834413028866882,300,4.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-03-19,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.1953071942982745,1.9559663252931239,2.6308415311787687,300,4.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-03-19,xgb,XGBoost,LMA,LMA (g/m²),LMA,66.8369589434329,62.61021544187499,77.03806228536295,300,4.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-03-19,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1319711964830543,0.12412029605330854,0.14579651372719707,300,4.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-04-02,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,31.91259466391427,30.323728135070244,34.069914102575304,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-04-02,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.032806334913431,10.459737547371942,12.199221954828145,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-04-02,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.402299123767013,1.9996455406423526,2.85185854226146,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-04-02,xgb,XGBoost,LMA,LMA (g/m²),LMA,67.83590626406895,60.82704301856664,77.87181739451981,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-04-02,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1408609988621926,0.1296093609375194,0.16027329381089522,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-04-16,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,32.71760115364877,31.054091356774812,34.69181334505335,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-04-16,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,10.975786951893722,10.453513727682399,12.377979461397127,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-04-16,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.4015171940401285,1.9326655323711286,2.8437384182602767,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-04-16,xgb,XGBoost,LMA,LMA (g/m²),LMA,68.49949005018016,61.40048587474443,81.29595928648433,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-04-16,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.13924980378298552,0.12596270944233337,0.16013667836458512,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-04-30,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,31.576242574629575,30.58314222042055,34.52713177657386,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-04-30,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,10.831932740701149,10.372808081907001,12.242760986706108,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-04-30,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.449984113885133,1.985676550887332,2.904696207823023,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-04-30,xgb,XGBoost,LMA,LMA (g/m²),LMA,69.20347060440405,63.706694485126434,82.0398921667117,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-04-30,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.13975803774911566,0.12908154367696162,0.16058687627935056,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-05-14,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,31.798434400879913,30.274526422096795,35.290734032214296,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-05-14,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.002140580157816,10.449438100458101,12.181907510348148,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-05-14,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.379458966316191,1.9674272170429947,2.744268883650215,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-05-14,xgb,XGBoost,LMA,LMA (g/m²),LMA,65.87255777019419,63.394803721076634,77.76965026820038,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-05-14,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.141202031890868,0.13489508608656764,0.15360795899009963,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-05-28,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.301658873660315,31.114870023608642,35.759216858048504,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-05-28,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.288722911624752,10.480726089052816,12.55736378249997,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-05-28,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.238323694315366,2.009481205329787,2.5534462414304517,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-05-28,xgb,XGBoost,LMA,LMA (g/m²),LMA,68.6034276799742,65.3908504136623,79.32469429223859,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-05-28,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.148431864658288,0.1407383377683873,0.1595017731451096,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-06-11,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,35.34187936254827,32.58320866647858,36.686200966810574,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-06-11,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.174781434042949,10.852399854227595,13.078099775292408,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-06-11,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.0020657497023278,1.8156389394885148,2.2926461479518476,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-06-11,xgb,XGBoost,LMA,LMA (g/m²),LMA,70.17863465795797,63.67326205999887,77.56891771894294,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-06-11,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15312092966322166,0.14249171088467708,0.1587741790576122,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-06-25,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,36.51856998196398,33.85821061815768,37.950497175829526,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-06-25,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.803095875990746,11.50708809400545,13.47182683735606,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-06-25,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.036441180393312,1.8297554747434102,2.195034171507398,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-06-25,xgb,XGBoost,LMA,LMA (g/m²),LMA,78.72505072599665,69.44949743672187,82.71131891782004,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-06-25,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1598187443623973,0.14723312902684835,0.16766083973454243,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-07-09,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,37.09773516899347,34.19338933001857,38.4044151947732,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-07-09,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.765293910056393,11.885178167540216,13.402445199660452,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-07-09,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.0497811494174156,1.8590186874884225,2.2733027157460794,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-07-09,xgb,XGBoost,LMA,LMA (g/m²),LMA,75.36768859833946,69.78059461330253,78.41505711912046,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-07-09,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.16314132153921554,0.1486975530838996,0.17166481034630432,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-07-23,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,38.37152724741878,33.94354250317111,39.65716217916257,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-07-23,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,13.505940657243775,11.869276601397894,13.88536703067781,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-07-23,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.0673398261989484,1.8760065687312837,2.208273089632725,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-07-23,xgb,XGBoost,LMA,LMA (g/m²),LMA,75.7868822800983,69.03931681726225,78.30147169122463,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-07-23,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.16752138422380017,0.15101878637994395,0.1810488967088359,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-08-06,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,38.0664335443957,33.16458640321129,39.34258314725015,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-08-06,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,13.549146157197612,11.941617474312583,14.097176698559073,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-08-06,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.0569712504626256,1.8733700868370442,2.2917515902911645,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-08-06,xgb,XGBoost,LMA,LMA (g/m²),LMA,76.09245768058588,70.31197985229643,78.1377923096872,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-08-06,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.16540746529488354,0.14443763761391387,0.17901689411780825,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-08-20,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,37.564065825808626,32.503943197055825,38.62322038983401,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-08-20,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,13.191273982521388,11.856043699663852,13.647808402823465,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-08-20,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.101076381146256,1.8956115289551168,2.3167483146451033,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-08-20,xgb,XGBoost,LMA,LMA (g/m²),LMA,72.4019857671165,67.24155577743566,75.55695689424046,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-08-20,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1645659908465527,0.14509565385507556,0.1752353987644037,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-09-03,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,35.80014091263851,31.0882506439038,37.027726077633794,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-09-03,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.404933665035825,11.682996484428479,12.901124103715667,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-09-03,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.060571181876358,1.8494275718989062,2.4609555180647087,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-09-03,xgb,XGBoost,LMA,LMA (g/m²),LMA,71.72736067012264,66.704521046234,75.5063474503812,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-09-03,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15494720719523403,0.14203090650333866,0.16328288197830587,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-09-17,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,34.95937753006373,31.47973669744919,36.53052051334058,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-09-17,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.882512211476355,11.345221883500999,12.412391702149028,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-09-17,xgb,XGBoost,LAI,LAI (m²/m²),LAI,1.7793096661426935,1.664852955669095,2.071927644492695,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-09-17,xgb,XGBoost,LMA,LMA (g/m²),LMA,68.7107000347392,65.11391893357417,71.75634085448246,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-09-17,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.14603065069537474,0.13599351472285923,0.1539087558889898,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-10-01,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.42517212314217,30.666946007471832,36.731926780927296,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-10-01,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.380261636599995,10.897565123256486,12.022056146418823,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-10-01,xgb,XGBoost,LAI,LAI (m²/m²),LAI,1.802090594802308,1.666871790953988,2.1463430377827897,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-10-01,xgb,XGBoost,LMA,LMA (g/m²),LMA,68.86924298070318,65.18938578526763,73.79762091896839,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-10-01,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.14206128522894917,0.13337136361038068,0.14931867154941952,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-10-15,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.643124623047456,30.60641801174802,36.41949065601625,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-10-15,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.480539415198187,10.999475823503625,12.324139511670307,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-10-15,xgb,XGBoost,LAI,LAI (m²/m²),LAI,1.7361056082867785,1.566851780256645,2.081638989044214,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-10-15,xgb,XGBoost,LMA,LMA (g/m²),LMA,70.3046541937575,67.24946792956578,78.08172025850747,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-10-15,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1420832197308545,0.13417177377744233,0.14959507875578068,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-10-29,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,31.580706100044893,30.088568944276858,33.493091802044994,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-10-29,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.471800278666736,10.919167342618987,12.364971795810234,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-10-29,xgb,XGBoost,LAI,LAI (m²/m²),LAI,1.8698864467675298,1.7070891712035026,2.4951916623817008,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-10-29,xgb,XGBoost,LMA,LMA (g/m²),LMA,72.22711455040763,68.45281392122389,79.4043374950797,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-10-29,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.14027341684284736,0.1339757516828721,0.14705238215545244,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-11-12,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,31.23446105365472,30.250627206064905,33.07620480710647,300,3.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-11-12,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,10.937351730816664,10.47845932637441,11.874259015496609,300,3.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-11-12,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.020486424761822,1.8373854811828711,2.398092541459339,300,3.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-11-12,xgb,XGBoost,LMA,LMA (g/m²),LMA,63.109327643487205,58.32588534137203,72.75793219186947,300,3.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-11-12,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.12267712446775661,0.1140015234080509,0.1400480520909267,300,3.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-11-26,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,32.18198165519739,31.401182883393016,33.83828150225086,300,2.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-11-26,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.487199980297623,11.15529752330068,12.297383390262356,300,2.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-11-26,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.155265953892834,2.009821951856092,2.4570072281281696,300,2.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-11-26,xgb,XGBoost,LMA,LMA (g/m²),LMA,67.54383760914155,61.28518240856831,78.51324512190884,300,2.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-11-26,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.13200405020560202,0.1252942867659863,0.14792029164479342,300,2.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-12-10,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,31.75258031065963,30.814845116014233,32.95849667990634,300,2.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-12-10,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.582488372358199,11.975615802656202,13.542504301783593,300,2.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-12-10,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.466198516472152,2.1045032493225686,2.7666108666413614,300,2.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-12-10,xgb,XGBoost,LMA,LMA (g/m²),LMA,70.96157282448563,62.95237597474054,79.40027190776318,300,2.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-12-10,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.13717799010566076,0.12593189081849965,0.14986256906076456,300,2.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-12-24,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,31.161199772417152,30.422121134144497,32.53502327527183,300,1.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-12-24,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.658145476213228,12.030790877745169,13.894380478280898,300,1.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-12-24,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.70231659476262,2.2944647186285443,3.218453442611833,300,1.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-12-24,xgb,XGBoost,LMA,LMA (g/m²),LMA,67.19948556287909,61.97626282367395,78.75582370974928,300,1.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2022-12-24,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.13643025819647303,0.1292939285593815,0.14863162420421908,300,1.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-01-07,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,29.203150284828155,28.5043989544613,31.095037344731814,300,2.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-01-07,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.499245425003464,10.942629221803294,12.525884551625973,300,2.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-01-07,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.601806192981706,2.1798006964174252,2.969870131192924,300,2.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-01-07,xgb,XGBoost,LMA,LMA (g/m²),LMA,70.16230388205375,62.402712091086,81.05942350086914,300,2.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-01-07,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1356668763286592,0.12441250810366754,0.1465621202401452,300,2.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-01-21,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,29.44924209421001,28.751548565811667,30.697324885605003,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-01-21,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.239090289278577,10.475449040244866,12.184827622081217,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-01-21,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.6649225591304946,2.1369111763477058,3.0412225397650947,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-01-21,xgb,XGBoost,LMA,LMA (g/m²),LMA,64.98353326291245,59.33900585153057,74.58430472817595,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-01-21,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1372059665235047,0.12684286794820637,0.14364534268768986,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-02-04,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,29.572622823680668,28.920026371819457,31.2185734544927,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-02-04,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.730047841746178,11.024376861639116,12.508852909430086,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-02-04,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.491253542796395,1.8750441337790476,2.994784546036078,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-02-04,xgb,XGBoost,LMA,LMA (g/m²),LMA,63.83288208133016,57.17547436878315,78.0019924886444,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-02-04,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.13441904886756584,0.1253363692403176,0.1460188932715443,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-02-18,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,30.232067543217383,29.263886818004938,32.06524304248143,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-02-18,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.333197436755245,10.72495932670693,12.077514528497407,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-02-18,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.404778177727882,1.9849584456671208,2.875299106904484,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-02-18,xgb,XGBoost,LMA,LMA (g/m²),LMA,69.9728522800645,62.79230158907964,82.01582302516007,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-02-18,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.13879811288068605,0.12687238292048436,0.15501569564481046,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-03-04,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,31.058704182505576,29.934151903885336,33.06917707363315,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-03-04,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,10.959911963453711,10.443892229121388,11.916175116891088,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-03-04,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.3004205848954973,1.9737585664254655,2.77002403267556,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-03-04,xgb,XGBoost,LMA,LMA (g/m²),LMA,70.60295282210139,65.03304050823495,80.91603360171831,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-03-04,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1350486272037786,0.12798366803294348,0.14972561652337732,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-03-18,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,28.72318684716395,27.831102035172382,32.79346279606545,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-03-18,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,10.925036944022107,10.386909027372205,11.835261672008441,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-03-18,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.5426290898629427,1.8276213846181455,3.0890310260259928,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-03-18,xgb,XGBoost,LMA,LMA (g/m²),LMA,66.37676689743816,61.2884000352338,77.92808885638358,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-03-18,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1396167801114222,0.12757478530830266,0.16012890119276132,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-04-01,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,29.77194741018034,28.698300658028707,33.830275811536325,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-04-01,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,10.6069386311056,10.21253593107272,11.810961532590717,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-04-01,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.5475224574254027,1.9130683706048046,2.9953230193814,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-04-01,xgb,XGBoost,LMA,LMA (g/m²),LMA,63.455808359434926,59.40476342135426,77.61330323755615,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-04-01,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.1356852546069724,0.12836953819803423,0.16062051038921926,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-04-15,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,31.873685879471758,30.477329578096324,34.83937547667541,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-04-15,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,10.723004675850103,10.197908173927656,11.889408456430651,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-04-15,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.4031867055922866,1.9011375203332925,2.8176723554418466,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-04-15,xgb,XGBoost,LMA,LMA (g/m²),LMA,65.81375022815934,63.35831514469749,79.04098689293626,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-04-15,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.13932269497799382,0.13246417978583885,0.15910486140587474,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-04-29,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,32.886285224221766,31.001739336117794,35.05233625335577,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-04-29,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.058090222404902,10.6167065681911,11.97868148133813,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-04-29,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.422765413202832,2.221539620439879,2.7034414742720005,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-04-29,xgb,XGBoost,LMA,LMA (g/m²),LMA,68.1389460854173,64.58118062222884,75.9270739317806,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-04-29,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.13976588005895302,0.13391947620233702,0.1517259600096571,300,7.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-05-13,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,33.91813238588145,32.32000944168478,35.25006424273809,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-05-13,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.49963642150163,10.844060961255966,12.487792204188569,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-05-13,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.042659463110197,1.8147219242444994,2.3965036852620223,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-05-13,xgb,XGBoost,LMA,LMA (g/m²),LMA,68.57701399557756,64.89039272675271,75.58422576846223,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-05-13,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.14699171492198948,0.13909409942021211,0.1543069585047082,300,5.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-05-27,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,34.32815722899644,32.86293255956822,35.584011574144675,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-05-27,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.758017881812739,10.936831695525079,12.606146656257884,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-05-27,xgb,XGBoost,LAI,LAI (m²/m²),LAI,1.9206513888699077,1.7500736767050473,2.1864984032942507,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-05-27,xgb,XGBoost,LMA,LMA (g/m²),LMA,71.55143048676973,66.51300046892793,77.82049924108122,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-05-27,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.14866802721814915,0.13859574880452735,0.15589876419329704,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-06-10,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,34.03093045888714,31.920257364100234,35.71410750791741,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-06-10,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,11.422179678053435,10.675848132515181,12.469615053903166,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-06-10,xgb,XGBoost,LAI,LAI (m²/m²),LAI,1.861809065525149,1.653751330411076,2.261086437542421,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-06-10,xgb,XGBoost,LMA,LMA (g/m²),LMA,69.49544835783514,63.59188374800592,75.49694422740767,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-06-10,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.14641002775670492,0.1340638260016969,0.15767471274379757,300,6.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-06-24,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,34.98222729698966,33.02689500411397,36.87580154279388,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-06-24,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.112563629184615,11.041172432928375,12.978661787971316,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-06-24,xgb,XGBoost,LAI,LAI (m²/m²),LAI,1.8946286161967354,1.6769376911147995,2.2194105702460143,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-06-24,xgb,XGBoost,LMA,LMA (g/m²),LMA,75.15095724257927,67.33936907996168,81.78339021636465,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-06-24,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15453318096903573,0.13972833501298548,0.16654071036036086,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-07-08,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,36.14244470060645,33.63266435670578,37.68237310043069,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-07-08,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.445364093045555,11.405238558124282,13.140319566500281,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-07-08,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.01413792096649,1.8000608789691044,2.202735417020728,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-07-08,xgb,XGBoost,LMA,LMA (g/m²),LMA,75.05422802986674,67.8029373649966,78.86675968111955,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-07-08,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.15783182592965145,0.14354467412828845,0.16395388205023104,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-07-22,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,37.89002250773504,34.152877344654314,39.59927081848613,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-07-22,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.983600315835996,11.552356307758378,13.406699124383165,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-07-22,xgb,XGBoost,LAI,LAI (m²/m²),LAI,1.9601949977462594,1.7694846736059708,2.172586201884874,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-07-22,xgb,XGBoost,LMA,LMA (g/m²),LMA,74.54123581395163,67.86151815432255,77.98533987134005,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-07-22,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.16432617501216318,0.14700618571174032,0.16916624632230381,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-08-05,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,38.13537989025596,34.51908777460465,39.56244702502348,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-08-05,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,13.127834828329902,11.566844209314057,13.700374526971327,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-08-05,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.0103075456817825,1.7957379888647704,2.1778914563328553,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-08-05,xgb,XGBoost,LMA,LMA (g/m²),LMA,73.19386126855511,67.39637090313911,76.26729289457612,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-08-05,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.16324132992942947,0.14519490982819686,0.17053564795623244,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-08-19,xgb,XGBoost,Chlorophyll,Chl content (μg/cm²),Chlorophyll,37.36334653855063,33.787153163528664,38.905210558011554,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-08-19,xgb,XGBoost,EWT,EWT (mg/cm²),EWT,12.88047496180819,11.694312251403112,13.29461604832047,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-08-19,xgb,XGBoost,LAI,LAI (m²/m²),LAI,2.0597867294417,1.8493529545902796,2.230915560024598,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-08-19,xgb,XGBoost,LMA,LMA (g/m²),LMA,74.5297067127561,68.40260036411745,78.66478110139082,300,8.0
+53,"site 53, Las Majadas de Tietar, Extremadura",2023-08-19,xgb,XGBoost,Nitrogen,N content (mg/cm²),Nitrogen,0.16120233658244576,0.14495337163678382,0.1662159078628766,300,8.0

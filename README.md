@@ -51,7 +51,7 @@ Known remaining tasks:
 2. Replace placeholder author affiliation details and complete `AUTHOR_NOTES.md`.
 3. **Figure decisions (handled by Chaonan):**
    - Figure 3 — decide whether panels a–c should be re-rendered as a traffic-light readiness matrix or retained as numerical heatmaps with the revised caption already in place.
-   - Figure 4 — decide whether to anchor the conceptual trait-anomaly trajectories in a real drought/heatwave case study from the European testbed.
+   - Figure 4 — re-rendered as a 2022 Le Bray/Bilos drought-anchor case study using local XGBoost-inferred trait trajectories; final visual/caption review remains before submission.
    - Figure 5 — decide whether to add an explicit 2026–2030 timeline track for the CHIME-SBG era.
 4. Add a real data/code availability statement once the underlying analysis outputs and repository release are frozen.
 5. Finalize acknowledgements and funding statements (MSCA + TEE Cube + LSCE + Leipzig).
