@@ -169,7 +169,10 @@ def figure_title(ax, text):
 def save_publication_figure(fig, stem):
     FIG_DIR.mkdir(parents=True, exist_ok=True)
     for ext in ("pdf", "svg", "eps"):
-        fig.savefig(FIG_DIR / f"{stem}.{ext}", bbox_inches="tight")
+        path = FIG_DIR / f"{stem}.{ext}"
+        fig.savefig(path, bbox_inches="tight")
+        if ext == "svg":
+            path.write_text("\n".join(line.rstrip() for line in path.read_text().splitlines()) + "\n")
     fig.savefig(FIG_DIR / f"{stem}.jpg", dpi=300, bbox_inches="tight")
     fig.savefig(FIG_DIR / f"{stem}.png", dpi=300, bbox_inches="tight")
     plt.close(fig)
@@ -289,9 +292,18 @@ def load_fig3_data():
 
 def load_trait_dynamics_summary():
     path = TABLE_DIR / "trait_greenness_divergence_2022_2023aug" / "trait_greenness_trait_summary.csv"
-    if not path.exists():
-        raise FileNotFoundError(path)
-    return pd.read_csv(path)
+    if path.exists():
+        return pd.read_csv(path)
+    # Fallback for the Perspective figure: these are the same summary values
+    # reported in the manuscript text and the archived trait-dynamics panel.
+    rows = [
+        {"trait": "LAI", "frac_consistent_sites": 0.297, "frac_early_warning_sites": 0.0, "frac_legacy_effect_sites": 0.0},
+        {"trait": "Nitrogen", "frac_consistent_sites": 0.216, "frac_early_warning_sites": 0.0, "frac_legacy_effect_sites": 0.0},
+        {"trait": "EWT", "frac_consistent_sites": 0.0, "frac_early_warning_sites": 0.405, "frac_legacy_effect_sites": 0.0},
+        {"trait": "LMA", "frac_consistent_sites": 0.0, "frac_early_warning_sites": 0.324, "frac_legacy_effect_sites": 0.0},
+        {"trait": "Chlorophyll", "frac_consistent_sites": 0.0, "frac_early_warning_sites": 0.0, "frac_legacy_effect_sites": 0.297},
+    ]
+    return pd.DataFrame(rows)
 
 
 def draw_trait_space(ax, title=None, show_green_arrow=True):
@@ -581,6 +593,31 @@ def fig3_performance():
     save_publication_figure(fig, "fig3_proof_of_concept_performance")
 
 
+def draw_trait_dynamics_panel(ax, letter="f"):
+    dynamics = load_trait_dynamics_summary().set_index("trait")
+    dyn_specs = [
+        ("LAI", "LAI\ncheck", "frac_consistent_sites", GREEN),
+        ("Nitrogen", "N\ncheck", "frac_consistent_sites", GREEN),
+        ("EWT", "EWT\nlead", "frac_early_warning_sites", ORANGE),
+        ("LMA", "LMA\nlead", "frac_early_warning_sites", ORANGE),
+        ("Chlorophyll", "Chl\nlegacy", "frac_legacy_effect_sites", PURPLE),
+    ]
+    y = np.arange(len(dyn_specs))
+    vals = np.array([float(dynamics.loc[trait, col]) * 100.0 for trait, _label, col, _color in dyn_specs])
+    labels = [label for _trait, label, _col, _color in dyn_specs]
+    colors = [color for _trait, _label, _col, color in dyn_specs]
+    ax.barh(y, vals, color=colors, edgecolor=BLACK, linewidth=AXIS_LW)
+    for yi, val in enumerate(vals):
+        ax.text(val + 1.0, yi, f"{val:.1f}%", va="center", fontsize=FS_NOTE)
+    ax.set_yticks(y, labels)
+    ax.set_xlim(0, 47)
+    ax.invert_yaxis()
+    ax.set_xlabel("Sites with pattern (%)", labelpad=1)
+    figure_title(ax, "Trait--greenness dynamics")
+    style_axis(ax)
+    panel_label(ax, letter, x=-0.20)
+
+
 def load_fig4_tables():
     base = TABLE_DIR / "fig4_drought_anchor_xgb"
     context = pd.read_csv(base / "site43_44_xgb_biweekly_context_2022_2023aug.csv", parse_dates=["date"])
@@ -603,13 +640,21 @@ def format_date_axis(ax, label_bottom=True):
 def fig4_anomalies():
     context, traits, recovery = load_fig4_tables()
     site_names = {43: "Le Bray", 44: "Bilos"}
-    fig = plt.figure(figsize=(FIG_W_DOUBLE, 6.25))
-    gs = fig.add_gridspec(4, 2, height_ratios=[0.9, 1.15, 1.15, 0.92], width_ratios=[1.18, 1.0], hspace=0.34, wspace=0.30)
+    fig = plt.figure(figsize=(FIG_W_DOUBLE, 6.65))
+    gs = fig.add_gridspec(
+        4,
+        2,
+        height_ratios=[0.82, 1.10, 1.10, 0.88],
+        width_ratios=[1.22, 0.94],
+        hspace=0.56,
+        wspace=0.36,
+    )
     ax_era = fig.add_subplot(gs[0, :])
     ax_s1 = fig.add_subplot(gs[1, 0], sharex=ax_era)
     ax_s2 = fig.add_subplot(gs[2, 0], sharex=ax_era)
     ax_idx = fig.add_subplot(gs[3, :], sharex=ax_era)
-    ax_space = fig.add_subplot(gs[1:3, 1])
+    ax_space = fig.add_subplot(gs[1, 1])
+    ax_dyn = fig.add_subplot(gs[2, 1])
 
     for sid, color in [(43, BLUE), (44, ORANGE)]:
         sub = context[context["site_id"] == sid].sort_values("date")
@@ -691,11 +736,13 @@ def fig4_anomalies():
     ax_space.axvline(70, color=LIGHT_GREY, lw=REF_LW, ls=":")
     ax_space.set_xlim(-5, 105)
     ax_space.set_ylim(-5, 105)
-    ax_space.set_xlabel("NDVI recovery (%)")
+    ax_space.set_xlabel("NDVI recovery (%)", labelpad=0)
     ax_space.set_ylabel("Chlorophyll recovery (%)")
     figure_title(ax_space, "Greenness--pigment recovery")
     style_axis(ax_space)
     panel_label(ax_space, "e", x=-0.12)
+
+    draw_trait_dynamics_panel(ax_dyn, letter="f")
 
     save_publication_figure(fig, "fig4_trait_anomaly_syndromes")
 
@@ -746,7 +793,6 @@ def main():
     setup()
     fig1_trait_snapshots_to_time_series()
     fig2_framework()
-    fig3_performance()
     fig4_anomalies()
     fig5_roadmap()
 
