@@ -29,6 +29,12 @@ UNIFIED_2022_TABLE = (
     / "fig3_all_sites_cap2000_flux_traits"
     / "all_sites_unified_biweekly_analysis_2022.csv"
 )
+PIXEL_TRAIT_PREDICTIONS = (
+    PAPER_ROOT
+    / "tables"
+    / "fig4_drought_anchor_xgb"
+    / "cap5000_sites_xgb_biweekly_trait_predictions_2022_2023aug.parquet"
+)
 FLUXNET_MAPPING = PAPER_ROOT / "tables" / "fig3_all_sites_cap2000_flux_traits" / "site_fluxnet_mapping.csv"
 FLUXNET_ZIP_DIR = PAPER_ROOT / "tables" / "fig3_all_sites_cap2000_flux_traits" / "fluxnet"
 
@@ -55,6 +61,11 @@ FLUXNET_SOURCE_VARS = [
 FLUX_VARS = ["GPP_NT_VUT_REF", "NEP_VUT_REF"]
 
 RECOVERY_THRESHOLD = 70.0
+S2_ROOT = ECOSPECTRA_ROOT / "input_data" / "s2" / "region"
+S2_WINDOW_DAYS = 28.0
+RESAMPLING_SEED = 20260601
+N_BOOTSTRAP = 20000
+N_PERMUTATIONS = 100000
 FOREST_SCOPE_TYPES = {
     "Evergreen forest",
     "Deciduous forest",
@@ -95,6 +106,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--recovery-table", type=Path, default=RECOVERY_TABLE)
     parser.add_argument("--unified-2022-table", type=Path, default=UNIFIED_2022_TABLE)
+    parser.add_argument("--pixel-trait-predictions", type=Path, default=PIXEL_TRAIT_PREDICTIONS)
     parser.add_argument("--fluxnet-mapping", type=Path, default=FLUXNET_MAPPING)
     parser.add_argument("--fluxnet-zip-dir", type=Path, default=FLUXNET_ZIP_DIR)
     parser.add_argument("--output-table-dir", type=Path, default=OUT_TABLE_DIR)
@@ -177,6 +189,33 @@ def recovery_score(value: float, baseline: float, trough: float, min_relative_ma
 def finite_median(values: pd.Series) -> float:
     vals = pd.to_numeric(values, errors="coerce").astype(float)
     return float(np.nanmedian(vals)) if np.isfinite(vals).any() else math.nan
+
+
+def safe_divide(num: np.ndarray, den: np.ndarray) -> np.ndarray:
+    num = np.asarray(num, dtype=np.float32)
+    den = np.asarray(den, dtype=np.float32)
+    out = np.full(num.shape, np.nan, dtype=np.float32)
+    finite = np.isfinite(num) & np.isfinite(den) & (np.abs(den) > 1e-12)
+    out[finite] = num[finite] / den[finite]
+    return out
+
+
+def nearest_20m_index(index_30m: int, max_size: int) -> int:
+    raw = int(round(((float(index_30m) + 0.5) * 1.5) - 0.5))
+    return int(np.clip(raw, 0, max_size - 1))
+
+
+def pixel_uid(site_id: int, y: int, x: int) -> str:
+    return f"site_{int(site_id)}_y_{int(y)}_x_{int(x)}"
+
+
+def in_recovery_windows(date: pd.Timestamp) -> bool:
+    date = pd.Timestamp(date)
+    return bool(
+        (BASELINE_START <= date <= BASELINE_END)
+        or (TROUGH_START <= date <= TROUGH_END)
+        or (RECOVERY_2023_START <= date <= RECOVERY_2023_END)
+    )
 
 
 def load_recovery_site_metrics(path: Path, threshold: float) -> pd.DataFrame:
@@ -608,6 +647,126 @@ def add_metric_association(
     )
 
 
+def paired_site_data(site: pd.DataFrame, metric_key: str) -> pd.DataFrame:
+    metric_col = GPP_METRICS[metric_key]["column"]
+    required = ["site_id", "site_name", "forest_type", "legacy_gap_pct", "quadrant", metric_col]
+    pair = site[required].copy()
+    pair = pair[np.isfinite(pair["legacy_gap_pct"]) & np.isfinite(pair[metric_col])].copy()
+    return pair.sort_values("site_id").reset_index(drop=True)
+
+
+def spearman_array(x: np.ndarray, y: np.ndarray) -> float:
+    if len(x) < 3 or len(y) < 3:
+        return math.nan
+    if float(np.nanstd(x)) <= 1e-12 or float(np.nanstd(y)) <= 1e-12:
+        return math.nan
+    xr = stats.rankdata(np.asarray(x, dtype=float), method="average")
+    yr = stats.rankdata(np.asarray(y, dtype=float), method="average")
+    if float(np.nanstd(xr)) <= 1e-12 or float(np.nanstd(yr)) <= 1e-12:
+        return math.nan
+    return float(np.corrcoef(xr, yr)[0, 1])
+
+
+def site_level_resampling_summary(
+    pair: pd.DataFrame,
+    metric_key: str,
+    n_bootstrap: int = N_BOOTSTRAP,
+    n_permutations: int = N_PERMUTATIONS,
+    seed: int = RESAMPLING_SEED,
+) -> dict[str, object]:
+    metric_col = GPP_METRICS[metric_key]["column"]
+    x = pd.to_numeric(pair["legacy_gap_pct"], errors="coerce").to_numpy(dtype=float)
+    y = pd.to_numeric(pair[metric_col], errors="coerce").to_numpy(dtype=float)
+    n = int(len(pair))
+    observed = spearman_array(x, y)
+    out: dict[str, object] = {
+        f"{metric_key}_site_resampling_n": n,
+        f"{metric_key}_bootstrap_replicates": int(n_bootstrap),
+        f"{metric_key}_permutation_replicates": int(n_permutations),
+        f"{metric_key}_resampling_seed": int(seed),
+        f"{metric_key}_bootstrap_spearman_median": math.nan,
+        f"{metric_key}_bootstrap_spearman_ci_low": math.nan,
+        f"{metric_key}_bootstrap_spearman_ci_high": math.nan,
+        f"{metric_key}_bootstrap_spearman_valid": 0,
+        f"{metric_key}_permutation_spearman_p_two_sided": math.nan,
+        f"{metric_key}_permutation_spearman_p_directional_negative": math.nan,
+    }
+    if n < 3 or not np.isfinite(observed):
+        return out
+    rng = np.random.default_rng(seed)
+    boot = np.full(int(n_bootstrap), np.nan, dtype=float)
+    for idx in range(int(n_bootstrap)):
+        take = rng.integers(0, n, size=n)
+        boot[idx] = spearman_array(x[take], y[take])
+    valid_boot = boot[np.isfinite(boot)]
+    if valid_boot.size:
+        out.update(
+            {
+                f"{metric_key}_bootstrap_spearman_median": float(np.nanmedian(valid_boot)),
+                f"{metric_key}_bootstrap_spearman_ci_low": float(np.nanquantile(valid_boot, 0.025)),
+                f"{metric_key}_bootstrap_spearman_ci_high": float(np.nanquantile(valid_boot, 0.975)),
+                f"{metric_key}_bootstrap_spearman_valid": int(valid_boot.size),
+            }
+        )
+
+    perm = np.full(int(n_permutations), np.nan, dtype=float)
+    xr = stats.rankdata(x, method="average")
+    yr = stats.rankdata(y, method="average")
+    for idx in range(int(n_permutations)):
+        perm[idx] = float(np.corrcoef(xr, rng.permutation(yr))[0, 1])
+    valid_perm = perm[np.isfinite(perm)]
+    if valid_perm.size:
+        out[f"{metric_key}_permutation_spearman_p_two_sided"] = float(
+            (np.count_nonzero(np.abs(valid_perm) >= abs(observed)) + 1) / (valid_perm.size + 1)
+        )
+        out[f"{metric_key}_permutation_spearman_p_directional_negative"] = float(
+            (np.count_nonzero(valid_perm <= observed) + 1) / (valid_perm.size + 1)
+        )
+    return out
+
+
+def leave_one_out_table(pair: pd.DataFrame, metric_key: str) -> pd.DataFrame:
+    metric_col = GPP_METRICS[metric_key]["column"]
+    rows: list[dict[str, object]] = []
+    for rec in pair.itertuples(index=False):
+        keep = pair[pair["site_id"].astype(int) != int(rec.site_id)].copy()
+        rho, pval, n = corr_test_value(keep["legacy_gap_pct"], keep[metric_col], method="spearman")
+        rows.append(
+            {
+                "omitted_site_id": int(rec.site_id),
+                "omitted_site_name": str(rec.site_name),
+                "omitted_forest_type": str(rec.forest_type),
+                "omitted_quadrant": str(rec.quadrant),
+                "n_remaining": int(n),
+                "spearman_rho": rho,
+                "spearman_p_scipy": pval,
+            }
+        )
+    return pd.DataFrame(rows).sort_values("omitted_site_id")
+
+
+def add_leave_one_out_summary(summary: dict[str, object], loo: pd.DataFrame, metric_key: str) -> None:
+    vals = pd.to_numeric(loo["spearman_rho"], errors="coerce").dropna().astype(float)
+    if vals.empty:
+        summary.update(
+            {
+                f"{metric_key}_loo_min_rho": math.nan,
+                f"{metric_key}_loo_max_rho": math.nan,
+                f"{metric_key}_loo_negative_fraction": math.nan,
+                f"{metric_key}_loo_all_negative": False,
+            }
+        )
+        return
+    summary.update(
+        {
+            f"{metric_key}_loo_min_rho": float(vals.min()),
+            f"{metric_key}_loo_max_rho": float(vals.max()),
+            f"{metric_key}_loo_negative_fraction": float(np.mean(vals < 0)),
+            f"{metric_key}_loo_all_negative": bool((vals < 0).all()),
+        }
+    )
+
+
 def build_summary(site: pd.DataFrame, threshold: float, scope_name: str, primary_metric: str) -> dict[str, object]:
     gpp_flux = site[np.isfinite(site["gpp_anomaly_pct_2023_vs_baseline"])].copy()
     gpp_pair = site[np.isfinite(site["legacy_gap_pct"]) & np.isfinite(site["gpp_anomaly_pct_2023_vs_baseline"])].copy()
@@ -691,6 +850,413 @@ def metric_value_fmt(value: float, metric_key: str) -> str:
     if metric_key.endswith("_baseline"):
         return f"{value:+.1f}%"
     return f"{value:+.2f}"
+
+
+def load_pixel_chlorophyll_recovery(
+    pred_path: Path,
+    site_ids: list[int],
+    threshold: float,
+) -> pd.DataFrame:
+    if not pred_path.exists():
+        return pd.DataFrame()
+    cols = ["site_id", "date", "y", "x", "pixel_uid", "hrl_tcd", "trait", "prediction", "valid_obs_count"]
+    pred = pd.read_parquet(pred_path, columns=cols)
+    pred = pred[(pred["site_id"].astype(int).isin([int(v) for v in site_ids])) & (pred["trait"] == "Chlorophyll")].copy()
+    if pred.empty:
+        return pd.DataFrame()
+    pred["date"] = pd.to_datetime(pred["date"])
+    rows: list[dict[str, object]] = []
+    for keys, sub in pred.groupby(["site_id", "pixel_uid", "y", "x"], sort=True):
+        site_id, uid, y, x = keys
+        baseline = pd.to_numeric(
+            sub[(sub["date"] >= BASELINE_START) & (sub["date"] <= BASELINE_END)]["prediction"],
+            errors="coerce",
+        )
+        trough = pd.to_numeric(
+            sub[(sub["date"] >= TROUGH_START) & (sub["date"] <= TROUGH_END)]["prediction"],
+            errors="coerce",
+        )
+        recovery = pd.to_numeric(
+            sub[(sub["date"] >= RECOVERY_2023_START) & (sub["date"] <= RECOVERY_2023_END)]["prediction"],
+            errors="coerce",
+        )
+        baseline_med = float(np.nanmedian(baseline)) if np.isfinite(baseline).any() else math.nan
+        trough_med = float(np.nanmedian(trough)) if np.isfinite(trough).any() else math.nan
+        recovery_med = float(np.nanmedian(recovery)) if np.isfinite(recovery).any() else math.nan
+        rec_raw, rec_clip, interpretable = recovery_score(recovery_med, baseline_med, trough_med, min_relative_magnitude=0.02)
+        rows.append(
+            {
+                "site_id": int(site_id),
+                "pixel_uid": str(uid),
+                "y": int(y),
+                "x": int(x),
+                "chl_baseline_median": baseline_med,
+                "chl_trough_median": trough_med,
+                "chl_recovery_value_2023": recovery_med,
+                "chl_recovery_pct_raw_2023": rec_raw,
+                "chl_recovery_pct_2023": rec_clip,
+                "chl_recovery_interpretable": bool(interpretable),
+                "chl_legacy_pixel": bool(np.isfinite(rec_clip) and rec_clip < threshold),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def build_pixel_ndvi_timeseries(
+    pred_path: Path,
+    site_ids: list[int],
+    out_path: Path,
+    force: bool = False,
+) -> pd.DataFrame:
+    if out_path.exists() and not force:
+        cached = pd.read_csv(out_path, parse_dates=["date"])
+        cached = cached[cached["site_id"].astype(int).isin([int(v) for v in site_ids])].copy()
+        if not cached.empty:
+            return cached
+    try:
+        import xarray as xr
+    except ImportError as exc:
+        raise RuntimeError("xarray is required to build pixel-level Sentinel-2 NDVI support.") from exc
+
+    pred_cols = ["site_id", "date", "y", "x", "pixel_uid", "trait"]
+    pred = pd.read_parquet(pred_path, columns=pred_cols)
+    pred = pred[(pred["site_id"].astype(int).isin([int(v) for v in site_ids])) & (pred["trait"] == "Chlorophyll")].copy()
+    if pred.empty:
+        return pd.DataFrame()
+    pred["date"] = pd.to_datetime(pred["date"])
+    rows: list[dict[str, object]] = []
+    for site_id, site_pred in pred.groupby("site_id", sort=True):
+        site_id = int(site_id)
+        pixels = site_pred[["site_id", "y", "x", "pixel_uid"]].drop_duplicates().sort_values(["y", "x"]).copy()
+        dates = pd.DatetimeIndex([d for d in sorted(site_pred["date"].dropna().unique()) if in_recovery_windows(pd.Timestamp(d))])
+        if pixels.empty or dates.empty:
+            continue
+        print(f"[pixel-ndvi] site={site_id} pixels={len(pixels)} recovery-window dates={len(dates)}", flush=True)
+        y_values = pixels["y"].to_numpy(dtype=np.int32)
+        x_values = pixels["x"].to_numpy(dtype=np.int32)
+        pixel_records = pixels.to_dict("records")
+        for year, year_dates in pd.Series(dates).groupby(pd.Series(dates).dt.year):
+            s2_path = S2_ROOT / f"site_{site_id}" / f"site_{site_id}_s2_region_{int(year)}.zarr"
+            if not s2_path.exists():
+                print(f"[warn] missing Sentinel-2 zarr for pixel NDVI site={site_id} year={int(year)}: {s2_path}", flush=True)
+                continue
+            ds = xr.open_zarr(s2_path, consolidated=False)
+            source_times = ds.time.values.astype("datetime64[ns]")
+            y10_min, y10_max = int(y_values.min() * 3), int(y_values.max() * 3 + 3)
+            x10_min, x10_max = int(x_values.min() * 3), int(x_values.max() * 3 + 3)
+            y20_values = np.array([nearest_20m_index(int(v), int(ds.sizes["y_20m"])) for v in y_values], dtype=np.int32)
+            x20_values = np.array([nearest_20m_index(int(v), int(ds.sizes["x_20m"])) for v in x_values], dtype=np.int32)
+            y20_min, y20_max = int(y20_values.min()), int(y20_values.max() + 1)
+            x20_min, x20_max = int(x20_values.min()), int(x20_values.max() + 1)
+
+            for center_date in pd.DatetimeIndex(year_dates):
+                trait_time = np.datetime64(center_date, "ns")
+                delta_all = ((source_times - trait_time) / np.timedelta64(1, "D")).astype(np.float32)
+                time_indices = np.where(np.abs(delta_all) <= S2_WINDOW_DAYS)[0]
+                if time_indices.size == 0:
+                    for pix in pixel_records:
+                        rows.append(
+                            {
+                                "site_id": site_id,
+                                "date": pd.Timestamp(center_date),
+                                "y": int(pix["y"]),
+                                "x": int(pix["x"]),
+                                "pixel_uid": str(pix["pixel_uid"]),
+                                "ndvi": math.nan,
+                                "n_valid_obs": 0,
+                            }
+                        )
+                    continue
+
+                refl10 = (
+                    ds["reflectance_10m"]
+                    .isel(time=time_indices.tolist(), y_10m=slice(y10_min, y10_max), x_10m=slice(x10_min, x10_max))
+                    .transpose("time", "y_10m", "x_10m", "band_10m")
+                    .values
+                    .astype(np.float32, copy=False)
+                )
+                refl20 = (
+                    ds["reflectance_20m"]
+                    .isel(time=time_indices.tolist(), y_20m=slice(y20_min, y20_max), x_20m=slice(x20_min, x20_max))
+                    .transpose("time", "y_20m", "x_20m", "band_20m")
+                    .values
+                    .astype(np.float32, copy=False)
+                )
+                adv = (
+                    ds["advanced_valid_mask"]
+                    .isel(time=time_indices.tolist(), y_20m=slice(y20_min, y20_max), x_20m=slice(x20_min, x20_max))
+                    .transpose("time", "y_20m", "x_20m")
+                    .values
+                )
+
+                for pix, y20, x20 in zip(pixel_records, y20_values, x20_values, strict=False):
+                    y = int(pix["y"])
+                    x = int(pix["x"])
+                    y10_rel = int(y * 3 - y10_min)
+                    x10_rel = int(x * 3 - x10_min)
+                    sub10 = refl10[:, y10_rel : y10_rel + 3, x10_rel : x10_rel + 3, :]
+                    valid_sub = np.isfinite(sub10).all(axis=-1)
+                    masked10 = np.where(valid_sub[..., None], sub10, 0.0).astype(np.float32, copy=False)
+                    valid_counts_10m = valid_sub.sum(axis=(1, 2)).astype(np.float32, copy=False)
+                    mean10 = np.divide(
+                        masked10.sum(axis=(1, 2), dtype=np.float32),
+                        valid_counts_10m[:, None],
+                        out=np.full((len(time_indices), masked10.shape[-1]), np.nan, dtype=np.float32),
+                        where=valid_counts_10m[:, None] > 0,
+                    )
+                    red = mean10[:, 2]
+                    nir = mean10[:, 3]
+                    ndvi_values = safe_divide(nir - red, nir + red)
+                    pix20 = refl20[:, int(y20 - y20_min), int(x20 - x20_min), :]
+                    pix_adv = adv[:, int(y20 - y20_min), int(x20 - x20_min)]
+                    valid_obs = (
+                        valid_sub.any(axis=(1, 2))
+                        & np.isfinite(pix20).all(axis=1)
+                        & (pix_adv > 0)
+                        & np.isfinite(ndvi_values)
+                    )
+                    vals = ndvi_values[valid_obs].astype(float)
+                    rows.append(
+                        {
+                            "site_id": site_id,
+                            "date": pd.Timestamp(center_date),
+                            "y": y,
+                            "x": x,
+                            "pixel_uid": str(pix["pixel_uid"]),
+                            "ndvi": float(np.nanmedian(vals)) if vals.size else math.nan,
+                            "n_valid_obs": int(vals.size),
+                        }
+                    )
+            ds.close()
+
+    out = pd.DataFrame(rows)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out.to_csv(out_path, index=False)
+    return out
+
+
+def build_pixel_ndvi_recovery(ndvi_ts: pd.DataFrame, threshold: float) -> pd.DataFrame:
+    if ndvi_ts.empty:
+        return pd.DataFrame()
+    ndvi = ndvi_ts.copy()
+    ndvi["date"] = pd.to_datetime(ndvi["date"])
+    rows: list[dict[str, object]] = []
+    for keys, sub in ndvi.groupby(["site_id", "pixel_uid", "y", "x"], sort=True):
+        site_id, uid, y, x = keys
+        baseline = pd.to_numeric(sub[(sub["date"] >= BASELINE_START) & (sub["date"] <= BASELINE_END)]["ndvi"], errors="coerce")
+        trough = pd.to_numeric(sub[(sub["date"] >= TROUGH_START) & (sub["date"] <= TROUGH_END)]["ndvi"], errors="coerce")
+        recovery = pd.to_numeric(
+            sub[(sub["date"] >= RECOVERY_2023_START) & (sub["date"] <= RECOVERY_2023_END)]["ndvi"],
+            errors="coerce",
+        )
+        baseline_med = float(np.nanmedian(baseline)) if np.isfinite(baseline).any() else math.nan
+        trough_med = float(np.nanmedian(trough)) if np.isfinite(trough).any() else math.nan
+        recovery_med = float(np.nanmedian(recovery)) if np.isfinite(recovery).any() else math.nan
+        rec_raw, rec_clip, interpretable = recovery_score(recovery_med, baseline_med, trough_med, min_relative_magnitude=0.01)
+        rows.append(
+            {
+                "site_id": int(site_id),
+                "pixel_uid": str(uid),
+                "y": int(y),
+                "x": int(x),
+                "ndvi_baseline_median": baseline_med,
+                "ndvi_trough_median": trough_med,
+                "ndvi_recovery_value_2023": recovery_med,
+                "ndvi_recovery_pct_raw_2023": rec_raw,
+                "ndvi_recovery_pct_2023": rec_clip,
+                "ndvi_recovery_interpretable": bool(interpretable),
+                "ndvi_recovered_pixel": bool(np.isfinite(rec_clip) and rec_clip >= threshold),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def build_pixel_recovery_table(
+    pred_path: Path,
+    site: pd.DataFrame,
+    site_ids: list[int],
+    metric_key: str,
+    threshold: float,
+    out_dir: Path,
+) -> tuple[pd.DataFrame, dict[str, object]]:
+    if not site_ids:
+        return pd.DataFrame(), {}
+    chl = load_pixel_chlorophyll_recovery(pred_path, site_ids, threshold)
+    if chl.empty:
+        return pd.DataFrame(), {}
+    ndvi_cache = out_dir / "pixel_ndvi_timeseries_forest_pairwise.csv"
+    ndvi_ts = build_pixel_ndvi_timeseries(pred_path, site_ids, ndvi_cache, force=False)
+    ndvi = build_pixel_ndvi_recovery(ndvi_ts, threshold)
+    if chl.empty or ndvi.empty:
+        return pd.DataFrame(), {}
+    pixel = ndvi.merge(chl, on=["site_id", "pixel_uid", "y", "x"], how="inner")
+    metric_col = GPP_METRICS[metric_key]["column"]
+    enrich_cols = [
+        "site_id",
+        "site_name",
+        "forest_type",
+        "quadrant",
+        "legacy_gap_pct",
+        "ndvi_recovery_pct_2023",
+        "chl_recovery_pct_2023",
+        metric_col,
+    ]
+    site_enrich = site[[c for c in enrich_cols if c in site.columns]].drop_duplicates("site_id")
+    pixel = pixel.merge(site_enrich, on="site_id", how="left", suffixes=("", "_site"))
+    pixel["pixel_recovery_interpretable"] = (
+        pixel["ndvi_recovery_interpretable"].astype(bool) & pixel["chl_recovery_interpretable"].astype(bool)
+    )
+    pixel["pixel_legacy_quadrant"] = (
+        pixel["pixel_recovery_interpretable"]
+        & (pd.to_numeric(pixel["ndvi_recovery_pct_2023"], errors="coerce") >= threshold)
+        & (pd.to_numeric(pixel["chl_recovery_pct_2023"], errors="coerce") < threshold)
+    )
+    desc = pixel[pixel["pixel_recovery_interpretable"]].copy()
+    legacy_n = int(pixel.loc[desc.index, "pixel_legacy_quadrant"].sum()) if not desc.empty else 0
+    summary = {
+        "pixel_scope_site_n": int(pd.Series(site_ids).nunique()),
+        "pixel_total_n": int(len(pixel)),
+        "pixel_interpretable_n": int(len(desc)),
+        "pixel_legacy_quadrant_n": legacy_n,
+        "pixel_legacy_quadrant_fraction": float(legacy_n / len(desc)) if len(desc) else math.nan,
+        "pixel_ndvi_source": str(ndvi_cache),
+        "pixel_flux_inference_guardrail": (
+            "Pixel counts describe greenness-chlorophyll decoupling and within-site trait heterogeneity only; "
+            "flux corroboration remains site-level because GPP is one footprint-integrated observation per site."
+        ),
+    }
+    return pixel, summary
+
+
+def plot_pixel_decoupling_hexbin(pixel: pd.DataFrame, summary: dict[str, object], out_dir: Path, threshold: float) -> list[str]:
+    if pixel.empty:
+        return []
+    plot_df = pixel[pixel["pixel_recovery_interpretable"]].copy()
+    plot_df = plot_df[
+        np.isfinite(plot_df["ndvi_recovery_pct_2023"]) & np.isfinite(plot_df["chl_recovery_pct_2023"])
+    ].copy()
+    if plot_df.empty:
+        return []
+    fig, ax = plt.subplots(figsize=(4.2, 3.55))
+    cmap = LinearSegmentedColormap.from_list("pixel_density", ["#F7F7F7", "#91BFDB", "#2C7FB8", "#08306B"])
+    hb = ax.hexbin(
+        plot_df["ndvi_recovery_pct_2023"],
+        plot_df["chl_recovery_pct_2023"],
+        gridsize=36,
+        extent=(0, 100, 0, 100),
+        mincnt=1,
+        cmap=cmap,
+        linewidths=0,
+    )
+    ax.axvspan(threshold, 100, ymin=0.0, ymax=threshold / 100.0, facecolor="#F4E7CB", alpha=0.40, lw=0)
+    ax.axvline(threshold, color="#777777", lw=0.65, ls=":")
+    ax.axhline(threshold, color="#777777", lw=0.65, ls=":")
+    ax.axline((0, 0), slope=1, color="#BBBBBB", lw=0.5, ls="--", zorder=0)
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 100)
+    ax.set_xlabel("Pixel NDVI recovery in 2023 (%)")
+    ax.set_ylabel("Pixel chlorophyll recovery in 2023 (%)")
+    ax.text(threshold + 2, 7, "legacy pixels", fontsize=7, ha="left", va="bottom", color="#5C4033")
+    legacy_pct = 100.0 * float(summary.get("pixel_legacy_quadrant_fraction", math.nan))
+    note = (
+        f"{summary.get('pixel_scope_site_n', 0)} forest flux sites\n"
+        f"interpretable pixels n={summary.get('pixel_interpretable_n', 0):,}\n"
+        f"legacy pixels={legacy_pct:.1f}%\n"
+        "descriptive; no pixel p value"
+    )
+    ax.text(
+        0.03,
+        0.97,
+        note,
+        transform=ax.transAxes,
+        ha="left",
+        va="top",
+        fontsize=6.7,
+        bbox=dict(facecolor="white", edgecolor="none", alpha=0.86, pad=2.0),
+    )
+    cbar = fig.colorbar(hb, ax=ax, fraction=0.046, pad=0.025)
+    cbar.set_label("Pixels per hexagon")
+    cbar.ax.tick_params(labelsize=7, width=0.5, length=3)
+    style_axis(ax)
+    fig.tight_layout()
+    return save_figure(fig, out_dir, "fig_pixel_greenness_chlorophyll_decoupling_hexbin")
+
+
+def plot_chl_pixel_violin(
+    pixel: pd.DataFrame,
+    out_dir: Path,
+    threshold: float,
+    gpp_metric: str = PRIMARY_GPP_METRIC,
+) -> list[str]:
+    if pixel.empty:
+        return []
+    metric_col = GPP_METRICS[gpp_metric]["column"]
+    plot_df = pixel[pixel["chl_recovery_interpretable"] & np.isfinite(pixel["chl_recovery_pct_2023"])].copy()
+    plot_df = plot_df[np.isfinite(plot_df[metric_col])].copy()
+    if plot_df.empty:
+        return []
+    site_order = (
+        plot_df[["site_id", "site_name", metric_col]]
+        .drop_duplicates("site_id")
+        .sort_values(metric_col, ascending=True)["site_id"]
+        .astype(int)
+        .tolist()
+    )
+    data = [
+        pd.to_numeric(plot_df.loc[plot_df["site_id"].astype(int) == site_id, "chl_recovery_pct_2023"], errors="coerce")
+        .dropna()
+        .to_numpy(dtype=float)
+        for site_id in site_order
+    ]
+    site_metric = plot_df[["site_id", metric_col]].drop_duplicates("site_id").set_index("site_id")[metric_col].astype(float)
+    site_names = plot_df[["site_id", "site_name"]].drop_duplicates("site_id").set_index("site_id")["site_name"].astype(str)
+    fig, ax = plt.subplots(figsize=(7.2, 3.2))
+    cmap = LinearSegmentedColormap.from_list("suppressed_recovered", ["#D55E00", "#F7F7F7", "#0072B2"])
+    finite_vals = site_metric[np.isfinite(site_metric)]
+    vmax = max(1.0, min(3.0, float(np.nanpercentile(np.abs(finite_vals), 85)))) if len(finite_vals) else 2.0
+    norm = TwoSlopeNorm(vmin=-vmax, vcenter=0.0, vmax=vmax)
+    parts = ax.violinplot(data, positions=np.arange(1, len(site_order) + 1), widths=0.72, showextrema=False)
+    for body, site_id in zip(parts["bodies"], site_order):
+        color = cmap(norm(float(site_metric.loc[site_id]))) if site_id in site_metric.index else "#BBBBBB"
+        body.set_facecolor(color)
+        body.set_edgecolor("#333333")
+        body.set_linewidth(0.35)
+        body.set_alpha(0.82)
+    medians = [float(np.nanmedian(v)) if len(v) else math.nan for v in data]
+    ax.scatter(
+        np.arange(1, len(site_order) + 1),
+        medians,
+        s=18,
+        color="white",
+        edgecolor="black",
+        linewidth=0.45,
+        zorder=3,
+    )
+    ax.axhline(threshold, color="#777777", lw=0.65, ls=":")
+    ax.set_ylim(-5, 105)
+    ax.set_ylabel("Pixel chlorophyll recovery in 2023 (%)")
+    ax.set_xlabel("Forest flux sites sorted by GPP persistence anomaly")
+    labels = [f"{sid}\n{site_names.loc[sid].split(',')[0][:10]}" if sid in site_names.index else str(sid) for sid in site_order]
+    ax.set_xticks(np.arange(1, len(site_order) + 1), labels)
+    ax.tick_params(axis="x", labelsize=6.4)
+    ax.text(
+        0.01,
+        0.97,
+        "Violin width shows footprint-pixel heterogeneity;\nflux corroboration is still site-level.",
+        transform=ax.transAxes,
+        ha="left",
+        va="top",
+        fontsize=6.7,
+        bbox=dict(facecolor="white", edgecolor="none", alpha=0.86, pad=2.0),
+    )
+    sm = mpl.cm.ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])
+    cbar = fig.colorbar(sm, ax=ax, fraction=0.035, pad=0.018)
+    cbar.set_label(GPP_METRICS[gpp_metric]["label"])
+    cbar.ax.tick_params(labelsize=7, width=0.5, length=3)
+    style_axis(ax)
+    fig.tight_layout()
+    return save_figure(fig, out_dir, "fig_flux_corroborated_chl_pixel_violin")
 
 
 def plot_quadrant(
@@ -800,7 +1366,7 @@ def plot_quadrant(
     )
     note = (
         f"{scope_label}\n"
-        f"paired n={summary[f'{gpp_metric}_pairwise_n']} "
+        f"site-level paired n={summary[f'{gpp_metric}_pairwise_n']} "
         f"({summary['n_sites_with_gpp_flux']} finite GPP)\n"
         f"rho={summary[f'{gpp_metric}_spearman_legacy_gap']:+.2f}, "
         f"p={format_p(summary[f'{gpp_metric}_spearman_legacy_gap_p'])}\n"
@@ -979,13 +1545,16 @@ def plot_forest_composite(
     ax.set_xlabel("NDVI recovery in 2023 (%)")
     ax.set_ylabel("Chlorophyll recovery in 2023 (%)")
     ax.text(threshold + 2, 7, "legacy quadrant", fontsize=7, ha="left", va="bottom", color="#5C4033")
+    perm_p = summary.get(f"{gpp_metric}_permutation_spearman_p_two_sided", math.nan)
+    ci_low = summary.get(f"{gpp_metric}_bootstrap_spearman_ci_low", math.nan)
+    ci_high = summary.get(f"{gpp_metric}_bootstrap_spearman_ci_high", math.nan)
+    ci_text = f"[{ci_low:+.2f}, {ci_high:+.2f}]" if np.isfinite(ci_low) and np.isfinite(ci_high) else "NA"
     note = (
-        f"forest-domain paired n={summary[f'{gpp_metric}_pairwise_n']}\n"
+        f"site-level paired n={summary[f'{gpp_metric}_pairwise_n']}\n"
         f"rho={summary[f'{gpp_metric}_spearman_legacy_gap']:+.2f}, "
-        f"p={format_p(summary[f'{gpp_metric}_spearman_legacy_gap_p'])}\n"
-        f"legacy median {metric_value_fmt(summary[f'{gpp_metric}_legacy_median'], gpp_metric)}\n"
-        f"other median {metric_value_fmt(summary[f'{gpp_metric}_nonlegacy_median'], gpp_metric)}; "
-        f"U p={format_p(summary[f'{gpp_metric}_mann_whitney_p'])}"
+        f"perm p={format_p(perm_p)}\n"
+        f"bootstrap 95% CI {ci_text}\n"
+        f"MW p={format_p(summary[f'{gpp_metric}_mann_whitney_p'])}"
     )
     ax.text(
         0.03,
@@ -1334,12 +1903,20 @@ def write_figure_notes(
     summaries: dict[str, dict[str, object]],
     site: pd.DataFrame,
     primary_metric: str,
+    pixel_summary: dict[str, object] | None = None,
 ) -> Path:
     path = out_dir / "figure_notes.md"
     forest = summaries["forest_main"]
     all_pft = summaries["all_pft_sensitivity"]
     strict = summaries["strict_forest_sensitivity"]
     primary_label = GPP_METRICS[primary_metric]["label"]
+    pixel_summary = pixel_summary or {}
+    primary_perm_p = forest.get(f"{primary_metric}_permutation_spearman_p_two_sided", math.nan)
+    primary_ci_low = forest.get(f"{primary_metric}_bootstrap_spearman_ci_low", math.nan)
+    primary_ci_high = forest.get(f"{primary_metric}_bootstrap_spearman_ci_high", math.nan)
+    primary_loo_min = forest.get(f"{primary_metric}_loo_min_rho", math.nan)
+    primary_loo_max = forest.get(f"{primary_metric}_loo_max_rho", math.nan)
+    pixel_legacy_pct = 100.0 * float(pixel_summary.get("pixel_legacy_quadrant_fraction", math.nan))
     counter = site[
         (site["site_id"].astype(int) == 44)
         & np.isfinite(site["gpp_anomaly_pct_2023_vs_baseline"])
@@ -1377,16 +1954,27 @@ python docs/paper0_perspective/scripts/make_flux_corroborated_trait_legacy_figur
 - Main flux color/statistic: `{primary_metric}` = {primary_label}. The z-score reference is the same day-of-year window across available non-2022/non-2023 years; the persistence metric averages the 2022 trough-window z-score and 2023 recovery-window z-score.
 - Forest-domain flux coverage: {forest["n_sites_with_gpp_flux"]} sites have finite GPP; {forest[f"{primary_metric}_pairwise_n"]} have both a finite greenness--chlorophyll gap and the primary GPP metric.
 - All-PFT sensitivity flux coverage: {all_pft["n_sites_with_gpp_flux"]} sites have finite GPP; {all_pft[f"{primary_metric}_pairwise_n"]} have pairwise primary-metric data.
-- Marker shape: FLUXNET IGBP where available, otherwise WorldCover/PFT fallback. Open marker rings denote weak recovery denominators (`NDVI` or chlorophyll recovery not interpretable under the 2% baseline--trough contrast rule).
+- Marker shape: FLUXNET IGBP where available, otherwise WorldCover/PFT fallback. Open marker rings denote weak recovery denominators (`NDVI` or chlorophyll recovery not interpretable under the trait/index-specific baseline--trough contrast rule).
+- Pixel data contract: pixel-level NDVI and chlorophyll recovery are used only for the greenness--chlorophyll decoupling distribution and within-site chlorophyll heterogeneity. They are not used to increase the effective flux sample size because each eddy-covariance GPP value is a site/footprint-integrated observation.
 
 ## Forest-Domain Main Readout
 
 - Legacy quadrant threshold: NDVI recovery >= {forest["recovery_threshold_pct"]:.0f}% and chlorophyll recovery < {forest["recovery_threshold_pct"]:.0f}%.
 - Legacy quadrant: {forest["legacy_quadrant_n_all"]}/{forest["n_sites_total"]} forest-domain sites.
 - Primary Spearman: NDVI-minus-chlorophyll recovery gap vs `{primary_metric}` rho={forest[f"{primary_metric}_spearman_legacy_gap"]:+.2f}, p={format_p(forest[f"{primary_metric}_spearman_legacy_gap_p"])}, n={forest[f"{primary_metric}_spearman_legacy_gap_n"]}.
-- Primary median separation: legacy median {metric_value_fmt(forest[f"{primary_metric}_legacy_median"], primary_metric)} vs other {metric_value_fmt(forest[f"{primary_metric}_nonlegacy_median"], primary_metric)}, Mann--Whitney U={forest[f"{primary_metric}_mann_whitney_u"]:.1f}, p={format_p(forest[f"{primary_metric}_mann_whitney_p"])}.
-- Same-season 2023 GPP z-score separation: legacy median {metric_value_fmt(forest["gpp_z_2023_vs_interannual_legacy_median"], "gpp_z_2023_vs_interannual")} vs other {metric_value_fmt(forest["gpp_z_2023_vs_interannual_nonlegacy_median"], "gpp_z_2023_vs_interannual")}, Mann--Whitney p={format_p(forest["gpp_z_2023_vs_interannual_mann_whitney_p"])}.
+- Site bootstrap: rho median={forest.get(f"{primary_metric}_bootstrap_spearman_median", math.nan):+.2f}, 95% CI [{primary_ci_low:+.2f}, {primary_ci_high:+.2f}], valid replicates={forest.get(f"{primary_metric}_bootstrap_spearman_valid", 0)}.
+- Site-label permutation: two-sided p={format_p(primary_perm_p)}; negative-direction p={format_p(forest.get(f"{primary_metric}_permutation_spearman_p_directional_negative", math.nan))}.
+- Leave-one-out: rho range [{primary_loo_min:+.2f}, {primary_loo_max:+.2f}], all-negative={forest.get(f"{primary_metric}_loo_all_negative", False)}.
+- Primary median separation is reported as underpowered: legacy median {metric_value_fmt(forest[f"{primary_metric}_legacy_median"], primary_metric)} vs other {metric_value_fmt(forest[f"{primary_metric}_nonlegacy_median"], primary_metric)}, Mann--Whitney U={forest[f"{primary_metric}_mann_whitney_u"]:.1f}, p={format_p(forest[f"{primary_metric}_mann_whitney_p"])}.
+- Same-season 2023 GPP z-score sensitivity: legacy median {metric_value_fmt(forest["gpp_z_2023_vs_interannual_legacy_median"], "gpp_z_2023_vs_interannual")} vs other {metric_value_fmt(forest["gpp_z_2023_vs_interannual_nonlegacy_median"], "gpp_z_2023_vs_interannual")}, Mann--Whitney p={format_p(forest["gpp_z_2023_vs_interannual_mann_whitney_p"])}. This remains a sensitivity, not the headline.
 - Raw 2023-vs-baseline percent sensitivity: rho={forest["gpp_pct_2023_vs_baseline_spearman_legacy_gap"]:+.2f}, p={format_p(forest["gpp_pct_2023_vs_baseline_spearman_legacy_gap_p"])}; legacy median {forest["legacy_gpp_anomaly_median_pct"]:+.1f}% vs other {forest["nonlegacy_gpp_anomaly_median_pct"]:+.1f}%, Mann--Whitney p={format_p(forest["gpp_pct_2023_vs_baseline_mann_whitney_p"])}.
+
+## Pixel-Level Decoupling Readout
+
+- Pixel display scope: {pixel_summary.get("pixel_scope_site_n", 0)} forest-domain pairwise flux sites.
+- Pixel recovery rows: {pixel_summary.get("pixel_total_n", 0)} total, {pixel_summary.get("pixel_interpretable_n", 0)} interpretable for both axes.
+- Pixel legacy-quadrant share: {pixel_summary.get("pixel_legacy_quadrant_n", 0)} pixels = {pixel_legacy_pct:.1f}% of interpretable pixels.
+- This is a descriptive Claim-A display of greenness--chlorophyll decoupling. No flux association, correlation p value, or independent-observation claim is made at the pixel level.
 
 This supports the narrower Perspective claim that, within the forest-domain flux subset, a greenness--chlorophyll recovery gap is associated with reduced independent GPP persistence. It is not framed as a deterministic quadrant law.
 
@@ -1403,10 +1991,14 @@ Keep this as an illustrative, descriptive figure. Do not frame it as formal vari
 ## Outputs
 
 - Main forest-domain figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.*`
+- Pixel decoupling figure: `figures/generated/flux_corroborated_trait_legacy/fig_pixel_greenness_chlorophyll_decoupling_hexbin.*`
+- Within-site chlorophyll figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_chl_pixel_violin.*`
 - All-PFT supplementary figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant_all_pft.*`
 - Recovery clocks candidate: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_recovery_clocks.*`
 - Chlorophyll-LMA trajectory candidate: `figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.*`
 - Source data: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_site_metrics.csv`
+- Pixel source data: `tables/flux_corroborated_trait_legacy/pixel_recovery_forest_pairwise.csv`
+- Leave-one-out source data: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_site_level_leave_one_out.csv`
 - Diagnostic summary: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_diagnostic_summary.json`
 """
     path.write_text(text)
@@ -1458,15 +2050,37 @@ def main() -> None:
             primary_metric=args.primary_gpp_metric,
         ),
     }
+    forest_pair = paired_site_data(forest_site, args.primary_gpp_metric)
+    summaries["forest_main"].update(site_level_resampling_summary(forest_pair, args.primary_gpp_metric))
+    loo = leave_one_out_table(forest_pair, args.primary_gpp_metric)
+    add_leave_one_out_summary(summaries["forest_main"], loo, args.primary_gpp_metric)
 
     site_path = args.output_table_dir / "flux_trait_legacy_site_metrics.csv"
     summary_path = args.output_table_dir / "flux_trait_legacy_diagnostic_summary.json"
     summary_csv_path = args.output_table_dir / "flux_trait_legacy_diagnostic_summary.csv"
+    loo_path = args.output_table_dir / "flux_trait_legacy_site_level_leave_one_out.csv"
     site.to_csv(site_path, index=False)
+    loo.to_csv(loo_path, index=False)
     summary_path.write_text(json.dumps(summaries, indent=2, allow_nan=True) + "\n")
     pd.DataFrame(list(summaries.values())).to_csv(summary_csv_path, index=False)
 
     figure_outputs: list[str] = []
+    pixel, pixel_summary = build_pixel_recovery_table(
+        args.pixel_trait_predictions,
+        forest_site,
+        forest_pair["site_id"].astype(int).tolist(),
+        args.primary_gpp_metric,
+        args.recovery_threshold,
+        args.output_table_dir,
+    )
+    pixel_path = args.output_table_dir / "pixel_recovery_forest_pairwise.csv"
+    if not pixel.empty:
+        pixel.to_csv(pixel_path, index=False)
+        summaries["forest_main"].update(pixel_summary)
+        summary_path.write_text(json.dumps(summaries, indent=2, allow_nan=True) + "\n")
+        pd.DataFrame(list(summaries.values())).to_csv(summary_csv_path, index=False)
+        figure_outputs.extend(plot_pixel_decoupling_hexbin(pixel, pixel_summary, args.output_figure_dir, args.recovery_threshold))
+        figure_outputs.extend(plot_chl_pixel_violin(pixel, args.output_figure_dir, args.recovery_threshold, args.primary_gpp_metric))
     selected = select_clock_sites(forest_site, gpp_metric=args.primary_gpp_metric)
     clock = build_recovery_clock_table(args.recovery_table, forest_site, daily_by_site, selected)
     clock_path = args.output_table_dir / "flux_recovery_clock_source_data.csv"
@@ -1503,11 +2117,19 @@ def main() -> None:
         "site_metrics": str(site_path),
         "diagnostic_summary_json": str(summary_path),
         "diagnostic_summary_csv": str(summary_csv_path),
+        "leave_one_out_source_data": str(loo_path),
+        "pixel_source_data": str(pixel_path) if not pixel.empty else "",
         "clock_source_data": str(clock_path),
         "trajectory_source_data": str(traj_path),
         "figures": figure_outputs,
         "selected_clock_sites": selected,
         "primary_gpp_metric": args.primary_gpp_metric,
+        "site_level_resampling": {
+            "bootstrap_replicates": N_BOOTSTRAP,
+            "permutation_replicates": N_PERMUTATIONS,
+            "seed": RESAMPLING_SEED,
+        },
+        "pixel_summary": pixel_summary,
         "forest_scope_types": sorted(FOREST_SCOPE_TYPES),
         "windows": {
             "baseline": [str(BASELINE_START.date()), str(BASELINE_END.date())],
@@ -1515,7 +2137,7 @@ def main() -> None:
             "recovery_2023": [str(RECOVERY_2023_START.date()), str(RECOVERY_2023_END.date())],
         },
     }
-    notes_path = write_figure_notes(args.output_table_dir, summaries, site, args.primary_gpp_metric)
+    notes_path = write_figure_notes(args.output_table_dir, summaries, site, args.primary_gpp_metric, pixel_summary=pixel_summary)
     run_summary["figure_notes"] = str(notes_path)
     run_summary_path = args.output_table_dir / "run_summary.json"
     run_summary_path.write_text(json.dumps(run_summary, indent=2, allow_nan=True) + "\n")

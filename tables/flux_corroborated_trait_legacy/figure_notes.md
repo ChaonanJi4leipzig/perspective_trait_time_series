@@ -18,16 +18,27 @@ python docs/paper0_perspective/scripts/make_flux_corroborated_trait_legacy_figur
 - Main flux color/statistic: `gpp_persistence_z_2022_2023` = 2022-2023 GPP persistence anomaly (z). The z-score reference is the same day-of-year window across available non-2022/non-2023 years; the persistence metric averages the 2022 trough-window z-score and 2023 recovery-window z-score.
 - Forest-domain flux coverage: 13 sites have finite GPP; 10 have both a finite greenness--chlorophyll gap and the primary GPP metric.
 - All-PFT sensitivity flux coverage: 19 sites have finite GPP; 16 have pairwise primary-metric data.
-- Marker shape: FLUXNET IGBP where available, otherwise WorldCover/PFT fallback. Open marker rings denote weak recovery denominators (`NDVI` or chlorophyll recovery not interpretable under the 2% baseline--trough contrast rule).
+- Marker shape: FLUXNET IGBP where available, otherwise WorldCover/PFT fallback. Open marker rings denote weak recovery denominators (`NDVI` or chlorophyll recovery not interpretable under the trait/index-specific baseline--trough contrast rule).
+- Pixel data contract: pixel-level NDVI and chlorophyll recovery are used only for the greenness--chlorophyll decoupling distribution and within-site chlorophyll heterogeneity. They are not used to increase the effective flux sample size because each eddy-covariance GPP value is a site/footprint-integrated observation.
 
 ## Forest-Domain Main Readout
 
 - Legacy quadrant threshold: NDVI recovery >= 70% and chlorophyll recovery < 70%.
 - Legacy quadrant: 7/25 forest-domain sites.
 - Primary Spearman: NDVI-minus-chlorophyll recovery gap vs `gpp_persistence_z_2022_2023` rho=-0.67, p=0.032, n=10.
-- Primary median separation: legacy median -0.97 vs other -0.29, Mann--Whitney U=5.0, p=0.151.
-- Same-season 2023 GPP z-score separation: legacy median -1.69 vs other +1.19, Mann--Whitney p=0.032.
+- Site bootstrap: rho median=-0.64, 95% CI [-0.91, -0.10], valid replicates=20000.
+- Site-label permutation: two-sided p=0.037; negative-direction p=0.018.
+- Leave-one-out: rho range [-0.80, -0.64], all-negative=True.
+- Primary median separation is reported as underpowered: legacy median -0.97 vs other -0.29, Mann--Whitney U=5.0, p=0.151.
+- Same-season 2023 GPP z-score sensitivity: legacy median -1.69 vs other +1.19, Mann--Whitney p=0.032. This remains a sensitivity, not the headline.
 - Raw 2023-vs-baseline percent sensitivity: rho=-0.64, p=0.044; legacy median -46.3% vs other -3.6%, Mann--Whitney p=0.056.
+
+## Pixel-Level Decoupling Readout
+
+- Pixel display scope: 10 forest-domain pairwise flux sites.
+- Pixel recovery rows: 3000 total, 1585 interpretable for both axes.
+- Pixel legacy-quadrant share: 347 pixels = 21.9% of interpretable pixels.
+- This is a descriptive Claim-A display of greenness--chlorophyll decoupling. No flux association, correlation p value, or independent-observation claim is made at the pixel level.
 
 This supports the narrower Perspective claim that, within the forest-domain flux subset, a greenness--chlorophyll recovery gap is associated with reduced independent GPP persistence. It is not framed as a deterministic quadrant law.
 
@@ -44,8 +55,12 @@ Keep this as an illustrative, descriptive figure. Do not frame it as formal vari
 ## Outputs
 
 - Main forest-domain figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.*`
+- Pixel decoupling figure: `figures/generated/flux_corroborated_trait_legacy/fig_pixel_greenness_chlorophyll_decoupling_hexbin.*`
+- Within-site chlorophyll figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_chl_pixel_violin.*`
 - All-PFT supplementary figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant_all_pft.*`
 - Recovery clocks candidate: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_recovery_clocks.*`
 - Chlorophyll-LMA trajectory candidate: `figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.*`
 - Source data: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_site_metrics.csv`
+- Pixel source data: `tables/flux_corroborated_trait_legacy/pixel_recovery_forest_pairwise.csv`
+- Leave-one-out source data: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_site_level_leave_one_out.csv`
 - Diagnostic summary: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_diagnostic_summary.json`

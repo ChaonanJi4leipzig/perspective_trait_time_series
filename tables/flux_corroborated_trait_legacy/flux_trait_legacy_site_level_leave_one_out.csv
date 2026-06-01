@@ -1,0 +1,11 @@
+omitted_site_id,omitted_site_name,omitted_forest_type,omitted_quadrant,n_remaining,spearman_rho,spearman_p_scipy
+3,Laegern,Mixed forest,unrecovered,9,-0.6359888306543495,0.0655947574629728
+9,Hainich,Deciduous forest,unrecovered,9,-0.6359888306543495,0.0655947574629728
+23,Hyytiala,Evergreen forest,unrecovered,9,-0.652725378829464,0.056676692165527655
+25,Lompolojankka,Evergreen forest,unrecovered,9,-0.652725378829464,0.056676692165527655
+29,Puechabon,Evergreen forest,legacy_quadrant,9,-0.65,0.05807305801714863
+37,Renon,Evergreen forest,legacy_quadrant,9,-0.652725378829464,0.056676692165527655
+44,Bilos,Evergreen forest,legacy_quadrant,9,-0.6610936529170212,0.05252286046708899
+46,Font-Blanche (FR-FBn),Evergreen forest,legacy_quadrant,9,-0.652725378829464,0.056676692165527655
+49,"Norunda, Uppsala",Evergreen forest,legacy_quadrant,9,-0.6666666666666667,0.04986723056888511
+53,"Las Majadas de Tietar, Extremadura",Open/savanna,unrecovered,9,-0.803354312405494,0.009106405386878009
