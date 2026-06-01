@@ -6,6 +6,7 @@
   "drought_driver_source_data": "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/tables/flux_corroborated_trait_legacy/flux_trait_legacy_drought_driver_exposure.csv",
   "pixel_source_data": "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/tables/flux_corroborated_trait_legacy/pixel_recovery_forest_pairwise.csv",
   "clock_source_data": "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/tables/flux_corroborated_trait_legacy/flux_recovery_clock_source_data.csv",
+  "clock_composite_source_data": "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/tables/flux_corroborated_trait_legacy/trait_recovery_clock_composite_source_data.csv",
   "trajectory_source_data": "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/tables/flux_corroborated_trait_legacy/trait_space_chl_lma_trajectory_source_data.csv",
   "figures": [
     "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_pixel_greenness_chlorophyll_decoupling_hexbin.pdf",
@@ -42,7 +43,12 @@
     "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.svg",
     "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.eps",
     "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.png",
-    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.jpg"
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.jpg",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_trait_recovery_clock_composite.pdf",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_trait_recovery_clock_composite.svg",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_trait_recovery_clock_composite.eps",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_trait_recovery_clock_composite.png",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_trait_recovery_clock_composite.jpg"
   ],
   "selected_clock_sites": [
     29,

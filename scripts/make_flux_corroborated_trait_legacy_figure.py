@@ -1888,7 +1888,7 @@ def plot_recovery_clocks(clock: pd.DataFrame, site: pd.DataFrame, out_dir: Path)
     return save_figure(fig, out_dir, "fig_flux_corroborated_recovery_clocks")
 
 
-def build_trait_space_table(recovery_path: Path, site: pd.DataFrame) -> pd.DataFrame:
+def build_trait_space_table(recovery_path: Path, site: pd.DataFrame, forest_only: bool = False) -> pd.DataFrame:
     recovery = pd.read_csv(recovery_path, parse_dates=["date"])
     keep_stages = ["pre-event", "drought trough", "2023 recovery"]
     keep = recovery[
@@ -1901,6 +1901,8 @@ def build_trait_space_table(recovery_path: Path, site: pd.DataFrame) -> pd.DataF
     )
     wide = stage.pivot_table(index=["site_id", "site_name", "stage"], columns="variable", values="value").reset_index()
     wide = wide.merge(site[["site_id", "forest_type", "quadrant"]], on="site_id", how="left")
+    if forest_only:
+        wide = wide[wide["forest_type"].apply(is_forest_scope)].copy()
     order = {"pre-event": 0, "drought trough": 1, "2023 recovery": 2}
     wide["stage_order"] = wide["stage"].map(order).astype(int)
     return wide.sort_values(["site_id", "stage_order"])
@@ -1974,6 +1976,116 @@ def plot_trait_space_trajectories(traj: pd.DataFrame, out_dir: Path) -> list[str
     fig.text(0.02, 0.975, "c", fontsize=8, fontweight="bold", ha="left", va="top")
     fig.tight_layout(rect=(0.03, 0.02, 0.78, 0.96))
     return save_figure(fig, out_dir, "fig_trait_space_trajectories_chl_lma")
+
+
+# Figure A: multi-trait recovery-clock composite.
+# Ordered to read as the recovery-phase "different clocks" story (structure and
+# nutrient track greenness; pigment lags). Colours follow the Okabe-Ito palette
+# used elsewhere in this script. The onset-leading EWT/LMA signal is a separate,
+# softer claim shown in the trait-greenness bar panel, not here.
+TRAIT_CLOCK_VARIABLES = ["NDVI", "LAI", "Nitrogen", "Chlorophyll", "EWT", "LMA"]
+TRAIT_CLOCK_MIN_SITES = 5
+TRAIT_CLOCK_STYLE: dict[str, dict[str, object]] = {
+    "NDVI": {"color": "#333333", "ls": "--", "label": "NDVI (greenness)", "band": False, "z": 5},
+    "LAI": {"color": "#009E73", "ls": "-", "label": "LAI (structure)", "band": False, "z": 3},
+    "Nitrogen": {"color": "#56B4E9", "ls": "-", "label": "Nitrogen", "band": False, "z": 3},
+    "Chlorophyll": {"color": "#D55E00", "ls": "-", "label": "Chlorophyll (pigment)", "band": True, "z": 4},
+    "EWT": {"color": "#0072B2", "ls": "-", "label": "EWT (water)", "band": False, "z": 2},
+    "LMA": {"color": "#CC79A7", "ls": "-", "label": "LMA (leaf economics)", "band": False, "z": 2},
+}
+
+
+def build_trait_recovery_clock_composite(
+    recovery_path: Path,
+    forest_site: pd.DataFrame,
+    variables: list[str] | None = None,
+    min_sites: int = TRAIT_CLOCK_MIN_SITES,
+) -> pd.DataFrame:
+    """Cross-site median recovery clock per trait for forest-domain sites.
+
+    For each variable and biweekly date the composite is the cross-site median of
+    the within-site recovery percentage (``recovery_pct_clipped``), taken over
+    sites whose recovery denominator is interpretable. This is a single-event
+    (2022) composite that reuses the within-2022 baseline-to-trough recovery
+    scale, so it does not depend on a multi-year trait climatology and is robust
+    to the current 2022--2023 trait-reconstruction window. Dates with fewer than
+    ``min_sites`` interpretable sites are dropped.
+    """
+    variables = variables or TRAIT_CLOCK_VARIABLES
+    recovery = pd.read_csv(recovery_path, parse_dates=["date"])
+    forest_ids = {int(s) for s in forest_site["site_id"].astype(int).tolist()}
+    sub = recovery[
+        recovery["site_id"].astype(int).isin(forest_ids) & recovery["variable"].isin(variables)
+    ].copy()
+    sub["recovery_pct_clipped"] = pd.to_numeric(sub["recovery_pct_clipped"], errors="coerce")
+    if "recovery_interpretable" in sub.columns:
+        sub = sub[sub["recovery_interpretable"].astype(bool)]
+    rows: list[dict[str, object]] = []
+    for (variable, date), grp in sub.groupby(["variable", "date"]):
+        vals = pd.to_numeric(grp["recovery_pct_clipped"], errors="coerce").dropna().astype(float)
+        if len(vals) < int(min_sites):
+            continue
+        rows.append(
+            {
+                "variable": str(variable),
+                "date": pd.Timestamp(date),
+                "median_recovery": float(np.nanmedian(vals)),
+                "q25_recovery": float(np.nanquantile(vals, 0.25)),
+                "q75_recovery": float(np.nanquantile(vals, 0.75)),
+                "n_sites": int(len(vals)),
+            }
+        )
+    out = pd.DataFrame(rows)
+    if out.empty:
+        return out
+    return out.sort_values(["variable", "date"]).reset_index(drop=True)
+
+
+def plot_trait_recovery_clock_composite(composite: pd.DataFrame, out_dir: Path) -> list[str]:
+    if composite.empty:
+        return []
+    present = set(composite["variable"].astype(str))
+    fig, ax = plt.subplots(figsize=(7.2, 3.4))
+    ax.axvspan(TROUGH_START, TROUGH_END, color="#F4E7CB", lw=0, alpha=0.85, zorder=0)
+    ax.axhline(100, color="#333333", lw=0.55, zorder=1)
+    ax.axhline(0, color="#777777", lw=0.45, ls=":", zorder=1)
+    for variable in TRAIT_CLOCK_VARIABLES:
+        if variable not in present:
+            continue
+        spec = TRAIT_CLOCK_STYLE[variable]
+        sub = composite[composite["variable"].astype(str) == variable].sort_values("date")
+        if sub.empty:
+            continue
+        if bool(spec["band"]):
+            ax.fill_between(
+                sub["date"],
+                sub["q25_recovery"],
+                sub["q75_recovery"],
+                color=str(spec["color"]),
+                alpha=0.16,
+                lw=0,
+                zorder=int(spec["z"]) - 1,
+            )
+        ax.plot(
+            sub["date"],
+            sub["median_recovery"],
+            color=str(spec["color"]),
+            ls=str(spec["ls"]),
+            lw=1.3,
+            marker="o",
+            ms=2.3,
+            label=str(spec["label"]),
+            zorder=int(spec["z"]),
+        )
+    ax.set_ylim(-5, 108)
+    ax.set_ylabel("Recovery toward 2022 pre-event baseline (%)")
+    ax.xaxis.set_major_locator(mdates.MonthLocator(bymonth=[1, 4, 7, 10]))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b\n%Y"))
+    ax.set_xlim(pd.Timestamp("2022-04-01"), pd.Timestamp("2023-08-31"))
+    style_axis(ax)
+    ax.legend(loc="lower right", frameon=False, ncol=2, handlelength=1.6, columnspacing=1.1)
+    fig.tight_layout()
+    return save_figure(fig, out_dir, "fig_trait_recovery_clock_composite")
 
 
 def write_figure_notes(
@@ -2237,10 +2349,15 @@ def main() -> None:
     )
     figure_outputs.extend(plot_recovery_clocks(clock, site, args.output_figure_dir))
 
-    traj = build_trait_space_table(args.recovery_table, site)
+    traj = build_trait_space_table(args.recovery_table, site, forest_only=True)
     traj_path = args.output_table_dir / "trait_space_chl_lma_trajectory_source_data.csv"
     traj.to_csv(traj_path, index=False)
     figure_outputs.extend(plot_trait_space_trajectories(traj, args.output_figure_dir))
+
+    clock_composite = build_trait_recovery_clock_composite(args.recovery_table, forest_site)
+    clock_composite_path = args.output_table_dir / "trait_recovery_clock_composite_source_data.csv"
+    clock_composite.to_csv(clock_composite_path, index=False)
+    figure_outputs.extend(plot_trait_recovery_clock_composite(clock_composite, args.output_figure_dir))
 
     run_summary = {
         "site_metrics": str(site_path),
@@ -2250,6 +2367,7 @@ def main() -> None:
         "drought_driver_source_data": str(drought_driver_path),
         "pixel_source_data": str(pixel_path) if not pixel.empty else "",
         "clock_source_data": str(clock_path),
+        "clock_composite_source_data": str(clock_composite_path),
         "trajectory_source_data": str(traj_path),
         "figures": figure_outputs,
         "selected_clock_sites": selected,
