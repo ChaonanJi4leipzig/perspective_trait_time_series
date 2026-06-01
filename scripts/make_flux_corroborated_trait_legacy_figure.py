@@ -561,43 +561,109 @@ def residualize(y: pd.Series, x: pd.Series) -> pd.Series:
     return out
 
 
-def build_summary(site: pd.DataFrame, threshold: float) -> dict[str, object]:
-    flux = site[np.isfinite(site["gpp_anomaly_pct_2023_vs_baseline"])].copy()
-    legacy = flux[flux["quadrant"] == "legacy_quadrant"]
-    nonlegacy = flux[flux["quadrant"] != "legacy_quadrant"]
-    gap_spearman, gap_n = corr_value(flux["legacy_gap_pct"], flux["gpp_anomaly_pct_2023_vs_baseline"], method="spearman")
-    gap_pearson, _ = corr_value(flux["legacy_gap_pct"], flux["gpp_anomaly_pct_2023_vs_baseline"], method="pearson")
-    chl_spearman, chl_n = corr_value(flux["chl_recovery_pct_2023"], flux["gpp_anomaly_pct_2023_vs_baseline"], method="spearman")
-    ndvi_spearman, ndvi_n = corr_value(flux["ndvi_recovery_pct_2023"], flux["gpp_anomaly_pct_2023_vs_baseline"], method="spearman")
-    gpp_resid = residualize(flux["gpp_anomaly_pct_2023_vs_baseline"], flux["ndvi_recovery_pct_2023"])
-    partial_r, partial_n = corr_value(flux["chl_recovery_pct_2023"], gpp_resid, method="pearson")
-    nep_gap, nep_n = corr_value(flux["legacy_gap_pct"], flux["nep_anomaly_pct_2023_vs_baseline"], method="spearman")
-    return {
+def add_metric_association(
+    summary: dict[str, object],
+    site: pd.DataFrame,
+    metric_key: str,
+    metric_col: str,
+) -> None:
+    if metric_col not in site.columns:
+        return
+    pair = site[np.isfinite(site["legacy_gap_pct"]) & np.isfinite(site[metric_col])].copy()
+    legacy = pair[pair["quadrant"] == "legacy_quadrant"]
+    nonlegacy = pair[pair["quadrant"] != "legacy_quadrant"]
+    rho, rho_p, rho_n = corr_test_value(pair["legacy_gap_pct"], pair[metric_col], method="spearman")
+    pearson, pearson_p, _ = corr_test_value(pair["legacy_gap_pct"], pair[metric_col], method="pearson")
+    chl_rho, chl_p, chl_n = corr_test_value(pair["chl_recovery_pct_2023"], pair[metric_col], method="spearman")
+    ndvi_rho, ndvi_p, ndvi_n = corr_test_value(pair["ndvi_recovery_pct_2023"], pair[metric_col], method="spearman")
+    u_stat, u_p, legacy_n, nonlegacy_n = mann_whitney_value(legacy[metric_col], nonlegacy[metric_col])
+    legacy_median = float(np.nanmedian(legacy[metric_col])) if len(legacy) else math.nan
+    nonlegacy_median = float(np.nanmedian(nonlegacy[metric_col])) if len(nonlegacy) else math.nan
+    summary.update(
+        {
+            f"{metric_key}_pairwise_n": int(len(pair)),
+            f"{metric_key}_legacy_n": int(len(legacy)),
+            f"{metric_key}_nonlegacy_n": int(len(nonlegacy)),
+            f"{metric_key}_legacy_median": legacy_median,
+            f"{metric_key}_nonlegacy_median": nonlegacy_median,
+            f"{metric_key}_legacy_minus_nonlegacy_median": (
+                legacy_median - nonlegacy_median if np.isfinite(legacy_median) and np.isfinite(nonlegacy_median) else math.nan
+            ),
+            f"{metric_key}_mann_whitney_u": u_stat,
+            f"{metric_key}_mann_whitney_p": u_p,
+            f"{metric_key}_mann_whitney_legacy_n": legacy_n,
+            f"{metric_key}_mann_whitney_nonlegacy_n": nonlegacy_n,
+            f"{metric_key}_spearman_legacy_gap": rho,
+            f"{metric_key}_spearman_legacy_gap_p": rho_p,
+            f"{metric_key}_spearman_legacy_gap_n": rho_n,
+            f"{metric_key}_pearson_legacy_gap": pearson,
+            f"{metric_key}_pearson_legacy_gap_p": pearson_p,
+            f"{metric_key}_spearman_chl_recovery": chl_rho,
+            f"{metric_key}_spearman_chl_recovery_p": chl_p,
+            f"{metric_key}_spearman_chl_recovery_n": chl_n,
+            f"{metric_key}_spearman_ndvi_recovery": ndvi_rho,
+            f"{metric_key}_spearman_ndvi_recovery_p": ndvi_p,
+            f"{metric_key}_spearman_ndvi_recovery_n": ndvi_n,
+        }
+    )
+
+
+def build_summary(site: pd.DataFrame, threshold: float, scope_name: str, primary_metric: str) -> dict[str, object]:
+    gpp_flux = site[np.isfinite(site["gpp_anomaly_pct_2023_vs_baseline"])].copy()
+    gpp_pair = site[np.isfinite(site["legacy_gap_pct"]) & np.isfinite(site["gpp_anomaly_pct_2023_vs_baseline"])].copy()
+    legacy_pair = gpp_pair[gpp_pair["quadrant"] == "legacy_quadrant"]
+    nonlegacy_pair = gpp_pair[gpp_pair["quadrant"] != "legacy_quadrant"]
+    gpp_resid = residualize(gpp_pair["gpp_anomaly_pct_2023_vs_baseline"], gpp_pair["ndvi_recovery_pct_2023"])
+    partial_r, partial_n = corr_value(gpp_pair["chl_recovery_pct_2023"], gpp_resid, method="pearson")
+    nep_gap, nep_p, nep_n = corr_test_value(site["legacy_gap_pct"], site["nep_anomaly_pct_2023_vs_baseline"], method="spearman")
+    summary: dict[str, object] = {
+        "analysis_scope": scope_name,
+        "primary_gpp_metric": primary_metric,
+        "primary_gpp_metric_column": GPP_METRICS[primary_metric]["column"],
         "n_sites_total": int(site["site_id"].nunique()),
-        "n_sites_with_gpp_flux": int(len(flux)),
+        "n_sites_with_gpp_flux": int(len(gpp_flux)),
+        "n_sites_with_pairwise_gpp_pct": int(len(gpp_pair)),
         "n_sites_with_nep_flux": int(np.isfinite(site["nep_anomaly_pct_2023_vs_baseline"]).sum()),
         "recovery_threshold_pct": float(threshold),
         "legacy_quadrant_n_all": int((site["quadrant"] == "legacy_quadrant").sum()),
-        "legacy_quadrant_n_with_gpp": int(len(legacy)),
-        "legacy_gpp_anomaly_median_pct": float(np.nanmedian(legacy["gpp_anomaly_pct_2023_vs_baseline"])) if len(legacy) else math.nan,
-        "nonlegacy_gpp_anomaly_median_pct": float(np.nanmedian(nonlegacy["gpp_anomaly_pct_2023_vs_baseline"])) if len(nonlegacy) else math.nan,
+        "legacy_quadrant_n_pairwise_gpp_pct": int(len(legacy_pair)),
+        "nonlegacy_n_pairwise_gpp_pct": int(len(nonlegacy_pair)),
+        "legacy_gpp_anomaly_median_pct": (
+            float(np.nanmedian(legacy_pair["gpp_anomaly_pct_2023_vs_baseline"])) if len(legacy_pair) else math.nan
+        ),
+        "nonlegacy_gpp_anomaly_median_pct": (
+            float(np.nanmedian(nonlegacy_pair["gpp_anomaly_pct_2023_vs_baseline"])) if len(nonlegacy_pair) else math.nan
+        ),
         "legacy_minus_nonlegacy_gpp_anomaly_pct": (
-            float(np.nanmedian(legacy["gpp_anomaly_pct_2023_vs_baseline"]) - np.nanmedian(nonlegacy["gpp_anomaly_pct_2023_vs_baseline"]))
-            if len(legacy) and len(nonlegacy)
+            float(
+                np.nanmedian(legacy_pair["gpp_anomaly_pct_2023_vs_baseline"])
+                - np.nanmedian(nonlegacy_pair["gpp_anomaly_pct_2023_vs_baseline"])
+            )
+            if len(legacy_pair) and len(nonlegacy_pair)
             else math.nan
         ),
-        "spearman_legacy_gap_vs_gpp_anomaly": gap_spearman,
-        "pearson_legacy_gap_vs_gpp_anomaly": gap_pearson,
-        "corr_n_legacy_gap_vs_gpp": gap_n,
-        "spearman_chl_recovery_vs_gpp_anomaly": chl_spearman,
-        "corr_n_chl_vs_gpp": chl_n,
-        "spearman_ndvi_recovery_vs_gpp_anomaly": ndvi_spearman,
-        "corr_n_ndvi_vs_gpp": ndvi_n,
         "partial_pearson_chl_vs_gpp_anomaly_given_ndvi": partial_r,
         "partial_n": partial_n,
         "spearman_legacy_gap_vs_nep_anomaly": nep_gap,
+        "spearman_legacy_gap_vs_nep_anomaly_p": nep_p,
         "corr_n_legacy_gap_vs_nep": nep_n,
     }
+    for metric_key, spec in GPP_METRICS.items():
+        add_metric_association(summary, site, metric_key, spec["column"])
+
+    # Backwards-compatible aliases for older prose/notes.
+    raw_key = "gpp_pct_2023_vs_baseline"
+    summary["spearman_legacy_gap_vs_gpp_anomaly"] = summary.get(f"{raw_key}_spearman_legacy_gap", math.nan)
+    summary["spearman_legacy_gap_vs_gpp_anomaly_p"] = summary.get(f"{raw_key}_spearman_legacy_gap_p", math.nan)
+    summary["pearson_legacy_gap_vs_gpp_anomaly"] = summary.get(f"{raw_key}_pearson_legacy_gap", math.nan)
+    summary["corr_n_legacy_gap_vs_gpp"] = summary.get(f"{raw_key}_spearman_legacy_gap_n", 0)
+    summary["spearman_chl_recovery_vs_gpp_anomaly"] = summary.get(f"{raw_key}_spearman_chl_recovery", math.nan)
+    summary["spearman_chl_recovery_vs_gpp_anomaly_p"] = summary.get(f"{raw_key}_spearman_chl_recovery_p", math.nan)
+    summary["corr_n_chl_vs_gpp"] = summary.get(f"{raw_key}_spearman_chl_recovery_n", 0)
+    summary["spearman_ndvi_recovery_vs_gpp_anomaly"] = summary.get(f"{raw_key}_spearman_ndvi_recovery", math.nan)
+    summary["spearman_ndvi_recovery_vs_gpp_anomaly_p"] = summary.get(f"{raw_key}_spearman_ndvi_recovery_p", math.nan)
+    summary["corr_n_ndvi_vs_gpp"] = summary.get(f"{raw_key}_spearman_ndvi_recovery_n", 0)
+    return summary
 
 
 def marker_map(categories: list[str]) -> dict[str, str]:
@@ -619,7 +685,25 @@ def marker_map(categories: list[str]) -> dict[str, str]:
     return out
 
 
-def plot_quadrant(site: pd.DataFrame, summary: dict[str, object], out_dir: Path, threshold: float) -> list[str]:
+def metric_value_fmt(value: float, metric_key: str) -> str:
+    if not np.isfinite(value):
+        return "NA"
+    if metric_key.endswith("_baseline"):
+        return f"{value:+.1f}%"
+    return f"{value:+.2f}"
+
+
+def plot_quadrant(
+    site: pd.DataFrame,
+    summary: dict[str, object],
+    out_dir: Path,
+    threshold: float,
+    gpp_metric: str = PRIMARY_GPP_METRIC,
+    stem: str = "fig_flux_corroborated_trait_legacy_quadrant",
+    scope_label: str = "All PFTs",
+) -> list[str]:
+    metric_col = GPP_METRICS[gpp_metric]["column"]
+    metric_label = GPP_METRICS[gpp_metric]["label"]
     fig = plt.figure(figsize=(7.2, 5.7))
     gs = fig.add_gridspec(
         2,
@@ -639,13 +723,16 @@ def plot_quadrant(site: pd.DataFrame, summary: dict[str, object], out_dir: Path,
     cax = fig.add_subplot(gs[1, 2])
 
     cmap = LinearSegmentedColormap.from_list("suppressed_recovered", ["#D55E00", "#F7F7F7", "#0072B2"])
-    vals = pd.to_numeric(site["gpp_anomaly_pct_2023_vs_baseline"], errors="coerce")
+    vals = pd.to_numeric(site[metric_col], errors="coerce")
     finite_vals = vals[np.isfinite(vals)]
     if finite_vals.empty:
-        vmax = 50.0
+        vmax = 50.0 if gpp_metric == "gpp_pct_2023_vs_baseline" else 2.0
     else:
         vmax = float(np.nanpercentile(np.abs(finite_vals), 85))
-        vmax = max(20.0, min(80.0, vmax))
+        if gpp_metric == "gpp_pct_2023_vs_baseline":
+            vmax = max(20.0, min(80.0, vmax))
+        else:
+            vmax = max(1.0, min(3.0, vmax))
     norm = TwoSlopeNorm(vmin=-vmax, vcenter=0.0, vmax=vmax)
 
     ax.axvspan(threshold, 100, ymin=0.0, ymax=threshold / 110.0, facecolor="#F4E7CB", alpha=0.55, lw=0)
@@ -657,12 +744,12 @@ def plot_quadrant(site: pd.DataFrame, summary: dict[str, object], out_dir: Path,
     markers = marker_map(categories)
     for category in categories:
         sub = site[site["forest_type"] == category].copy()
-        has = np.isfinite(sub["gpp_anomaly_pct_2023_vs_baseline"])
+        has = np.isfinite(sub[metric_col])
         if has.any():
             ax.scatter(
                 sub.loc[has, "ndvi_recovery_pct_2023"],
                 sub.loc[has, "chl_recovery_pct_2023"],
-                c=sub.loc[has, "gpp_anomaly_pct_2023_vs_baseline"],
+                c=sub.loc[has, metric_col],
                 cmap=cmap,
                 norm=norm,
                 marker=markers[category],
@@ -684,6 +771,19 @@ def plot_quadrant(site: pd.DataFrame, summary: dict[str, object], out_dir: Path,
                 alpha=0.75,
                 zorder=2,
             )
+        uncertain = has & (~(sub["ndvi_recovery_interpretable"].astype(bool) & sub["chl_recovery_interpretable"].astype(bool)))
+        if uncertain.any():
+            ax.scatter(
+                sub.loc[uncertain, "ndvi_recovery_pct_2023"],
+                sub.loc[uncertain, "chl_recovery_pct_2023"],
+                facecolors="none",
+                edgecolors="#222222",
+                marker=markers[category],
+                s=72,
+                linewidth=0.7,
+                alpha=0.95,
+                zorder=4,
+            )
 
     ax.set_xlim(-5, 105)
     ax.set_ylim(-5, 105)
@@ -699,10 +799,14 @@ def plot_quadrant(site: pd.DataFrame, summary: dict[str, object], out_dir: Path,
         color="#5C4033",
     )
     note = (
-        f"n={summary['n_sites_with_gpp_flux']} flux sites\n"
-        f"legacy median: {summary['legacy_gpp_anomaly_median_pct']:+.1f}%\n"
-        f"other median: {summary['nonlegacy_gpp_anomaly_median_pct']:+.1f}%\n"
-        f"rho(gap,GPP): {summary['spearman_legacy_gap_vs_gpp_anomaly']:+.2f}"
+        f"{scope_label}\n"
+        f"paired n={summary[f'{gpp_metric}_pairwise_n']} "
+        f"({summary['n_sites_with_gpp_flux']} finite GPP)\n"
+        f"rho={summary[f'{gpp_metric}_spearman_legacy_gap']:+.2f}, "
+        f"p={format_p(summary[f'{gpp_metric}_spearman_legacy_gap_p'])}\n"
+        f"legacy median {metric_value_fmt(summary[f'{gpp_metric}_legacy_median'], gpp_metric)}\n"
+        f"other median {metric_value_fmt(summary[f'{gpp_metric}_nonlegacy_median'], gpp_metric)}; "
+        f"U p={format_p(summary[f'{gpp_metric}_mann_whitney_p'])}"
     )
     ax.text(
         0.03,
@@ -739,7 +843,7 @@ def plot_quadrant(site: pd.DataFrame, summary: dict[str, object], out_dir: Path,
     sm = mpl.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
     cbar = fig.colorbar(sm, cax=cax)
-    cbar.set_label("2023 GPP anomaly vs baseline (%)")
+    cbar.set_label(metric_label)
     cbar.ax.tick_params(labelsize=7, width=0.5, length=3)
 
     handles = [
@@ -756,6 +860,20 @@ def plot_quadrant(site: pd.DataFrame, summary: dict[str, object], out_dir: Path,
         )
         for cat in categories
     ]
+    if (~(site["ndvi_recovery_interpretable"].astype(bool) & site["chl_recovery_interpretable"].astype(bool))).any():
+        handles.append(
+            Line2D(
+                [0],
+                [0],
+                marker="o",
+                color="#222222",
+                linestyle="None",
+                markerfacecolor="none",
+                markeredgewidth=0.7,
+                markersize=6.2,
+                label="weak recovery denominator",
+            )
+        )
     fig.legend(
         handles=handles,
         title="PFT / land cover",
@@ -767,6 +885,217 @@ def plot_quadrant(site: pd.DataFrame, summary: dict[str, object], out_dir: Path,
         columnspacing=0.9,
     )
     fig.text(0.02, 0.965, "a", fontsize=8, fontweight="bold", ha="left", va="top")
+    return save_figure(fig, out_dir, stem)
+
+
+def plot_forest_composite(
+    site: pd.DataFrame,
+    summary: dict[str, object],
+    clock: pd.DataFrame,
+    out_dir: Path,
+    threshold: float,
+    gpp_metric: str = PRIMARY_GPP_METRIC,
+) -> list[str]:
+    metric_col = GPP_METRICS[gpp_metric]["column"]
+    metric_label = GPP_METRICS[gpp_metric]["label"]
+    fig = plt.figure(figsize=(7.2, 5.75))
+    gs = fig.add_gridspec(
+        1,
+        3,
+        width_ratios=[1.25, 0.95, 0.06],
+        left=0.08,
+        right=0.94,
+        bottom=0.16,
+        top=0.91,
+        wspace=0.22,
+    )
+    ax = fig.add_subplot(gs[0, 0])
+    clock_gs = gs[0, 1].subgridspec(3, 1, hspace=0.24)
+    clock_axes = [fig.add_subplot(clock_gs[i, 0]) for i in range(3)]
+    cax = fig.add_subplot(gs[0, 2])
+
+    cmap = LinearSegmentedColormap.from_list("suppressed_recovered", ["#D55E00", "#F7F7F7", "#0072B2"])
+    vals = pd.to_numeric(site[metric_col], errors="coerce")
+    finite_vals = vals[np.isfinite(vals)]
+    if finite_vals.empty:
+        vmax = 2.0
+    else:
+        vmax = float(np.nanpercentile(np.abs(finite_vals), 85))
+        vmax = max(1.0, min(3.0, vmax))
+    norm = TwoSlopeNorm(vmin=-vmax, vcenter=0.0, vmax=vmax)
+
+    ax.axvspan(threshold, 100, ymin=0.0, ymax=threshold / 110.0, facecolor="#F4E7CB", alpha=0.55, lw=0)
+    ax.axvline(threshold, color="#777777", lw=0.65, ls=":")
+    ax.axhline(threshold, color="#777777", lw=0.65, ls=":")
+    ax.axline((0, 0), slope=1, color="#BBBBBB", lw=0.5, ls="--", zorder=0)
+
+    categories = [c for c in site["forest_type"].dropna().unique().tolist()]
+    markers = marker_map(categories)
+    for category in categories:
+        sub = site[site["forest_type"] == category].copy()
+        has = np.isfinite(sub[metric_col])
+        if has.any():
+            ax.scatter(
+                sub.loc[has, "ndvi_recovery_pct_2023"],
+                sub.loc[has, "chl_recovery_pct_2023"],
+                c=sub.loc[has, metric_col],
+                cmap=cmap,
+                norm=norm,
+                marker=markers[category],
+                s=39,
+                edgecolor="black",
+                linewidth=0.35,
+                alpha=0.95,
+                zorder=3,
+            )
+        if (~has).any():
+            ax.scatter(
+                sub.loc[~has, "ndvi_recovery_pct_2023"],
+                sub.loc[~has, "chl_recovery_pct_2023"],
+                marker=markers[category],
+                s=31,
+                facecolor="#DDDDDD",
+                edgecolor="#777777",
+                linewidth=0.35,
+                alpha=0.72,
+                zorder=2,
+            )
+        uncertain = has & (~(sub["ndvi_recovery_interpretable"].astype(bool) & sub["chl_recovery_interpretable"].astype(bool)))
+        if uncertain.any():
+            ax.scatter(
+                sub.loc[uncertain, "ndvi_recovery_pct_2023"],
+                sub.loc[uncertain, "chl_recovery_pct_2023"],
+                facecolors="none",
+                edgecolors="#222222",
+                marker=markers[category],
+                s=66,
+                linewidth=0.7,
+                alpha=0.95,
+                zorder=4,
+            )
+
+    ax.set_xlim(-5, 105)
+    ax.set_ylim(-5, 105)
+    ax.set_xlabel("NDVI recovery in 2023 (%)")
+    ax.set_ylabel("Chlorophyll recovery in 2023 (%)")
+    ax.text(threshold + 2, 7, "legacy quadrant", fontsize=7, ha="left", va="bottom", color="#5C4033")
+    note = (
+        f"forest-domain paired n={summary[f'{gpp_metric}_pairwise_n']}\n"
+        f"rho={summary[f'{gpp_metric}_spearman_legacy_gap']:+.2f}, "
+        f"p={format_p(summary[f'{gpp_metric}_spearman_legacy_gap_p'])}\n"
+        f"legacy median {metric_value_fmt(summary[f'{gpp_metric}_legacy_median'], gpp_metric)}\n"
+        f"other median {metric_value_fmt(summary[f'{gpp_metric}_nonlegacy_median'], gpp_metric)}; "
+        f"U p={format_p(summary[f'{gpp_metric}_mann_whitney_p'])}"
+    )
+    ax.text(
+        0.03,
+        0.97,
+        note,
+        transform=ax.transAxes,
+        ha="left",
+        va="top",
+        fontsize=6.7,
+        bbox=dict(facecolor="white", edgecolor="none", alpha=0.84, pad=2.0),
+    )
+    style_axis(ax)
+
+    sm = mpl.cm.ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])
+    cbar = fig.colorbar(sm, cax=cax)
+    cbar.set_label(metric_label)
+    cbar.ax.tick_params(labelsize=7, width=0.5, length=3)
+
+    colors = {"NDVI": "#333333", "Chlorophyll": "#009E73", "GPP": "#0072B2"}
+    linestyles = {"NDVI": "--", "Chlorophyll": "-", "GPP": "-"}
+    selected = [int(v) for v in clock["site_id"].dropna().unique()[:3]] if not clock.empty else []
+    for idx, ax_clock in enumerate(clock_axes):
+        if idx >= len(selected):
+            ax_clock.set_visible(False)
+            continue
+        site_id = selected[idx]
+        ax_clock.axvspan(TROUGH_START, TROUGH_END, color="#F4E7CB", lw=0, alpha=0.80)
+        ax_clock.axhline(100, color="#333333", lw=0.50)
+        ax_clock.axhline(0, color="#777777", lw=0.45, ls=":")
+        for variable in ["NDVI", "Chlorophyll", "GPP"]:
+            sub = clock[(clock["site_id"].astype(int) == site_id) & (clock["variable"] == variable)].sort_values("date")
+            if sub.empty:
+                continue
+            ax_clock.plot(
+                sub["date"],
+                sub["recovery_pct_clipped"],
+                color=colors[variable],
+                ls=linestyles[variable],
+                lw=0.95,
+                marker="o",
+                ms=1.8,
+                label=variable,
+            )
+        meta = site[site["site_id"].astype(int) == site_id].iloc[0]
+        ax_clock.set_title(f"site {site_id}, {meta['site_name']}", loc="left", fontsize=6.7, pad=1.0)
+        ax_clock.set_ylim(-5, 105)
+        ax_clock.set_ylabel("Recovery (%)", fontsize=6.7)
+        ax_clock.tick_params(axis="both", labelsize=6.4)
+        style_axis(ax_clock)
+        if idx < len(selected) - 1:
+            ax_clock.tick_params(axis="x", labelbottom=False)
+    if selected:
+        last_visible = clock_axes[len(selected) - 1]
+        last_visible.xaxis.set_major_locator(mdates.MonthLocator(bymonth=[4, 7, 10, 1, 4, 7]))
+        last_visible.xaxis.set_major_formatter(mdates.DateFormatter("%b\n%Y"))
+        last_visible.set_xlim(pd.Timestamp("2022-04-01"), pd.Timestamp("2023-08-31"))
+        clock_axes[0].legend(
+            loc="upper center",
+            bbox_to_anchor=(0.58, 1.28),
+            frameon=False,
+            ncol=3,
+            handlelength=1.2,
+            columnspacing=0.6,
+            fontsize=6.5,
+            borderaxespad=0.0,
+        )
+
+    handles = [
+        Line2D(
+            [0],
+            [0],
+            marker=markers[cat],
+            color="black",
+            linestyle="None",
+            markerfacecolor="#DDDDDD",
+            markeredgewidth=0.35,
+            markersize=5.0,
+            label=cat,
+        )
+        for cat in categories
+    ]
+    if (~(site["ndvi_recovery_interpretable"].astype(bool) & site["chl_recovery_interpretable"].astype(bool))).any():
+        handles.append(
+            Line2D(
+                [0],
+                [0],
+                marker="o",
+                color="#222222",
+                linestyle="None",
+                markerfacecolor="none",
+                markeredgewidth=0.7,
+                markersize=5.8,
+                label="weak recovery denominator",
+            )
+        )
+    fig.legend(
+        handles=handles,
+        title="Forest-domain PFT",
+        loc="lower center",
+        bbox_to_anchor=(0.47, 0.02),
+        ncol=3,
+        frameon=False,
+        handletextpad=0.4,
+        columnspacing=0.8,
+        fontsize=6.8,
+        title_fontsize=7.0,
+    )
+    fig.text(0.02, 0.965, "a", fontsize=8, fontweight="bold", ha="left", va="top")
+    fig.text(0.56, 0.965, "b", fontsize=8, fontweight="bold", ha="left", va="top")
     return save_figure(fig, out_dir, "fig_flux_corroborated_trait_legacy_quadrant")
 
 
@@ -789,20 +1118,32 @@ def biweekly_flux_series(site_id: int, daily: pd.DataFrame, dates: pd.DatetimeIn
     return out
 
 
-def select_clock_sites(site: pd.DataFrame, max_sites: int = 3) -> list[int]:
+def select_clock_sites(site: pd.DataFrame, max_sites: int = 3, gpp_metric: str = PRIMARY_GPP_METRIC) -> list[int]:
+    metric_col = GPP_METRICS[gpp_metric]["column"]
     sub = site[
-        np.isfinite(site["gpp_anomaly_pct_2023_vs_baseline"])
+        np.isfinite(site[metric_col])
         & np.isfinite(site["legacy_gap_pct"])
         & (site["quadrant"] == "legacy_quadrant")
     ].copy()
     forest_like = sub["forest_type"].astype(str).str.contains("forest|Tree cover", case=False, regex=True)
     if forest_like.any():
         sub = sub[forest_like].copy()
+    corroborated_2023 = sub[
+        (pd.to_numeric(sub[metric_col], errors="coerce") < 0)
+        & (pd.to_numeric(sub.get("gpp_anomaly_z_2023_vs_interannual", np.nan), errors="coerce") < 0)
+    ].copy()
+    if len(corroborated_2023) >= max_sites:
+        sub = corroborated_2023
+    else:
+        corroborated = sub[pd.to_numeric(sub[metric_col], errors="coerce") < 0].copy()
+        if not corroborated.empty:
+            sub = corroborated
     if sub.empty:
-        sub = site[np.isfinite(site["gpp_anomaly_pct_2023_vs_baseline"]) & np.isfinite(site["legacy_gap_pct"])].copy()
+        sub = site[np.isfinite(site[metric_col]) & np.isfinite(site["legacy_gap_pct"])].copy()
     if sub.empty:
         return []
-    sub["_score"] = sub["legacy_gap_pct"].astype(float) - 0.65 * sub["gpp_anomaly_pct_2023_vs_baseline"].astype(float)
+    sub["_quality"] = sub["ndvi_recovery_interpretable"].astype(bool).astype(int) + sub["chl_recovery_interpretable"].astype(bool).astype(int)
+    sub["_score"] = 0.5 * sub["legacy_gap_pct"].astype(float) - 18.0 * sub[metric_col].astype(float) + 20.0 * sub["_quality"]
     picked: list[int] = []
     used_types: set[str] = set()
     for rec in sub.sort_values("_score", ascending=False).itertuples(index=False):
@@ -988,8 +1329,34 @@ def plot_trait_space_trajectories(traj: pd.DataFrame, out_dir: Path) -> list[str
     return save_figure(fig, out_dir, "fig_trait_space_trajectories_chl_lma")
 
 
-def write_figure_notes(out_dir: Path, summary: dict[str, object]) -> Path:
+def write_figure_notes(
+    out_dir: Path,
+    summaries: dict[str, dict[str, object]],
+    site: pd.DataFrame,
+    primary_metric: str,
+) -> Path:
     path = out_dir / "figure_notes.md"
+    forest = summaries["forest_main"]
+    all_pft = summaries["all_pft_sensitivity"]
+    strict = summaries["strict_forest_sensitivity"]
+    primary_label = GPP_METRICS[primary_metric]["label"]
+    counter = site[
+        (site["site_id"].astype(int) == 44)
+        & np.isfinite(site["gpp_anomaly_pct_2023_vs_baseline"])
+    ]
+    if counter.empty:
+        counter_text = "- No predefined evergreen counterexample row was available in the regenerated table."
+    else:
+        rec = counter.iloc[0]
+        counter_text = (
+            f"- Evergreen counterexample check: site {int(rec['site_id'])} ({rec['site_name']}) has "
+            f"2023 GPP anomaly {rec['gpp_anomaly_pct_2023_vs_baseline']:+.1f}% "
+            f"({rec['gpp_anomaly_z_2023_vs_interannual']:+.2f} z) while falling in the legacy quadrant. "
+            f"Its chlorophyll recovery is clipped to {rec['chl_recovery_pct_2023']:.1f}% from raw "
+            f"{rec['chl_recovery_pct_raw_2023']:+.1f}%, with "
+            f"`chl_recovery_interpretable={bool(rec['chl_recovery_interpretable'])}`. Treat it as a "
+            "recovery-denominator/domain warning, not as a deterministic-law failure."
+        )
     text = f"""# Flux-Corroborated Trait Legacy Figure Notes
 
 Generated by:
@@ -1000,35 +1367,43 @@ python docs/paper0_perspective/scripts/make_flux_corroborated_trait_legacy_figur
 
 ## Data Contract
 
-- Site set: {summary["n_sites_total"]} cap5000 sites from `cap5000_sites_recovery_timeline_2022_2023aug.csv`.
+- Breadth set: 37 cap5000 sites from `cap5000_sites_recovery_timeline_2022_2023aug.csv`.
+- Main corroboration scope: forest-domain PFTs `{", ".join(sorted(FOREST_SCOPE_TYPES))}`. Wetland sites are retained in the all-PFT sensitivity, not in the main forest-domain analysis, because their available IGBP/WorldCover labels are wetland/grassland rather than forest.
 - Recovery definition: `(value_2023 - value_trough) / (value_preevent - value_trough) * 100`, clipped to 0-100% for plotting.
 - Windows:
   - Pre-event baseline: {BASELINE_START.date()} to {BASELINE_END.date()}.
   - Drought trough: {TROUGH_START.date()} to {TROUGH_END.date()}.
   - 2023 recovery readout: {RECOVERY_2023_START.date()} to {RECOVERY_2023_END.date()}.
-- Flux color: 2023 GPP anomaly relative to pre-event baseline, computed as `100 * (GPP_2023 - GPP_baseline) / abs(GPP_baseline)`.
-- Flux coverage: {summary["n_sites_with_gpp_flux"]} sites have finite GPP anomaly; {summary["n_sites_with_nep_flux"]} sites have finite NEP anomaly.
-- Marker shape: FLUXNET IGBP where available, otherwise WorldCover/PFT fallback.
+- Main flux color/statistic: `{primary_metric}` = {primary_label}. The z-score reference is the same day-of-year window across available non-2022/non-2023 years; the persistence metric averages the 2022 trough-window z-score and 2023 recovery-window z-score.
+- Forest-domain flux coverage: {forest["n_sites_with_gpp_flux"]} sites have finite GPP; {forest[f"{primary_metric}_pairwise_n"]} have both a finite greenness--chlorophyll gap and the primary GPP metric.
+- All-PFT sensitivity flux coverage: {all_pft["n_sites_with_gpp_flux"]} sites have finite GPP; {all_pft[f"{primary_metric}_pairwise_n"]} have pairwise primary-metric data.
+- Marker shape: FLUXNET IGBP where available, otherwise WorldCover/PFT fallback. Open marker rings denote weak recovery denominators (`NDVI` or chlorophyll recovery not interpretable under the 2% baseline--trough contrast rule).
 
-## Main Readout
+## Forest-Domain Main Readout
 
-- Legacy quadrant threshold: NDVI recovery >= {summary["recovery_threshold_pct"]:.0f}% and chlorophyll recovery < {summary["recovery_threshold_pct"]:.0f}%.
-- Legacy quadrant: {summary["legacy_quadrant_n_all"]}/{summary["n_sites_total"]} sites.
-- Legacy quadrant with finite GPP: {summary["legacy_quadrant_n_with_gpp"]}/{summary["n_sites_with_gpp_flux"]} flux sites.
-- Median GPP anomaly in legacy quadrant: {summary["legacy_gpp_anomaly_median_pct"]:+.1f}%.
-- Median GPP anomaly outside legacy quadrant: {summary["nonlegacy_gpp_anomaly_median_pct"]:+.1f}%.
-- Difference: {summary["legacy_minus_nonlegacy_gpp_anomaly_pct"]:+.1f} percentage points.
-- Spearman rho between NDVI-minus-chlorophyll recovery gap and GPP anomaly: {summary["spearman_legacy_gap_vs_gpp_anomaly"]:+.2f}.
+- Legacy quadrant threshold: NDVI recovery >= {forest["recovery_threshold_pct"]:.0f}% and chlorophyll recovery < {forest["recovery_threshold_pct"]:.0f}%.
+- Legacy quadrant: {forest["legacy_quadrant_n_all"]}/{forest["n_sites_total"]} forest-domain sites.
+- Primary Spearman: NDVI-minus-chlorophyll recovery gap vs `{primary_metric}` rho={forest[f"{primary_metric}_spearman_legacy_gap"]:+.2f}, p={format_p(forest[f"{primary_metric}_spearman_legacy_gap_p"])}, n={forest[f"{primary_metric}_spearman_legacy_gap_n"]}.
+- Primary median separation: legacy median {metric_value_fmt(forest[f"{primary_metric}_legacy_median"], primary_metric)} vs other {metric_value_fmt(forest[f"{primary_metric}_nonlegacy_median"], primary_metric)}, Mann--Whitney U={forest[f"{primary_metric}_mann_whitney_u"]:.1f}, p={format_p(forest[f"{primary_metric}_mann_whitney_p"])}.
+- Same-season 2023 GPP z-score separation: legacy median {metric_value_fmt(forest["gpp_z_2023_vs_interannual_legacy_median"], "gpp_z_2023_vs_interannual")} vs other {metric_value_fmt(forest["gpp_z_2023_vs_interannual_nonlegacy_median"], "gpp_z_2023_vs_interannual")}, Mann--Whitney p={format_p(forest["gpp_z_2023_vs_interannual_mann_whitney_p"])}.
+- Raw 2023-vs-baseline percent sensitivity: rho={forest["gpp_pct_2023_vs_baseline_spearman_legacy_gap"]:+.2f}, p={format_p(forest["gpp_pct_2023_vs_baseline_spearman_legacy_gap_p"])}; legacy median {forest["legacy_gpp_anomaly_median_pct"]:+.1f}% vs other {forest["nonlegacy_gpp_anomaly_median_pct"]:+.1f}%, Mann--Whitney p={format_p(forest["gpp_pct_2023_vs_baseline_mann_whitney_p"])}.
 
-This supports the descriptive Perspective claim that sites with recovered greenness but unrecovered chlorophyll tend to remain GPP-suppressed in the 2023 readout window.
+This supports the narrower Perspective claim that, within the forest-domain flux subset, a greenness--chlorophyll recovery gap is associated with reduced independent GPP persistence. It is not framed as a deterministic quadrant law.
+
+## Sensitivities
+
+- Strict forest sensitivity (excluding open/savanna): primary rho={strict[f"{primary_metric}_spearman_legacy_gap"]:+.2f}, p={format_p(strict[f"{primary_metric}_spearman_legacy_gap_p"])}, n={strict[f"{primary_metric}_spearman_legacy_gap_n"]}; Mann--Whitney p={format_p(strict[f"{primary_metric}_mann_whitney_p"])}.
+- All-PFT sensitivity: primary rho={all_pft[f"{primary_metric}_spearman_legacy_gap"]:+.2f}, p={format_p(all_pft[f"{primary_metric}_spearman_legacy_gap_p"])}, n={all_pft[f"{primary_metric}_spearman_legacy_gap_n"]}; Mann--Whitney p={format_p(all_pft[f"{primary_metric}_mann_whitney_p"])}.
+{counter_text}
 
 ## Boundary
 
-Keep this as an illustrative, descriptive figure. Do not frame it as formal variance partitioning. The current residual check is weaker than the quadrant readout: Pearson correlation between chlorophyll recovery and GPP anomaly residual after linear NDVI adjustment is {summary["partial_pearson_chl_vs_gpp_anomaly_given_ndvi"]:+.2f} under the current anomaly definition. The safe manuscript wording is therefore quadrant-level corroboration, not a claim that chlorophyll independently explains flux residuals in a formal model.
+Keep this as an illustrative, descriptive figure. Do not frame it as formal variance partitioning. The residual check remains a sensitivity only: Pearson correlation between chlorophyll recovery and raw GPP anomaly residual after linear NDVI adjustment is {forest["partial_pearson_chl_vs_gpp_anomaly_given_ndvi"]:+.2f} in the forest-domain subset. The safe manuscript wording is therefore forest-domain corroboration, with managed/non-forest land-cover types shown as sensitivity rather than folded into the main claim.
 
 ## Outputs
 
-- Main figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.*`
+- Main forest-domain figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.*`
+- All-PFT supplementary figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant_all_pft.*`
 - Recovery clocks candidate: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_recovery_clocks.*`
 - Chlorophyll-LMA trajectory candidate: `figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.*`
 - Source data: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_site_metrics.csv`
@@ -1056,22 +1431,67 @@ def main() -> None:
         lambda r: quadrant_label(r["ndvi_recovery_pct_2023"], r["chl_recovery_pct_2023"], args.recovery_threshold),
         axis=1,
     )
-    summary = build_summary(site, threshold=args.recovery_threshold)
+    site["forest_scope"] = site["forest_type"].apply(is_forest_scope)
+    site["strict_forest_scope"] = site["forest_type"].apply(is_strict_forest_scope)
+    site["recovery_denominator_weak"] = ~(
+        site["ndvi_recovery_interpretable"].astype(bool) & site["chl_recovery_interpretable"].astype(bool)
+    )
+    forest_site = site[site["forest_scope"]].copy()
+    strict_forest_site = site[site["strict_forest_scope"]].copy()
+    summaries = {
+        "forest_main": build_summary(
+            forest_site,
+            threshold=args.recovery_threshold,
+            scope_name="forest_main",
+            primary_metric=args.primary_gpp_metric,
+        ),
+        "strict_forest_sensitivity": build_summary(
+            strict_forest_site,
+            threshold=args.recovery_threshold,
+            scope_name="strict_forest_sensitivity",
+            primary_metric=args.primary_gpp_metric,
+        ),
+        "all_pft_sensitivity": build_summary(
+            site,
+            threshold=args.recovery_threshold,
+            scope_name="all_pft_sensitivity",
+            primary_metric=args.primary_gpp_metric,
+        ),
+    }
 
     site_path = args.output_table_dir / "flux_trait_legacy_site_metrics.csv"
     summary_path = args.output_table_dir / "flux_trait_legacy_diagnostic_summary.json"
     summary_csv_path = args.output_table_dir / "flux_trait_legacy_diagnostic_summary.csv"
     site.to_csv(site_path, index=False)
-    summary_path.write_text(json.dumps(summary, indent=2, allow_nan=True) + "\n")
-    pd.DataFrame([summary]).to_csv(summary_csv_path, index=False)
+    summary_path.write_text(json.dumps(summaries, indent=2, allow_nan=True) + "\n")
+    pd.DataFrame(list(summaries.values())).to_csv(summary_csv_path, index=False)
 
     figure_outputs: list[str] = []
-    figure_outputs.extend(plot_quadrant(site, summary, args.output_figure_dir, threshold=args.recovery_threshold))
-
-    selected = select_clock_sites(site)
-    clock = build_recovery_clock_table(args.recovery_table, site, daily_by_site, selected)
+    selected = select_clock_sites(forest_site, gpp_metric=args.primary_gpp_metric)
+    clock = build_recovery_clock_table(args.recovery_table, forest_site, daily_by_site, selected)
     clock_path = args.output_table_dir / "flux_recovery_clock_source_data.csv"
     clock.to_csv(clock_path, index=False)
+    figure_outputs.extend(
+        plot_forest_composite(
+            forest_site,
+            summaries["forest_main"],
+            clock,
+            args.output_figure_dir,
+            threshold=args.recovery_threshold,
+            gpp_metric=args.primary_gpp_metric,
+        )
+    )
+    figure_outputs.extend(
+        plot_quadrant(
+            site,
+            summaries["all_pft_sensitivity"],
+            args.output_figure_dir,
+            threshold=args.recovery_threshold,
+            gpp_metric=args.primary_gpp_metric,
+            stem="fig_flux_corroborated_trait_legacy_quadrant_all_pft",
+            scope_label="All PFT sensitivity",
+        )
+    )
     figure_outputs.extend(plot_recovery_clocks(clock, site, args.output_figure_dir))
 
     traj = build_trait_space_table(args.recovery_table, site)
@@ -1087,13 +1507,15 @@ def main() -> None:
         "trajectory_source_data": str(traj_path),
         "figures": figure_outputs,
         "selected_clock_sites": selected,
+        "primary_gpp_metric": args.primary_gpp_metric,
+        "forest_scope_types": sorted(FOREST_SCOPE_TYPES),
         "windows": {
             "baseline": [str(BASELINE_START.date()), str(BASELINE_END.date())],
             "trough": [str(TROUGH_START.date()), str(TROUGH_END.date())],
             "recovery_2023": [str(RECOVERY_2023_START.date()), str(RECOVERY_2023_END.date())],
         },
     }
-    notes_path = write_figure_notes(args.output_table_dir, summary)
+    notes_path = write_figure_notes(args.output_table_dir, summaries, site, args.primary_gpp_metric)
     run_summary["figure_notes"] = str(notes_path)
     run_summary_path = args.output_table_dir / "run_summary.json"
     run_summary_path.write_text(json.dumps(run_summary, indent=2, allow_nan=True) + "\n")

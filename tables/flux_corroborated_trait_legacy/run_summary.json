@@ -10,6 +10,11 @@
     "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.eps",
     "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.png",
     "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.jpg",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant_all_pft.pdf",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant_all_pft.svg",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant_all_pft.eps",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant_all_pft.png",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant_all_pft.jpg",
     "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_recovery_clocks.pdf",
     "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_recovery_clocks.svg",
     "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_recovery_clocks.eps",
@@ -23,8 +28,16 @@
   ],
   "selected_clock_sites": [
     29,
-    49,
-    46
+    46,
+    37
+  ],
+  "primary_gpp_metric": "gpp_persistence_z_2022_2023",
+  "forest_scope_types": [
+    "Deciduous forest",
+    "Evergreen forest",
+    "Mixed forest",
+    "Open/savanna",
+    "Tree cover"
   ],
   "windows": {
     "baseline": [

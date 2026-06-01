@@ -8,35 +8,43 @@ python docs/paper0_perspective/scripts/make_flux_corroborated_trait_legacy_figur
 
 ## Data Contract
 
-- Site set: 37 cap5000 sites from `cap5000_sites_recovery_timeline_2022_2023aug.csv`.
+- Breadth set: 37 cap5000 sites from `cap5000_sites_recovery_timeline_2022_2023aug.csv`.
+- Main corroboration scope: forest-domain PFTs `Deciduous forest, Evergreen forest, Mixed forest, Open/savanna, Tree cover`. Wetland sites are retained in the all-PFT sensitivity, not in the main forest-domain analysis, because their available IGBP/WorldCover labels are wetland/grassland rather than forest.
 - Recovery definition: `(value_2023 - value_trough) / (value_preevent - value_trough) * 100`, clipped to 0-100% for plotting.
 - Windows:
   - Pre-event baseline: 2022-05-14 to 2022-06-25.
   - Drought trough: 2022-07-23 to 2022-08-20.
   - 2023 recovery readout: 2023-07-08 to 2023-08-19.
-- Flux color: 2023 GPP anomaly relative to pre-event baseline, computed as `100 * (GPP_2023 - GPP_baseline) / abs(GPP_baseline)`.
-- Flux coverage: 19 sites have finite GPP anomaly; 20 sites have finite NEP anomaly.
-- Marker shape: FLUXNET IGBP where available, otherwise WorldCover/PFT fallback.
+- Main flux color/statistic: `gpp_persistence_z_2022_2023` = 2022-2023 GPP persistence anomaly (z). The z-score reference is the same day-of-year window across available non-2022/non-2023 years; the persistence metric averages the 2022 trough-window z-score and 2023 recovery-window z-score.
+- Forest-domain flux coverage: 13 sites have finite GPP; 10 have both a finite greenness--chlorophyll gap and the primary GPP metric.
+- All-PFT sensitivity flux coverage: 19 sites have finite GPP; 16 have pairwise primary-metric data.
+- Marker shape: FLUXNET IGBP where available, otherwise WorldCover/PFT fallback. Open marker rings denote weak recovery denominators (`NDVI` or chlorophyll recovery not interpretable under the 2% baseline--trough contrast rule).
 
-## Main Readout
+## Forest-Domain Main Readout
 
 - Legacy quadrant threshold: NDVI recovery >= 70% and chlorophyll recovery < 70%.
-- Legacy quadrant: 9/37 sites.
-- Legacy quadrant with finite GPP: 6/19 flux sites.
-- Median GPP anomaly in legacy quadrant: -49.7%.
-- Median GPP anomaly outside legacy quadrant: +20.2%.
-- Difference: -69.9 percentage points.
-- Spearman rho between NDVI-minus-chlorophyll recovery gap and GPP anomaly: -0.41.
+- Legacy quadrant: 7/25 forest-domain sites.
+- Primary Spearman: NDVI-minus-chlorophyll recovery gap vs `gpp_persistence_z_2022_2023` rho=-0.67, p=0.032, n=10.
+- Primary median separation: legacy median -0.97 vs other -0.29, Mann--Whitney U=5.0, p=0.151.
+- Same-season 2023 GPP z-score separation: legacy median -1.69 vs other +1.19, Mann--Whitney p=0.032.
+- Raw 2023-vs-baseline percent sensitivity: rho=-0.64, p=0.044; legacy median -46.3% vs other -3.6%, Mann--Whitney p=0.056.
 
-This supports the descriptive Perspective claim that sites with recovered greenness but unrecovered chlorophyll tend to remain GPP-suppressed in the 2023 readout window.
+This supports the narrower Perspective claim that, within the forest-domain flux subset, a greenness--chlorophyll recovery gap is associated with reduced independent GPP persistence. It is not framed as a deterministic quadrant law.
+
+## Sensitivities
+
+- Strict forest sensitivity (excluding open/savanna): primary rho=-0.80, p=0.009, n=9; Mann--Whitney p=0.016.
+- All-PFT sensitivity: primary rho=-0.47, p=0.063, n=16; Mann--Whitney p=0.022.
+- Evergreen counterexample check: site 44 (Bilos) has 2023 GPP anomaly +28.2% (+0.31 z) while falling in the legacy quadrant. Its chlorophyll recovery is clipped to 0.0% from raw -76.6%, with `chl_recovery_interpretable=False`. Treat it as a recovery-denominator/domain warning, not as a deterministic-law failure.
 
 ## Boundary
 
-Keep this as an illustrative, descriptive figure. Do not frame it as formal variance partitioning. The current residual check is weaker than the quadrant readout: Pearson correlation between chlorophyll recovery and GPP anomaly residual after linear NDVI adjustment is -0.41 under the current anomaly definition. The safe manuscript wording is therefore quadrant-level corroboration, not a claim that chlorophyll independently explains flux residuals in a formal model.
+Keep this as an illustrative, descriptive figure. Do not frame it as formal variance partitioning. The residual check remains a sensitivity only: Pearson correlation between chlorophyll recovery and raw GPP anomaly residual after linear NDVI adjustment is -0.18 in the forest-domain subset. The safe manuscript wording is therefore forest-domain corroboration, with managed/non-forest land-cover types shown as sensitivity rather than folded into the main claim.
 
 ## Outputs
 
-- Main figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.*`
+- Main forest-domain figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.*`
+- All-PFT supplementary figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant_all_pft.*`
 - Recovery clocks candidate: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_recovery_clocks.*`
 - Chlorophyll-LMA trajectory candidate: `figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.*`
 - Source data: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_site_metrics.csv`
