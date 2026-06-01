@@ -1,0 +1,44 @@
+{
+  "site_metrics": "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/tables/flux_corroborated_trait_legacy/flux_trait_legacy_site_metrics.csv",
+  "diagnostic_summary_json": "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/tables/flux_corroborated_trait_legacy/flux_trait_legacy_diagnostic_summary.json",
+  "diagnostic_summary_csv": "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/tables/flux_corroborated_trait_legacy/flux_trait_legacy_diagnostic_summary.csv",
+  "clock_source_data": "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/tables/flux_corroborated_trait_legacy/flux_recovery_clock_source_data.csv",
+  "trajectory_source_data": "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/tables/flux_corroborated_trait_legacy/trait_space_chl_lma_trajectory_source_data.csv",
+  "figures": [
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.pdf",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.svg",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.eps",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.png",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.jpg",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_recovery_clocks.pdf",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_recovery_clocks.svg",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_recovery_clocks.eps",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_recovery_clocks.png",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_recovery_clocks.jpg",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.pdf",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.svg",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.eps",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.png",
+    "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.jpg"
+  ],
+  "selected_clock_sites": [
+    29,
+    49,
+    46
+  ],
+  "windows": {
+    "baseline": [
+      "2022-05-14",
+      "2022-06-25"
+    ],
+    "trough": [
+      "2022-07-23",
+      "2022-08-20"
+    ],
+    "recovery_2023": [
+      "2023-07-08",
+      "2023-08-19"
+    ]
+  },
+  "figure_notes": "/home/chaonan.ji/data/projects/ecospectra/docs/paper0_perspective/tables/flux_corroborated_trait_legacy/figure_notes.md"
+}

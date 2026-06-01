@@ -6,26 +6,67 @@
 
 \begin{document}
 
-\title{Supplementary information for ``From greenness to function in ecosystem monitoring''}
+\title{Supplementary information for ``Diagnosing functional recovery in trait space under climate change''}
 
 \maketitle
 
-\section*{Supplementary Table 1. Extended trait list}
+\section*{Supplementary Note 1. Reporting practices for trait-state observables}
 
-The extended trait table from the original manuscript should be moved here after revision. The main manuscript should retain only traits required for the argument or for the proof-of-concept.
+The main text lists six reporting practices. Here they are expanded into candidate requirements for product papers and data releases.
 
-\section*{Densification and retrospective reconstruction}
+\begin{enumerate}
+\item Define each trait with physical units, biological support and ecological interpretation before fitting the model.
+\item Distinguish the hyperspectral label step from the Sentinel-2 or Landsat reconstruction step. Direct/indirect status applies to the label step; every dense multispectral time-series value remains a learned reconstruction.
+\item Report retrieval uncertainty, reconstruction uncertainty and transfer uncertainty separately where possible.
+\item Attach domain-of-applicability masks and provenance classes to every ecological claim.
+\item Stratify validation by trait, site, year, season, vegetation type and disturbance context; pooled random-split metrics are not sufficient for recovery claims.
+\item Test trait covariance and trajectory direction against ecological expectations, not only against held-out labels.
+\end{enumerate}
 
-The proof-of-concept is designed to test how sparse hyperspectral-derived trait labels can be linked to dense Sentinel-2 temporal context. We use \textit{densification} to refer to filling temporal gaps between trait anchors within the contemporary satellite record. We use \textit{retrospective reconstruction} to refer to cautious inference of trait-relevant functional states through existing multispectral archives, including Sentinel-2 since 2015 and, trait by trait where defensible, Landsat-era observations.
-
-The final supplement should report which traits are suitable for each task, the input sensors used, validation splits, uncertainty estimates and known failure modes. It should also distinguish observed hyperspectral trait anchors, densified estimates within the contemporary record and retrospective predictions outside the direct hyperspectral archive.
-
-\section*{Supplementary Figure 1. Sentinel-2 feature importance}
+\section*{Supplementary Figure 1. Three-pillar measurement framework}
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=\textwidth]{../figures/draft/fig_supp_s2_importance_heatmap.png}
-\caption{Draft Sentinel-2 feature-importance heatmap from the proof-of-concept analyses. This figure requires redesign before submission.}
+\includegraphics[width=\textwidth]{../figures/generated/fig2_functional_observables_framework.pdf}
+\caption{The original three-pillar framework figure is retained as supporting material rather than a main display item. It summarizes the relationship among field traits, imaging spectroscopy, active structural observations and dense multispectral time series.}
 \end{figure}
+
+\section*{Supplementary Figure 2. Flux-corroboration diagnostic}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{../figures/generated/fig3_all_sites_cap2000_flux_traits/all_sites_cap2000_traits_flux_2022.pdf}
+\caption{First page of the all-site 2022 trait--index--ERA5--FLUXNET diagnostic. The full generated PDF is a site-by-site diagnostic used to inspect flux context, not a main manuscript display item.}
+\end{figure}
+
+\section*{Supplementary Table 1. Site-fraction denominators and Wilson intervals}
+
+\begin{tabularx}{\textwidth}{lrrrr}
+\toprule
+\textbf{Trait signal} & \textbf{Count} & \textbf{Denominator} & \textbf{Percent} & \textbf{Wilson 95\% CI} \\
+\midrule
+EWT early-warning candidate & 15 & 37 & 40.5 & 26.3--56.5 \\
+LMA early-warning candidate & 12 & 37 & 32.4 & 19.6--48.5 \\
+Chlorophyll legacy-effect candidate & 11 & 37 & 29.7 & 17.5--45.8 \\
+LAI consistent-with-greenness candidate & 11 & 37 & 29.7 & 17.5--45.8 \\
+Nitrogen consistent-with-greenness candidate & 8 & 37 & 21.6 & 11.4--37.2 \\
+\bottomrule
+\end{tabularx}
+
+\section*{Supplementary Table 2. Transfer-stratified skill for chlorophyll and EWT}
+
+\begin{tabularx}{\textwidth}{llrrr}
+\toprule
+\textbf{Validation design} & \textbf{Held-out unit} & \textbf{Chlorophyll $R^2$} & \textbf{EWT $R^2$} & \textbf{Rows per split} \\
+\midrule
+Four-year temporal holdout, all20 Transformer & 2022 & 0.19--0.29 & 0.21--0.29 & 65,000 \\
+Four-year temporal holdout, all20 Transformer & 2023 & 0.16--0.24 & 0.23--0.25 & 90,000 \\
+Balanced16 two-year-train temporal holdout, all20 Transformer & 2023 & 0.13 & 0.19 & 80,000 \\
+Balanced16 trait-PCA spatial holdout, all20 Transformer & site group & 0.38--0.51 & 0.35--0.41 & 60,000 \\
+Balanced16 trait-PCA spatial holdout, XGBoost multi-output & site group & 0.46--0.57 & 0.41--0.47 & 60,000 \\
+\bottomrule
+\end{tabularx}
+
+The balanced16 design is stricter because it uses balanced site-year sampling and a two-year training set with internal validation. These values are used in the main text to bound the 2022--2023 drought demonstration; they are not final operational benchmark claims.
 
 \end{document}

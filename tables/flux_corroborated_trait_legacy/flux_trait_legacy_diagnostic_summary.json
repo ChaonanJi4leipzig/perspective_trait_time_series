@@ -1,0 +1,22 @@
+{
+  "n_sites_total": 37,
+  "n_sites_with_gpp_flux": 19,
+  "n_sites_with_nep_flux": 20,
+  "recovery_threshold_pct": 70.0,
+  "legacy_quadrant_n_all": 9,
+  "legacy_quadrant_n_with_gpp": 6,
+  "legacy_gpp_anomaly_median_pct": -49.66973254456147,
+  "nonlegacy_gpp_anomaly_median_pct": 20.243001605995047,
+  "legacy_minus_nonlegacy_gpp_anomaly_pct": -69.91273415055652,
+  "spearman_legacy_gap_vs_gpp_anomaly": -0.4050205227439495,
+  "pearson_legacy_gap_vs_gpp_anomaly": -0.2708763796540138,
+  "corr_n_legacy_gap_vs_gpp": 15,
+  "spearman_chl_recovery_vs_gpp_anomaly": 0.01889960122262126,
+  "corr_n_chl_vs_gpp": 19,
+  "spearman_ndvi_recovery_vs_gpp_anomaly": -0.6115766297251506,
+  "corr_n_ndvi_vs_gpp": 15,
+  "partial_pearson_chl_vs_gpp_anomaly_given_ndvi": -0.4062354221605065,
+  "partial_n": 15,
+  "spearman_legacy_gap_vs_nep_anomaly": -0.2473134165427656,
+  "corr_n_legacy_gap_vs_nep": 15
+}

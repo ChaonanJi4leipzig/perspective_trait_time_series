@@ -1,0 +1,1049 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import argparse
+import json
+import math
+from pathlib import Path
+import zipfile
+
+import matplotlib as mpl
+
+mpl.use("Agg")
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap, TwoSlopeNorm
+from matplotlib.lines import Line2D
+import numpy as np
+import pandas as pd
+from scipy import stats
+
+
+PAPER_ROOT = Path(__file__).resolve().parents[1]
+ECOSPECTRA_ROOT = Path("/home/chaonan.ji/data/projects/ecospectra")
+
+RECOVERY_TABLE = PAPER_ROOT / "tables" / "fig4_drought_anchor_xgb" / "cap5000_sites_recovery_timeline_2022_2023aug.csv"
+UNIFIED_2022_TABLE = (
+    PAPER_ROOT
+    / "tables"
+    / "fig3_all_sites_cap2000_flux_traits"
+    / "all_sites_unified_biweekly_analysis_2022.csv"
+)
+FLUXNET_MAPPING = PAPER_ROOT / "tables" / "fig3_all_sites_cap2000_flux_traits" / "site_fluxnet_mapping.csv"
+FLUXNET_ZIP_DIR = PAPER_ROOT / "tables" / "fig3_all_sites_cap2000_flux_traits" / "fluxnet"
+
+OUT_TABLE_DIR = PAPER_ROOT / "tables" / "flux_corroborated_trait_legacy"
+OUT_FIG_DIR = PAPER_ROOT / "figures" / "generated" / "flux_corroborated_trait_legacy"
+
+EVENT_DATE = pd.Timestamp("2022-08-06")
+BASELINE_START = pd.Timestamp("2022-05-14")
+BASELINE_END = pd.Timestamp("2022-06-25")
+TROUGH_START = pd.Timestamp("2022-07-23")
+TROUGH_END = pd.Timestamp("2022-08-20")
+RECOVERY_2023_START = pd.Timestamp("2023-07-08")
+RECOVERY_2023_END = pd.Timestamp("2023-08-19")
+
+FLUXNET_SOURCE_VARS = [
+    "GPP_NT_VUT_REF",
+    "NEE_VUT_REF",
+    "RECO_NT_VUT_REF",
+    "LE_F_MDS",
+    "VPD_F_MDS",
+    "SWC_F_MDS_1",
+    "SWC_F_MDS_2",
+]
+FLUX_VARS = ["GPP_NT_VUT_REF", "NEP_VUT_REF"]
+
+RECOVERY_THRESHOLD = 70.0
+FOREST_SCOPE_TYPES = {
+    "Evergreen forest",
+    "Deciduous forest",
+    "Mixed forest",
+    "Tree cover",
+    "Open/savanna",
+}
+STRICT_FOREST_SCOPE_TYPES = {
+    "Evergreen forest",
+    "Deciduous forest",
+    "Mixed forest",
+    "Tree cover",
+}
+PRIMARY_GPP_METRIC = "gpp_persistence_z_2022_2023"
+PRIMARY_GPP_LABEL = "2022-2023 GPP persistence anomaly (z)"
+GPP_METRICS = {
+    "gpp_pct_2023_vs_baseline": {
+        "column": "gpp_anomaly_pct_2023_vs_baseline",
+        "label": "2023 GPP anomaly vs 2022 baseline (%)",
+    },
+    "gpp_z_2023_vs_interannual": {
+        "column": "gpp_anomaly_z_2023_vs_interannual",
+        "label": "2023 GPP anomaly vs same-season climatology (z)",
+    },
+    "gpp_persistence_z_2022_2023": {
+        "column": "gpp_persistence_z_2022_2023",
+        "label": PRIMARY_GPP_LABEL,
+    },
+}
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Build a Perspective-style flux-corroborated trait legacy figure: "
+            "NDVI recovery vs chlorophyll recovery, colored by 2023 flux anomaly."
+        )
+    )
+    parser.add_argument("--recovery-table", type=Path, default=RECOVERY_TABLE)
+    parser.add_argument("--unified-2022-table", type=Path, default=UNIFIED_2022_TABLE)
+    parser.add_argument("--fluxnet-mapping", type=Path, default=FLUXNET_MAPPING)
+    parser.add_argument("--fluxnet-zip-dir", type=Path, default=FLUXNET_ZIP_DIR)
+    parser.add_argument("--output-table-dir", type=Path, default=OUT_TABLE_DIR)
+    parser.add_argument("--output-figure-dir", type=Path, default=OUT_FIG_DIR)
+    parser.add_argument("--recovery-threshold", type=float, default=RECOVERY_THRESHOLD)
+    parser.add_argument(
+        "--primary-gpp-metric",
+        choices=sorted(GPP_METRICS),
+        default=PRIMARY_GPP_METRIC,
+        help="GPP metric used for the main forest-domain color scale and primary association test.",
+    )
+    return parser.parse_args()
+
+
+def setup_style() -> None:
+    mpl.rcParams["pdf.fonttype"] = 42
+    mpl.rcParams["ps.fonttype"] = 42
+    mpl.rcParams["svg.fonttype"] = "none"
+    plt.rcParams.update(
+        {
+            "font.family": "sans-serif",
+            "font.sans-serif": ["Arial", "Helvetica", "DejaVu Sans"],
+            "font.size": 8,
+            "axes.labelsize": 8,
+            "axes.titlesize": 8,
+            "xtick.labelsize": 7,
+            "ytick.labelsize": 7,
+            "legend.fontsize": 7,
+            "axes.spines.top": False,
+            "axes.spines.right": False,
+            "axes.linewidth": 0.5,
+            "xtick.major.width": 0.5,
+            "ytick.major.width": 0.5,
+            "xtick.major.size": 3.0,
+            "ytick.major.size": 3.0,
+            "axes.grid": False,
+            "figure.dpi": 180,
+            "savefig.dpi": 300,
+        }
+    )
+
+
+def style_axis(ax) -> None:
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_linewidth(0.5)
+    ax.spines["bottom"].set_linewidth(0.5)
+    ax.tick_params(axis="both", width=0.5, length=3)
+    ax.grid(False)
+
+
+def save_figure(fig: plt.Figure, out_dir: Path, stem: str, preview: bool = True) -> list[str]:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    paths: list[str] = []
+    for ext in ("pdf", "svg", "eps"):
+        path = out_dir / f"{stem}.{ext}"
+        fig.savefig(path, bbox_inches="tight")
+        paths.append(str(path))
+    if preview:
+        for ext in ("png", "jpg"):
+            path = out_dir / f"{stem}.{ext}"
+            fig.savefig(path, dpi=300, bbox_inches="tight")
+            paths.append(str(path))
+    plt.close(fig)
+    return paths
+
+
+def recovery_score(value: float, baseline: float, trough: float, min_relative_magnitude: float = 0.02) -> tuple[float, float, bool]:
+    if not (np.isfinite(value) and np.isfinite(baseline) and np.isfinite(trough)):
+        return math.nan, math.nan, False
+    denom = float(baseline) - float(trough)
+    scale = max(abs(float(baseline)), 1e-12)
+    interpretable = abs(denom) / scale >= float(min_relative_magnitude)
+    if abs(denom) <= 1e-12:
+        return math.nan, math.nan, False
+    pct = 100.0 * (float(value) - float(trough)) / denom
+    return pct, float(np.clip(pct, 0.0, 100.0)), bool(interpretable)
+
+
+def finite_median(values: pd.Series) -> float:
+    vals = pd.to_numeric(values, errors="coerce").astype(float)
+    return float(np.nanmedian(vals)) if np.isfinite(vals).any() else math.nan
+
+
+def load_recovery_site_metrics(path: Path, threshold: float) -> pd.DataFrame:
+    df = pd.read_csv(path, parse_dates=["date"])
+    required = {
+        "site_id",
+        "site_name",
+        "date",
+        "stage",
+        "variable",
+        "value",
+        "recovery_pct",
+        "recovery_pct_clipped",
+        "recovery_interpretable",
+    }
+    missing = required.difference(df.columns)
+    if missing:
+        raise ValueError(f"Missing recovery columns in {path}: {sorted(missing)}")
+    df["site_id"] = df["site_id"].astype(int)
+    df["recovery_pct"] = pd.to_numeric(df["recovery_pct"], errors="coerce")
+    df["recovery_pct_clipped"] = pd.to_numeric(df["recovery_pct_clipped"], errors="coerce")
+    df["recovery_interpretable"] = df["recovery_interpretable"].astype(bool)
+
+    rows: list[dict[str, object]] = []
+    for site_id, site in df.groupby("site_id"):
+        row: dict[str, object] = {"site_id": int(site_id), "site_name": str(site["site_name"].dropna().iloc[0])}
+        for variable in ["NDVI", "Chlorophyll", "LMA", "GPP_NT_VUT_REF"]:
+            var = site[(site["variable"] == variable) & (site["stage"] == "2023 recovery")].copy()
+            if variable == "GPP_NT_VUT_REF":
+                continue
+            prefix = variable.lower().replace("chlorophyll", "chl")
+            row[f"{prefix}_recovery_pct_raw_2023"] = finite_median(var["recovery_pct"]) if not var.empty else math.nan
+            row[f"{prefix}_recovery_pct_2023"] = finite_median(var["recovery_pct_clipped"]) if not var.empty else math.nan
+            row[f"{prefix}_recovery_interpretable"] = bool(var["recovery_interpretable"].mean() >= 0.5) if not var.empty else False
+        ndvi = row.get("ndvi_recovery_pct_2023", math.nan)
+        chl = row.get("chl_recovery_pct_2023", math.nan)
+        row["legacy_gap_pct"] = float(ndvi - chl) if np.isfinite(ndvi) and np.isfinite(chl) else math.nan
+        row["quadrant"] = quadrant_label(ndvi, chl, threshold)
+        rows.append(row)
+    return pd.DataFrame(rows).sort_values("site_id")
+
+
+def quadrant_label(ndvi: float, chl: float, threshold: float) -> str:
+    if not (np.isfinite(ndvi) and np.isfinite(chl)):
+        return "not_interpretable"
+    ndvi_ok = ndvi >= threshold
+    chl_ok = chl >= threshold
+    if ndvi_ok and chl_ok:
+        return "greenness_and_trait_recovered"
+    if ndvi_ok and not chl_ok:
+        return "legacy_quadrant"
+    if not ndvi_ok and chl_ok:
+        return "trait_only_recovered"
+    return "unrecovered"
+
+
+def load_site_metadata(unified_path: Path, mapping_path: Path) -> pd.DataFrame:
+    parts: list[pd.DataFrame] = []
+    if unified_path.exists():
+        unified = pd.read_csv(unified_path)
+        cols = [c for c in ["site_id", "site_name", "fluxnet_site_id", "igbp", "worldcover_class", "pft_group"] if c in unified.columns]
+        if cols:
+            parts.append(unified[cols].drop_duplicates("site_id"))
+    if mapping_path.exists():
+        mapping = pd.read_csv(mapping_path)
+        cols = [c for c in ["site_id", "site_name", "fluxnet_site_id", "has_2022", "first_year", "last_year", "fluxnet_product_name"] if c in mapping.columns]
+        if cols:
+            parts.append(mapping[cols].drop_duplicates("site_id"))
+    if not parts:
+        return pd.DataFrame(columns=["site_id"])
+    meta = parts[0].copy()
+    for part in parts[1:]:
+        meta = meta.merge(part, on="site_id", how="outer", suffixes=("", "_map"))
+        for col in ["site_name", "fluxnet_site_id"]:
+            alt = f"{col}_map"
+            if alt in meta.columns:
+                meta[col] = meta[col].where(meta[col].notna() & (meta[col].astype(str) != ""), meta[alt])
+                meta = meta.drop(columns=[alt])
+    meta["site_id"] = meta["site_id"].astype(int)
+    if "pft_group" not in meta.columns:
+        meta["pft_group"] = np.nan
+    if "worldcover_class" not in meta.columns:
+        meta["worldcover_class"] = np.nan
+    if "igbp" not in meta.columns:
+        meta["igbp"] = np.nan
+    meta["forest_type"] = meta.apply(forest_type_label, axis=1)
+    return meta
+
+
+def forest_type_label(row: pd.Series) -> str:
+    igbp = str(row.get("igbp", "")).strip()
+    pft = str(row.get("pft_group", "")).strip()
+    wc = str(row.get("worldcover_class", "")).strip()
+    value = igbp if igbp and igbp.lower() != "nan" else pft
+    if not value or value.lower() == "nan":
+        value = wc
+    if value in {"ENF", "EBF"}:
+        return "Evergreen forest"
+    if value in {"DBF", "DNF"}:
+        return "Deciduous forest"
+    if value == "MF":
+        return "Mixed forest"
+    if value == "Tree cover":
+        return "Tree cover"
+    if value in {"GRA", "Grassland"}:
+        return "Grassland"
+    if value in {"CRO", "Cropland"}:
+        return "Cropland"
+    if value in {"WET", "Wetland"}:
+        return "Wetland"
+    if value in {"OSH", "SAV"}:
+        return "Open/savanna"
+    return "Unclassified"
+
+
+def is_forest_scope(forest_type: object) -> bool:
+    return str(forest_type) in FOREST_SCOPE_TYPES
+
+
+def is_strict_forest_scope(forest_type: object) -> bool:
+    return str(forest_type) in STRICT_FOREST_SCOPE_TYPES
+
+
+def format_p(value: float) -> str:
+    if not np.isfinite(value):
+        return "NA"
+    if value < 0.001:
+        return "<0.001"
+    return f"{value:.3f}"
+
+
+def finite_nanmean(values: list[float]) -> float:
+    finite = [float(v) for v in values if np.isfinite(v)]
+    return float(np.mean(finite)) if finite else math.nan
+
+
+def same_doy_window_medians(
+    daily: pd.DataFrame,
+    column: str,
+    start: pd.Timestamp,
+    end: pd.Timestamp,
+) -> dict[int, float]:
+    if column not in daily.columns or "date" not in daily.columns:
+        return {}
+    out: dict[int, float] = {}
+    years = sorted(pd.to_datetime(daily["date"], errors="coerce").dropna().dt.year.unique().tolist())
+    for year in years:
+        try:
+            y_start = pd.Timestamp(year=int(year), month=start.month, day=start.day)
+            y_end = pd.Timestamp(year=int(year), month=end.month, day=end.day)
+        except ValueError:
+            continue
+        value = window_median(daily, column, y_start, y_end)
+        if np.isfinite(value):
+            out[int(year)] = float(value)
+    return out
+
+
+def interannual_anomaly(
+    annual_values: dict[int, float],
+    target_year: int,
+    exclude_years: set[int],
+) -> dict[str, float | int]:
+    target = annual_values.get(int(target_year), math.nan)
+    reference = [float(v) for y, v in annual_values.items() if y not in exclude_years and np.isfinite(v)]
+    if len(reference) < 2 or not np.isfinite(target):
+        return {
+            "target": target,
+            "reference_mean": math.nan,
+            "reference_sd": math.nan,
+            "reference_n_years": int(len(reference)),
+            "anomaly_abs": math.nan,
+            "anomaly_pct": math.nan,
+            "anomaly_z": math.nan,
+        }
+    mean = float(np.mean(reference))
+    sd = float(np.std(reference, ddof=1))
+    anomaly_abs = float(target - mean)
+    return {
+        "target": float(target),
+        "reference_mean": mean,
+        "reference_sd": sd,
+        "reference_n_years": int(len(reference)),
+        "anomaly_abs": anomaly_abs,
+        "anomaly_pct": 100.0 * anomaly_abs / abs(mean) if abs(mean) > 1e-12 else math.nan,
+        "anomaly_z": anomaly_abs / sd if sd > 1e-12 else math.nan,
+    }
+
+
+def find_fluxnet_zip(site_code: str, zip_dir: Path) -> Path | None:
+    if not isinstance(site_code, str) or not site_code or site_code.lower() == "nan":
+        return None
+    search_dirs = [
+        zip_dir,
+        ECOSPECTRA_ROOT / "input_data" / "fluxnet",
+        ECOSPECTRA_ROOT / "input_data" / "0_others",
+        ECOSPECTRA_ROOT / "input_data",
+    ]
+    for root in search_dirs:
+        if not root.exists():
+            continue
+        candidates = sorted(root.glob(f"*{site_code}*FLUXNET*.zip"))
+        if candidates:
+            return candidates[0]
+    return None
+
+
+def read_fluxnet_daily(zip_path: Path) -> pd.DataFrame:
+    with zipfile.ZipFile(zip_path) as zf:
+        names = zf.namelist()
+        fluxmet_daily = [n for n in names if n.lower().endswith(".csv") and "fluxmet_dd" in n.lower()]
+        daily = [
+            n
+            for n in names
+            if n.lower().endswith(".csv") and ("_dd_" in n.lower() or "daily" in n.lower()) and "bif" not in n.lower()
+        ]
+        chosen = (fluxmet_daily or daily)[0] if (fluxmet_daily or daily) else None
+        if chosen is None:
+            raise ValueError(f"No daily FLUXNET CSV found in {zip_path}")
+        with zf.open(chosen) as handle:
+            df = pd.read_csv(handle)
+    timestamp_col = "TIMESTAMP" if "TIMESTAMP" in df.columns else "TIMESTAMP_START"
+    ts = df[timestamp_col].astype(str).str.slice(0, 8)
+    df["date"] = pd.to_datetime(ts, format="%Y%m%d", errors="coerce")
+    available = [v for v in FLUXNET_SOURCE_VARS if v in df.columns]
+    if not available:
+        return pd.DataFrame(columns=["date"])
+    df[available] = df[available].replace(-9999, np.nan)
+    daily = df.groupby("date", as_index=False)[available].mean(numeric_only=True)
+    if "NEE_VUT_REF" in daily.columns:
+        daily["NEP_VUT_REF"] = -pd.to_numeric(daily["NEE_VUT_REF"], errors="coerce")
+    return daily
+
+
+def window_median(df: pd.DataFrame, column: str, start: pd.Timestamp, end: pd.Timestamp) -> float:
+    if column not in df.columns:
+        return math.nan
+    sub = df[(df["date"] >= start) & (df["date"] <= end)]
+    if sub.empty:
+        return math.nan
+    vals = pd.to_numeric(sub[column], errors="coerce").astype(float)
+    return float(np.nanmedian(vals)) if np.isfinite(vals).any() else math.nan
+
+
+def compute_flux_metrics(meta: pd.DataFrame, zip_dir: Path) -> tuple[pd.DataFrame, dict[int, pd.DataFrame]]:
+    rows: list[dict[str, object]] = []
+    daily_by_site: dict[int, pd.DataFrame] = {}
+    for rec in meta.sort_values("site_id").itertuples(index=False):
+        site_id = int(rec.site_id)
+        site_code = str(getattr(rec, "fluxnet_site_id", ""))
+        row: dict[str, object] = {"site_id": site_id, "fluxnet_site_id": site_code}
+        zip_path = find_fluxnet_zip(site_code, zip_dir)
+        row["fluxnet_zip"] = str(zip_path) if zip_path else ""
+        if zip_path is None:
+            for var in FLUX_VARS:
+                add_empty_flux_fields(row, var)
+            rows.append(row)
+            continue
+        try:
+            daily = read_fluxnet_daily(zip_path)
+        except Exception as exc:
+            row["flux_read_error"] = str(exc)
+            for var in FLUX_VARS:
+                add_empty_flux_fields(row, var)
+            rows.append(row)
+            continue
+        daily_by_site[site_id] = daily
+        for var in FLUX_VARS:
+            baseline = window_median(daily, var, BASELINE_START, BASELINE_END)
+            trough = window_median(daily, var, TROUGH_START, TROUGH_END)
+            late = window_median(daily, var, RECOVERY_2023_START, RECOVERY_2023_END)
+            rec_pct, rec_clip, interpretable = recovery_score(late, baseline, trough)
+            short = "gpp" if var == "GPP_NT_VUT_REF" else "nep"
+            row[f"{short}_baseline_2022"] = baseline
+            row[f"{short}_trough_2022"] = trough
+            row[f"{short}_median_2023"] = late
+            row[f"{short}_anomaly_abs_2023_vs_baseline"] = late - baseline if np.isfinite(late) and np.isfinite(baseline) else math.nan
+            row[f"{short}_anomaly_pct_2023_vs_baseline"] = (
+                100.0 * (late - baseline) / abs(baseline)
+                if np.isfinite(late) and np.isfinite(baseline) and abs(baseline) > 1e-12
+                else math.nan
+            )
+            row[f"{short}_recovery_pct_raw_2023"] = rec_pct
+            row[f"{short}_recovery_pct_2023"] = rec_clip
+            row[f"{short}_recovery_interpretable"] = interpretable
+        rows.append(row)
+    return pd.DataFrame(rows).sort_values("site_id"), daily_by_site
+
+
+def add_empty_flux_fields(row: dict[str, object], var: str) -> None:
+    short = "gpp" if var == "GPP_NT_VUT_REF" else "nep"
+    for suffix in [
+        "baseline_2022",
+        "trough_2022",
+        "median_2023",
+        "anomaly_abs_2023_vs_baseline",
+        "anomaly_pct_2023_vs_baseline",
+        "recovery_pct_raw_2023",
+        "recovery_pct_2023",
+    ]:
+        row[f"{short}_{suffix}"] = math.nan
+    row[f"{short}_recovery_interpretable"] = False
+
+
+def corr_value(x: pd.Series, y: pd.Series, method: str = "pearson") -> tuple[float, int]:
+    pair = pd.DataFrame({"x": pd.to_numeric(x, errors="coerce"), "y": pd.to_numeric(y, errors="coerce")}).dropna()
+    if len(pair) < 3:
+        return math.nan, int(len(pair))
+    xv = pair["x"].astype(float)
+    yv = pair["y"].astype(float)
+    if method == "spearman":
+        xv = xv.rank(method="average")
+        yv = yv.rank(method="average")
+    if float(xv.std(ddof=0)) <= 1e-12 or float(yv.std(ddof=0)) <= 1e-12:
+        return math.nan, int(len(pair))
+    return float(np.corrcoef(xv, yv)[0, 1]), int(len(pair))
+
+
+def residualize(y: pd.Series, x: pd.Series) -> pd.Series:
+    pair = pd.DataFrame({"x": pd.to_numeric(x, errors="coerce"), "y": pd.to_numeric(y, errors="coerce")})
+    out = pd.Series(np.nan, index=pair.index, dtype=float)
+    finite = pair.dropna()
+    if len(finite) < 3 or float(finite["x"].std(ddof=0)) <= 1e-12:
+        return out
+    coef = np.polyfit(finite["x"].astype(float), finite["y"].astype(float), deg=1)
+    out.loc[finite.index] = finite["y"].astype(float) - (coef[0] * finite["x"].astype(float) + coef[1])
+    return out
+
+
+def build_summary(site: pd.DataFrame, threshold: float) -> dict[str, object]:
+    flux = site[np.isfinite(site["gpp_anomaly_pct_2023_vs_baseline"])].copy()
+    legacy = flux[flux["quadrant"] == "legacy_quadrant"]
+    nonlegacy = flux[flux["quadrant"] != "legacy_quadrant"]
+    gap_spearman, gap_n = corr_value(flux["legacy_gap_pct"], flux["gpp_anomaly_pct_2023_vs_baseline"], method="spearman")
+    gap_pearson, _ = corr_value(flux["legacy_gap_pct"], flux["gpp_anomaly_pct_2023_vs_baseline"], method="pearson")
+    chl_spearman, chl_n = corr_value(flux["chl_recovery_pct_2023"], flux["gpp_anomaly_pct_2023_vs_baseline"], method="spearman")
+    ndvi_spearman, ndvi_n = corr_value(flux["ndvi_recovery_pct_2023"], flux["gpp_anomaly_pct_2023_vs_baseline"], method="spearman")
+    gpp_resid = residualize(flux["gpp_anomaly_pct_2023_vs_baseline"], flux["ndvi_recovery_pct_2023"])
+    partial_r, partial_n = corr_value(flux["chl_recovery_pct_2023"], gpp_resid, method="pearson")
+    nep_gap, nep_n = corr_value(flux["legacy_gap_pct"], flux["nep_anomaly_pct_2023_vs_baseline"], method="spearman")
+    return {
+        "n_sites_total": int(site["site_id"].nunique()),
+        "n_sites_with_gpp_flux": int(len(flux)),
+        "n_sites_with_nep_flux": int(np.isfinite(site["nep_anomaly_pct_2023_vs_baseline"]).sum()),
+        "recovery_threshold_pct": float(threshold),
+        "legacy_quadrant_n_all": int((site["quadrant"] == "legacy_quadrant").sum()),
+        "legacy_quadrant_n_with_gpp": int(len(legacy)),
+        "legacy_gpp_anomaly_median_pct": float(np.nanmedian(legacy["gpp_anomaly_pct_2023_vs_baseline"])) if len(legacy) else math.nan,
+        "nonlegacy_gpp_anomaly_median_pct": float(np.nanmedian(nonlegacy["gpp_anomaly_pct_2023_vs_baseline"])) if len(nonlegacy) else math.nan,
+        "legacy_minus_nonlegacy_gpp_anomaly_pct": (
+            float(np.nanmedian(legacy["gpp_anomaly_pct_2023_vs_baseline"]) - np.nanmedian(nonlegacy["gpp_anomaly_pct_2023_vs_baseline"]))
+            if len(legacy) and len(nonlegacy)
+            else math.nan
+        ),
+        "spearman_legacy_gap_vs_gpp_anomaly": gap_spearman,
+        "pearson_legacy_gap_vs_gpp_anomaly": gap_pearson,
+        "corr_n_legacy_gap_vs_gpp": gap_n,
+        "spearman_chl_recovery_vs_gpp_anomaly": chl_spearman,
+        "corr_n_chl_vs_gpp": chl_n,
+        "spearman_ndvi_recovery_vs_gpp_anomaly": ndvi_spearman,
+        "corr_n_ndvi_vs_gpp": ndvi_n,
+        "partial_pearson_chl_vs_gpp_anomaly_given_ndvi": partial_r,
+        "partial_n": partial_n,
+        "spearman_legacy_gap_vs_nep_anomaly": nep_gap,
+        "corr_n_legacy_gap_vs_nep": nep_n,
+    }
+
+
+def marker_map(categories: list[str]) -> dict[str, str]:
+    markers = ["o", "^", "s", "D", "P", "X", "v", "<", ">"]
+    preferred = {
+        "Evergreen forest": "^",
+        "Deciduous forest": "s",
+        "Mixed forest": "D",
+        "Tree cover": "o",
+        "Grassland": "P",
+        "Cropland": "X",
+        "Wetland": "v",
+        "Open/savanna": "<",
+        "Unclassified": "o",
+    }
+    out: dict[str, str] = {}
+    for idx, cat in enumerate(categories):
+        out[cat] = preferred.get(cat, markers[idx % len(markers)])
+    return out
+
+
+def plot_quadrant(site: pd.DataFrame, summary: dict[str, object], out_dir: Path, threshold: float) -> list[str]:
+    fig = plt.figure(figsize=(7.2, 5.7))
+    gs = fig.add_gridspec(
+        2,
+        3,
+        width_ratios=[4.7, 0.95, 0.28],
+        height_ratios=[0.85, 4.2],
+        left=0.10,
+        right=0.96,
+        bottom=0.25,
+        top=0.92,
+        hspace=0.04,
+        wspace=0.10,
+    )
+    ax_histx = fig.add_subplot(gs[0, 0])
+    ax = fig.add_subplot(gs[1, 0], sharex=ax_histx)
+    ax_histy = fig.add_subplot(gs[1, 1], sharey=ax)
+    cax = fig.add_subplot(gs[1, 2])
+
+    cmap = LinearSegmentedColormap.from_list("suppressed_recovered", ["#D55E00", "#F7F7F7", "#0072B2"])
+    vals = pd.to_numeric(site["gpp_anomaly_pct_2023_vs_baseline"], errors="coerce")
+    finite_vals = vals[np.isfinite(vals)]
+    if finite_vals.empty:
+        vmax = 50.0
+    else:
+        vmax = float(np.nanpercentile(np.abs(finite_vals), 85))
+        vmax = max(20.0, min(80.0, vmax))
+    norm = TwoSlopeNorm(vmin=-vmax, vcenter=0.0, vmax=vmax)
+
+    ax.axvspan(threshold, 100, ymin=0.0, ymax=threshold / 110.0, facecolor="#F4E7CB", alpha=0.55, lw=0)
+    ax.axvline(threshold, color="#777777", lw=0.65, ls=":")
+    ax.axhline(threshold, color="#777777", lw=0.65, ls=":")
+    ax.axline((0, 0), slope=1, color="#BBBBBB", lw=0.5, ls="--", zorder=0)
+
+    categories = [c for c in site["forest_type"].dropna().unique().tolist()]
+    markers = marker_map(categories)
+    for category in categories:
+        sub = site[site["forest_type"] == category].copy()
+        has = np.isfinite(sub["gpp_anomaly_pct_2023_vs_baseline"])
+        if has.any():
+            ax.scatter(
+                sub.loc[has, "ndvi_recovery_pct_2023"],
+                sub.loc[has, "chl_recovery_pct_2023"],
+                c=sub.loc[has, "gpp_anomaly_pct_2023_vs_baseline"],
+                cmap=cmap,
+                norm=norm,
+                marker=markers[category],
+                s=44,
+                edgecolor="black",
+                linewidth=0.35,
+                alpha=0.95,
+                zorder=3,
+            )
+        if (~has).any():
+            ax.scatter(
+                sub.loc[~has, "ndvi_recovery_pct_2023"],
+                sub.loc[~has, "chl_recovery_pct_2023"],
+                marker=markers[category],
+                s=34,
+                facecolor="#DDDDDD",
+                edgecolor="#777777",
+                linewidth=0.35,
+                alpha=0.75,
+                zorder=2,
+            )
+
+    ax.set_xlim(-5, 105)
+    ax.set_ylim(-5, 105)
+    ax.set_xlabel("NDVI recovery in 2023 (%)")
+    ax.set_ylabel("Chlorophyll recovery in 2023 (%)")
+    ax.text(
+        threshold + 2,
+        8,
+        "legacy quadrant",
+        fontsize=7,
+        ha="left",
+        va="bottom",
+        color="#5C4033",
+    )
+    note = (
+        f"n={summary['n_sites_with_gpp_flux']} flux sites\n"
+        f"legacy median: {summary['legacy_gpp_anomaly_median_pct']:+.1f}%\n"
+        f"other median: {summary['nonlegacy_gpp_anomaly_median_pct']:+.1f}%\n"
+        f"rho(gap,GPP): {summary['spearman_legacy_gap_vs_gpp_anomaly']:+.2f}"
+    )
+    ax.text(
+        0.03,
+        0.97,
+        note,
+        transform=ax.transAxes,
+        ha="left",
+        va="top",
+        fontsize=7,
+        bbox=dict(facecolor="white", edgecolor="none", alpha=0.84, pad=2.2),
+    )
+    style_axis(ax)
+
+    bins = np.linspace(0, 100, 11)
+    ax_histx.hist(site["ndvi_recovery_pct_2023"].dropna(), bins=bins, color="#BDBDBD", edgecolor="white", linewidth=0.4)
+    ax_histx.axvline(threshold, color="#777777", lw=0.65, ls=":")
+    ax_histx.set_ylabel("Sites")
+    ax_histx.tick_params(axis="x", labelbottom=False)
+    style_axis(ax_histx)
+
+    ax_histy.hist(
+        site["chl_recovery_pct_2023"].dropna(),
+        bins=bins,
+        orientation="horizontal",
+        color="#BDBDBD",
+        edgecolor="white",
+        linewidth=0.4,
+    )
+    ax_histy.axhline(threshold, color="#777777", lw=0.65, ls=":")
+    ax_histy.set_xlabel("Sites")
+    ax_histy.tick_params(axis="y", labelleft=False)
+    style_axis(ax_histy)
+
+    sm = mpl.cm.ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])
+    cbar = fig.colorbar(sm, cax=cax)
+    cbar.set_label("2023 GPP anomaly vs baseline (%)")
+    cbar.ax.tick_params(labelsize=7, width=0.5, length=3)
+
+    handles = [
+        Line2D(
+            [0],
+            [0],
+            marker=markers[cat],
+            color="black",
+            linestyle="None",
+            markerfacecolor="#DDDDDD",
+            markeredgewidth=0.35,
+            markersize=5.4,
+            label=cat,
+        )
+        for cat in categories
+    ]
+    fig.legend(
+        handles=handles,
+        title="PFT / land cover",
+        loc="lower center",
+        bbox_to_anchor=(0.49, 0.035),
+        ncol=4,
+        frameon=False,
+        handletextpad=0.4,
+        columnspacing=0.9,
+    )
+    fig.text(0.02, 0.965, "a", fontsize=8, fontweight="bold", ha="left", va="top")
+    return save_figure(fig, out_dir, "fig_flux_corroborated_trait_legacy_quadrant")
+
+
+def biweekly_flux_series(site_id: int, daily: pd.DataFrame, dates: pd.DatetimeIndex, var: str) -> pd.DataFrame:
+    rows: list[dict[str, object]] = []
+    for date in dates:
+        start = pd.Timestamp(date) - pd.Timedelta(days=7)
+        end = pd.Timestamp(date) + pd.Timedelta(days=6)
+        value = window_median(daily, var, start, end)
+        rows.append({"site_id": int(site_id), "date": pd.Timestamp(date), "variable": var, "value": value})
+    out = pd.DataFrame(rows)
+    baseline = window_median(out, "value", BASELINE_START, BASELINE_END)
+    trough = window_median(out, "value", TROUGH_START, TROUGH_END)
+    scores = [recovery_score(v, baseline, trough) for v in out["value"].astype(float)]
+    out["baseline_median"] = baseline
+    out["trough_median"] = trough
+    out["recovery_pct"] = [s[0] for s in scores]
+    out["recovery_pct_clipped"] = [s[1] for s in scores]
+    out["recovery_interpretable"] = [s[2] for s in scores]
+    return out
+
+
+def select_clock_sites(site: pd.DataFrame, max_sites: int = 3) -> list[int]:
+    sub = site[
+        np.isfinite(site["gpp_anomaly_pct_2023_vs_baseline"])
+        & np.isfinite(site["legacy_gap_pct"])
+        & (site["quadrant"] == "legacy_quadrant")
+    ].copy()
+    forest_like = sub["forest_type"].astype(str).str.contains("forest|Tree cover", case=False, regex=True)
+    if forest_like.any():
+        sub = sub[forest_like].copy()
+    if sub.empty:
+        sub = site[np.isfinite(site["gpp_anomaly_pct_2023_vs_baseline"]) & np.isfinite(site["legacy_gap_pct"])].copy()
+    if sub.empty:
+        return []
+    sub["_score"] = sub["legacy_gap_pct"].astype(float) - 0.65 * sub["gpp_anomaly_pct_2023_vs_baseline"].astype(float)
+    picked: list[int] = []
+    used_types: set[str] = set()
+    for rec in sub.sort_values("_score", ascending=False).itertuples(index=False):
+        forest_type = str(rec.forest_type)
+        if forest_type in used_types and len(sub["forest_type"].unique()) >= max_sites:
+            continue
+        picked.append(int(rec.site_id))
+        used_types.add(forest_type)
+        if len(picked) >= max_sites:
+            return picked
+    for rec in sub.sort_values("_score", ascending=False).itertuples(index=False):
+        sid = int(rec.site_id)
+        if sid not in picked:
+            picked.append(sid)
+        if len(picked) >= max_sites:
+            break
+    return picked
+
+
+def build_recovery_clock_table(
+    recovery_path: Path,
+    site: pd.DataFrame,
+    daily_by_site: dict[int, pd.DataFrame],
+    selected_sites: list[int],
+) -> pd.DataFrame:
+    recovery = pd.read_csv(recovery_path, parse_dates=["date"])
+    dates = pd.DatetimeIndex(sorted(recovery["date"].dropna().unique()))
+    rows: list[pd.DataFrame] = []
+    for site_id in selected_sites:
+        base = recovery[
+            (recovery["site_id"].astype(int) == int(site_id))
+            & (recovery["variable"].isin(["NDVI", "Chlorophyll"]))
+        ].copy()
+        base = base[
+            [
+                "site_id",
+                "site_name",
+                "date",
+                "variable",
+                "value",
+                "recovery_pct",
+                "recovery_pct_clipped",
+                "recovery_interpretable",
+            ]
+        ]
+        rows.append(base)
+        if site_id in daily_by_site:
+            gpp = biweekly_flux_series(site_id, daily_by_site[site_id], dates, "GPP_NT_VUT_REF")
+            gpp["site_name"] = str(site.loc[site["site_id"] == site_id, "site_name"].iloc[0])
+            gpp["variable"] = "GPP"
+            rows.append(gpp[base.columns])
+    return pd.concat(rows, ignore_index=True) if rows else pd.DataFrame()
+
+
+def plot_recovery_clocks(clock: pd.DataFrame, site: pd.DataFrame, out_dir: Path) -> list[str]:
+    if clock.empty:
+        return []
+    selected = [int(v) for v in clock["site_id"].dropna().unique()]
+    fig, axes = plt.subplots(len(selected), 1, figsize=(7.2, max(2.0, 1.35 * len(selected))), sharex=True, sharey=True)
+    if len(selected) == 1:
+        axes = [axes]
+    colors = {"NDVI": "#333333", "Chlorophyll": "#009E73", "GPP": "#0072B2"}
+    linestyles = {"NDVI": "--", "Chlorophyll": "-", "GPP": "-"}
+    labels = {"NDVI": "NDVI", "Chlorophyll": "Chlorophyll", "GPP": "GPP"}
+    for ax, site_id in zip(axes, selected):
+        ax.axvspan(TROUGH_START, TROUGH_END, color="#F4E7CB", lw=0, alpha=0.85)
+        ax.axhline(100, color="#333333", lw=0.55)
+        ax.axhline(0, color="#777777", lw=0.45, ls=":")
+        for variable in ["NDVI", "Chlorophyll", "GPP"]:
+            sub = clock[(clock["site_id"].astype(int) == site_id) & (clock["variable"] == variable)].sort_values("date")
+            if sub.empty:
+                continue
+            ax.plot(
+                sub["date"],
+                sub["recovery_pct_clipped"],
+                color=colors[variable],
+                ls=linestyles[variable],
+                lw=1.0,
+                marker="o",
+                ms=2.1,
+                label=labels[variable],
+            )
+        meta = site[site["site_id"].astype(int) == site_id].iloc[0]
+        title = f"site {site_id}, {meta['site_name']} ({meta['forest_type']})"
+        ax.set_title(title, loc="left", fontsize=7)
+        ax.set_ylim(-5, 105)
+        ax.set_ylabel("Recovery (%)")
+        style_axis(ax)
+    axes[-1].xaxis.set_major_locator(mdates.MonthLocator(bymonth=[1, 4, 7, 10]))
+    axes[-1].xaxis.set_major_formatter(mdates.DateFormatter("%b\n%Y"))
+    axes[-1].set_xlim(pd.Timestamp("2022-04-01"), pd.Timestamp("2023-08-31"))
+    axes[0].legend(loc="upper right", frameon=False, ncol=3, handlelength=1.4, columnspacing=0.9)
+    fig.text(0.02, 0.975, "b", fontsize=8, fontweight="bold", ha="left", va="top")
+    fig.tight_layout(rect=(0.03, 0.02, 0.99, 0.96))
+    return save_figure(fig, out_dir, "fig_flux_corroborated_recovery_clocks")
+
+
+def build_trait_space_table(recovery_path: Path, site: pd.DataFrame) -> pd.DataFrame:
+    recovery = pd.read_csv(recovery_path, parse_dates=["date"])
+    keep_stages = ["pre-event", "drought trough", "2023 recovery"]
+    keep = recovery[
+        recovery["stage"].isin(keep_stages)
+        & recovery["variable"].isin(["Chlorophyll", "LMA"])
+    ].copy()
+    stage = (
+        keep.groupby(["site_id", "site_name", "stage", "variable"], as_index=False)
+        .agg(value=("value", "median"), recovery_pct=("recovery_pct_clipped", "median"))
+    )
+    wide = stage.pivot_table(index=["site_id", "site_name", "stage"], columns="variable", values="value").reset_index()
+    wide = wide.merge(site[["site_id", "forest_type", "quadrant"]], on="site_id", how="left")
+    order = {"pre-event": 0, "drought trough": 1, "2023 recovery": 2}
+    wide["stage_order"] = wide["stage"].map(order).astype(int)
+    return wide.sort_values(["site_id", "stage_order"])
+
+
+def plot_trait_space_trajectories(traj: pd.DataFrame, out_dir: Path) -> list[str]:
+    if traj.empty:
+        return []
+    fig, ax = plt.subplots(figsize=(7.2, 4.15))
+    categories = [c for c in traj["forest_type"].dropna().unique().tolist()]
+    palette = {
+        "Evergreen forest": "#0072B2",
+        "Deciduous forest": "#D55E00",
+        "Mixed forest": "#CC79A7",
+        "Tree cover": "#666666",
+        "Grassland": "#E69F00",
+        "Cropland": "#56B4E9",
+        "Wetland": "#009E73",
+        "Open/savanna": "#999999",
+        "Unclassified": "#333333",
+    }
+    markers = {"pre-event": "o", "drought trough": "^", "2023 recovery": "s"}
+    for site_id, sub in traj.groupby("site_id"):
+        sub = sub.sort_values("stage_order")
+        if len(sub) < 2 or not {"Chlorophyll", "LMA"}.issubset(sub.columns):
+            continue
+        forest_type = str(sub["forest_type"].iloc[0])
+        color = palette.get(forest_type, "#555555")
+        x = pd.to_numeric(sub["Chlorophyll"], errors="coerce").to_numpy(dtype=float)
+        y = pd.to_numeric(sub["LMA"], errors="coerce").to_numpy(dtype=float)
+        if not (np.isfinite(x).all() and np.isfinite(y).all()):
+            continue
+        ax.plot(x, y, color=color, lw=0.75, alpha=0.56, zorder=1)
+        for i in range(len(x) - 1):
+            ax.annotate(
+                "",
+                xy=(x[i + 1], y[i + 1]),
+                xytext=(x[i], y[i]),
+                arrowprops=dict(arrowstyle="-|>", color=color, lw=0.65, alpha=0.50, mutation_scale=6),
+                zorder=1,
+            )
+        for stage, marker in markers.items():
+            s = sub[sub["stage"] == stage]
+            if s.empty:
+                continue
+            ax.scatter(
+                s["Chlorophyll"],
+                s["LMA"],
+                marker=marker,
+                s=22,
+                color=color,
+                edgecolor="black",
+                linewidth=0.25,
+                alpha=0.88,
+                zorder=2,
+            )
+    ax.set_xlabel("Chlorophyll content")
+    ax.set_ylabel("Leaf mass per area")
+    style_axis(ax)
+    stage_handles = [
+        Line2D([0], [0], marker=m, linestyle="None", markerfacecolor="#BBBBBB", markeredgecolor="black", markersize=5, label=s)
+        for s, m in markers.items()
+    ]
+    type_handles = [
+        Line2D([0], [0], color=palette.get(cat, "#555555"), lw=1.2, label=cat)
+        for cat in categories
+    ]
+    leg1 = ax.legend(handles=stage_handles, loc="upper left", frameon=False, title="Stage")
+    ax.add_artist(leg1)
+    ax.legend(handles=type_handles, loc="center left", bbox_to_anchor=(1.01, 0.45), frameon=False, title="PFT / land cover")
+    fig.text(0.02, 0.975, "c", fontsize=8, fontweight="bold", ha="left", va="top")
+    fig.tight_layout(rect=(0.03, 0.02, 0.78, 0.96))
+    return save_figure(fig, out_dir, "fig_trait_space_trajectories_chl_lma")
+
+
+def write_figure_notes(out_dir: Path, summary: dict[str, object]) -> Path:
+    path = out_dir / "figure_notes.md"
+    text = f"""# Flux-Corroborated Trait Legacy Figure Notes
+
+Generated by:
+
+```bash
+python docs/paper0_perspective/scripts/make_flux_corroborated_trait_legacy_figure.py
+```
+
+## Data Contract
+
+- Site set: {summary["n_sites_total"]} cap5000 sites from `cap5000_sites_recovery_timeline_2022_2023aug.csv`.
+- Recovery definition: `(value_2023 - value_trough) / (value_preevent - value_trough) * 100`, clipped to 0-100% for plotting.
+- Windows:
+  - Pre-event baseline: {BASELINE_START.date()} to {BASELINE_END.date()}.
+  - Drought trough: {TROUGH_START.date()} to {TROUGH_END.date()}.
+  - 2023 recovery readout: {RECOVERY_2023_START.date()} to {RECOVERY_2023_END.date()}.
+- Flux color: 2023 GPP anomaly relative to pre-event baseline, computed as `100 * (GPP_2023 - GPP_baseline) / abs(GPP_baseline)`.
+- Flux coverage: {summary["n_sites_with_gpp_flux"]} sites have finite GPP anomaly; {summary["n_sites_with_nep_flux"]} sites have finite NEP anomaly.
+- Marker shape: FLUXNET IGBP where available, otherwise WorldCover/PFT fallback.
+
+## Main Readout
+
+- Legacy quadrant threshold: NDVI recovery >= {summary["recovery_threshold_pct"]:.0f}% and chlorophyll recovery < {summary["recovery_threshold_pct"]:.0f}%.
+- Legacy quadrant: {summary["legacy_quadrant_n_all"]}/{summary["n_sites_total"]} sites.
+- Legacy quadrant with finite GPP: {summary["legacy_quadrant_n_with_gpp"]}/{summary["n_sites_with_gpp_flux"]} flux sites.
+- Median GPP anomaly in legacy quadrant: {summary["legacy_gpp_anomaly_median_pct"]:+.1f}%.
+- Median GPP anomaly outside legacy quadrant: {summary["nonlegacy_gpp_anomaly_median_pct"]:+.1f}%.
+- Difference: {summary["legacy_minus_nonlegacy_gpp_anomaly_pct"]:+.1f} percentage points.
+- Spearman rho between NDVI-minus-chlorophyll recovery gap and GPP anomaly: {summary["spearman_legacy_gap_vs_gpp_anomaly"]:+.2f}.
+
+This supports the descriptive Perspective claim that sites with recovered greenness but unrecovered chlorophyll tend to remain GPP-suppressed in the 2023 readout window.
+
+## Boundary
+
+Keep this as an illustrative, descriptive figure. Do not frame it as formal variance partitioning. The current residual check is weaker than the quadrant readout: Pearson correlation between chlorophyll recovery and GPP anomaly residual after linear NDVI adjustment is {summary["partial_pearson_chl_vs_gpp_anomaly_given_ndvi"]:+.2f} under the current anomaly definition. The safe manuscript wording is therefore quadrant-level corroboration, not a claim that chlorophyll independently explains flux residuals in a formal model.
+
+## Outputs
+
+- Main figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.*`
+- Recovery clocks candidate: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_recovery_clocks.*`
+- Chlorophyll-LMA trajectory candidate: `figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.*`
+- Source data: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_site_metrics.csv`
+- Diagnostic summary: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_diagnostic_summary.json`
+"""
+    path.write_text(text)
+    return path
+
+
+def main() -> None:
+    args = parse_args()
+    setup_style()
+    args.output_table_dir.mkdir(parents=True, exist_ok=True)
+    args.output_figure_dir.mkdir(parents=True, exist_ok=True)
+
+    recovery_site = load_recovery_site_metrics(args.recovery_table, threshold=args.recovery_threshold)
+    meta = load_site_metadata(args.unified_2022_table, args.fluxnet_mapping)
+    site = recovery_site.merge(meta, on=["site_id"], how="left", suffixes=("", "_meta"))
+    if "site_name_meta" in site.columns:
+        site["site_name"] = site["site_name"].where(site["site_name"].notna(), site["site_name_meta"])
+        site = site.drop(columns=["site_name_meta"])
+    flux, daily_by_site = compute_flux_metrics(site[["site_id", "fluxnet_site_id"]].drop_duplicates(), args.fluxnet_zip_dir)
+    site = site.merge(flux.drop(columns=["fluxnet_site_id"], errors="ignore"), on="site_id", how="left")
+    site["quadrant"] = site.apply(
+        lambda r: quadrant_label(r["ndvi_recovery_pct_2023"], r["chl_recovery_pct_2023"], args.recovery_threshold),
+        axis=1,
+    )
+    summary = build_summary(site, threshold=args.recovery_threshold)
+
+    site_path = args.output_table_dir / "flux_trait_legacy_site_metrics.csv"
+    summary_path = args.output_table_dir / "flux_trait_legacy_diagnostic_summary.json"
+    summary_csv_path = args.output_table_dir / "flux_trait_legacy_diagnostic_summary.csv"
+    site.to_csv(site_path, index=False)
+    summary_path.write_text(json.dumps(summary, indent=2, allow_nan=True) + "\n")
+    pd.DataFrame([summary]).to_csv(summary_csv_path, index=False)
+
+    figure_outputs: list[str] = []
+    figure_outputs.extend(plot_quadrant(site, summary, args.output_figure_dir, threshold=args.recovery_threshold))
+
+    selected = select_clock_sites(site)
+    clock = build_recovery_clock_table(args.recovery_table, site, daily_by_site, selected)
+    clock_path = args.output_table_dir / "flux_recovery_clock_source_data.csv"
+    clock.to_csv(clock_path, index=False)
+    figure_outputs.extend(plot_recovery_clocks(clock, site, args.output_figure_dir))
+
+    traj = build_trait_space_table(args.recovery_table, site)
+    traj_path = args.output_table_dir / "trait_space_chl_lma_trajectory_source_data.csv"
+    traj.to_csv(traj_path, index=False)
+    figure_outputs.extend(plot_trait_space_trajectories(traj, args.output_figure_dir))
+
+    run_summary = {
+        "site_metrics": str(site_path),
+        "diagnostic_summary_json": str(summary_path),
+        "diagnostic_summary_csv": str(summary_csv_path),
+        "clock_source_data": str(clock_path),
+        "trajectory_source_data": str(traj_path),
+        "figures": figure_outputs,
+        "selected_clock_sites": selected,
+        "windows": {
+            "baseline": [str(BASELINE_START.date()), str(BASELINE_END.date())],
+            "trough": [str(TROUGH_START.date()), str(TROUGH_END.date())],
+            "recovery_2023": [str(RECOVERY_2023_START.date()), str(RECOVERY_2023_END.date())],
+        },
+    }
+    notes_path = write_figure_notes(args.output_table_dir, summary)
+    run_summary["figure_notes"] = str(notes_path)
+    run_summary_path = args.output_table_dir / "run_summary.json"
+    run_summary_path.write_text(json.dumps(run_summary, indent=2, allow_nan=True) + "\n")
+    print(json.dumps(run_summary, indent=2, allow_nan=True))
+
+
+if __name__ == "__main__":
+    main()

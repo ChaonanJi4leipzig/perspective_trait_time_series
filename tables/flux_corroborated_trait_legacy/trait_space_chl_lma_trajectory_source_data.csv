@@ -1,0 +1,112 @@
+site_id,site_name,stage,Chlorophyll,LMA,forest_type,quadrant,stage_order
+0,Neustift,pre-event,35.07385514505308,97.11901735518063,Grassland,unrecovered,0
+0,Neustift,drought trough,35.6092539247936,98.7845918726548,Grassland,unrecovered,1
+0,Neustift,2023 recovery,35.05461646408682,96.04419162095839,Grassland,unrecovered,2
+2,Chamau,pre-event,36.78271999122616,93.09213457163938,Grassland,unrecovered,0
+2,Chamau,drought trough,35.874029297817586,93.9239507232495,Grassland,unrecovered,1
+2,Chamau,2023 recovery,36.45720453363825,96.61358356289581,Grassland,unrecovered,2
+3,Laegern,pre-event,37.88804353276413,90.45870426618677,Mixed forest,unrecovered,0
+3,Laegern,drought trough,36.79234911578087,94.40327323965889,Mixed forest,unrecovered,1
+3,Laegern,2023 recovery,37.60112199363475,92.06102082604582,Mixed forest,unrecovered,2
+6,Dagowsee,pre-event,37.52324884554095,90.91587831092801,Tree cover,unrecovered,0
+6,Dagowsee,drought trough,36.83153441122624,93.16316424930916,Tree cover,unrecovered,1
+6,Dagowsee,2023 recovery,36.437544640400034,88.39387588277748,Tree cover,unrecovered,2
+7,Gebesee,pre-event,35.91104920598099,73.46926166682624,Cropland,unrecovered,0
+7,Gebesee,drought trough,34.24629099886353,70.13165934139965,Cropland,unrecovered,1
+7,Gebesee,2023 recovery,34.24246509726431,73.23225748798913,Cropland,unrecovered,2
+9,Hainich,pre-event,37.40131480913638,88.96858055193044,Deciduous forest,unrecovered,0
+9,Hainich,drought trough,37.34242332812138,91.63052851775136,Deciduous forest,unrecovered,1
+9,Hainich,2023 recovery,37.95017760780896,94.34287688977808,Deciduous forest,unrecovered,2
+10,Huetelmoor,pre-event,36.38268769499057,99.64328068964197,Wetland,trait_only_recovered,0
+10,Huetelmoor,drought trough,36.09743328352717,96.65587852603382,Wetland,trait_only_recovered,1
+10,Huetelmoor,2023 recovery,36.94798922549293,96.85604183151162,Wetland,trait_only_recovered,2
+11,Klingenberg,pre-event,37.1874303521743,82.66822217843297,Cropland,legacy_quadrant,0
+11,Klingenberg,drought trough,36.65515917254797,88.95122731313266,Cropland,legacy_quadrant,1
+11,Klingenberg,2023 recovery,36.30137360789506,87.37007111851923,Cropland,legacy_quadrant,2
+13,Leinefelde,pre-event,37.65129151642654,84.99271473457172,Deciduous forest,not_interpretable,0
+13,Leinefelde,drought trough,36.65515917254797,88.95122731313266,Deciduous forest,not_interpretable,1
+13,Leinefelde,2023 recovery,38.1983908027861,96.45426544905385,Deciduous forest,not_interpretable,2
+15,Schechenfilz Nord,pre-event,33.72491000141285,97.55172171917863,Tree cover,unrecovered,0
+15,Schechenfilz Nord,drought trough,34.887745341135854,114.28047833157348,Tree cover,unrecovered,1
+15,Schechenfilz Nord,2023 recovery,34.33037061327564,109.3526667024727,Tree cover,unrecovered,2
+17,Zarnekow,pre-event,33.64729102165755,74.78569319972645,Wetland,legacy_quadrant,0
+17,Zarnekow,drought trough,33.391975123424515,70.3415623485393,Wetland,legacy_quadrant,1
+17,Zarnekow,2023 recovery,32.72302953767972,71.82915513609518,Wetland,legacy_quadrant,2
+20,Llano de los Juanes,pre-event,33.187264174682255,65.49891719024428,Open/savanna,legacy_quadrant,0
+20,Llano de los Juanes,drought trough,34.702068664394446,71.58924658287494,Open/savanna,legacy_quadrant,1
+20,Llano de los Juanes,2023 recovery,36.65515917254797,88.95122731313266,Open/savanna,legacy_quadrant,2
+22,Lanjaron-Salvage logging,pre-event,33.8006866036448,70.08554114721798,Grassland,trait_only_recovered,0
+22,Lanjaron-Salvage logging,drought trough,33.68062695164019,69.664640378304,Grassland,trait_only_recovered,1
+22,Lanjaron-Salvage logging,2023 recovery,34.292336994946865,73.05021203172984,Grassland,trait_only_recovered,2
+23,Hyytiala,pre-event,34.41812442179694,96.04479411178137,Evergreen forest,unrecovered,0
+23,Hyytiala,drought trough,35.67947706535909,108.79850255056692,Evergreen forest,unrecovered,1
+23,Hyytiala,2023 recovery,35.73702189588377,109.86878607301287,Evergreen forest,unrecovered,2
+24,Lettosuo,pre-event,34.67062280040561,96.78365042079668,Evergreen forest,not_interpretable,0
+24,Lettosuo,drought trough,36.65515917254797,88.95122731313266,Evergreen forest,not_interpretable,1
+24,Lettosuo,2023 recovery,36.65515917254797,88.95122731313266,Evergreen forest,not_interpretable,2
+25,Lompolojankka,pre-event,34.116670792931075,99.62439858788262,Evergreen forest,unrecovered,0
+25,Lompolojankka,drought trough,35.12521427599576,105.2622589829059,Evergreen forest,unrecovered,1
+25,Lompolojankka,2023 recovery,35.023940327747106,104.13551095817448,Evergreen forest,unrecovered,2
+26,Sodankyla,pre-event,32.893176548914965,94.32728227284198,Evergreen forest,unrecovered,0
+26,Sodankyla,drought trough,34.01673173564204,103.73504441617538,Evergreen forest,unrecovered,1
+26,Sodankyla,2023 recovery,34.300727704193264,102.00552785364442,Evergreen forest,unrecovered,2
+28,Grignon,pre-event,35.219672410920325,71.43248623672642,Cropland,trait_only_recovered,0
+28,Grignon,drought trough,36.65515917254797,88.95122731313266,Cropland,trait_only_recovered,1
+28,Grignon,2023 recovery,33.39422443886312,69.63245731193085,Cropland,trait_only_recovered,2
+29,Puechabon,pre-event,34.46467627080591,93.3083407386364,Evergreen forest,legacy_quadrant,0
+29,Puechabon,drought trough,35.55917759040041,111.43262893243812,Evergreen forest,legacy_quadrant,1
+29,Puechabon,2023 recovery,36.32128992904185,101.6648533813036,Evergreen forest,legacy_quadrant,2
+32,Castelporziano2,pre-event,35.67527538371773,99.79711823059216,Mixed forest,not_interpretable,0
+32,Castelporziano2,drought trough,36.65515917254797,88.95122731313266,Mixed forest,not_interpretable,1
+32,Castelporziano2,2023 recovery,36.347924906439026,105.48072569833386,Mixed forest,not_interpretable,2
+33,Ispra ABC-IS,pre-event,36.195822511028275,92.59216972114933,Tree cover,unrecovered,0
+33,Ispra ABC-IS,drought trough,36.65515917254797,95.24463422732164,Tree cover,unrecovered,1
+33,Ispra ABC-IS,2023 recovery,36.59736773370015,93.11965159978848,Tree cover,unrecovered,2
+35,Monte Bondone,pre-event,35.42311249577388,89.2098888629359,Grassland,greenness_and_trait_recovered,0
+35,Monte Bondone,drought trough,34.43440210709831,97.11804606911376,Grassland,greenness_and_trait_recovered,1
+35,Monte Bondone,2023 recovery,36.22402293987756,92.8962352263104,Grassland,greenness_and_trait_recovered,2
+37,Renon,pre-event,35.280240475169556,103.20335297513324,Evergreen forest,legacy_quadrant,0
+37,Renon,drought trough,34.63122378248204,109.1842269455678,Evergreen forest,legacy_quadrant,1
+37,Renon,2023 recovery,34.8210950736044,106.20260740549273,Evergreen forest,legacy_quadrant,2
+39,Torgnon,pre-event,33.81866914788092,81.80127778775719,Grassland,not_interpretable,0
+39,Torgnon,drought trough,35.52418158225527,95.3000154271294,Grassland,not_interpretable,1
+39,Torgnon,2023 recovery,36.65515917254797,88.95122731313266,Grassland,not_interpretable,2
+40,Loobos,pre-event,36.060461177034696,97.26223087321944,Evergreen forest,not_interpretable,0
+40,Loobos,drought trough,36.31760671440934,115.73598306987144,Evergreen forest,not_interpretable,1
+40,Loobos,2023 recovery,36.65515917254797,88.95122731313266,Evergreen forest,not_interpretable,2
+41,Degero,pre-event,33.79709597145545,100.72538892208641,Wetland,unrecovered,0
+41,Degero,drought trough,36.1748404541141,100.3874558098312,Wetland,unrecovered,1
+41,Degero,2023 recovery,35.75160225784999,107.3160580444094,Wetland,unrecovered,2
+43,Le Bray,pre-event,36.08692089347642,98.87899987629223,Evergreen forest,legacy_quadrant,0
+43,Le Bray,drought trough,35.544685942085,114.79623194884896,Evergreen forest,legacy_quadrant,1
+43,Le Bray,2023 recovery,35.43758541052212,108.22191865402368,Evergreen forest,legacy_quadrant,2
+44,Bilos,pre-event,34.40014761083144,100.93024832770041,Evergreen forest,legacy_quadrant,0
+44,Bilos,drought trough,34.80275617208438,108.81418055352124,Evergreen forest,legacy_quadrant,1
+44,Bilos,2023 recovery,35.11121103219703,103.9867678376967,Evergreen forest,legacy_quadrant,2
+46,Font-Blanche (FR-FBn),pre-event,34.52703205895,94.95727348256736,Evergreen forest,legacy_quadrant,0
+46,Font-Blanche (FR-FBn),drought trough,35.66346584951344,117.73917003920435,Evergreen forest,legacy_quadrant,1
+46,Font-Blanche (FR-FBn),2023 recovery,35.42370183071313,117.87363911960196,Evergreen forest,legacy_quadrant,2
+47,Alice Holt / Straits Inclosure,pre-event,34.58541436871201,86.39413306019702,Tree cover,greenness_and_trait_recovered,0
+47,Alice Holt / Straits Inclosure,drought trough,35.222392729078614,90.7863252478693,Tree cover,greenness_and_trait_recovered,1
+47,Alice Holt / Straits Inclosure,2023 recovery,34.19303928932062,88.28168545286411,Tree cover,greenness_and_trait_recovered,2
+48,"Wetzstein, Thuringia",pre-event,34.05469270035856,98.39207921158291,Tree cover,unrecovered,0
+48,"Wetzstein, Thuringia",drought trough,35.13613109801422,104.57785302806091,Tree cover,unrecovered,1
+48,"Wetzstein, Thuringia",2023 recovery,34.79395057869399,99.51696590291937,Tree cover,unrecovered,2
+49,"Norunda, Uppsala",pre-event,34.17874540887668,95.30003403688457,Evergreen forest,legacy_quadrant,0
+49,"Norunda, Uppsala",drought trough,34.147957248468806,106.55535280920787,Evergreen forest,legacy_quadrant,1
+49,"Norunda, Uppsala",2023 recovery,33.65092540027764,71.90272397170327,Evergreen forest,legacy_quadrant,2
+52,"Mitra II, Evora",pre-event,31.9052339878964,68.45459795255897,Grassland,not_interpretable,0
+52,"Mitra II, Evora",drought trough,32.67721790429272,69.94148696927826,Grassland,not_interpretable,1
+52,"Mitra II, Evora",2023 recovery,36.65515917254797,88.95122731313266,Grassland,not_interpretable,2
+53,"Las Majadas de Tietar, Extremadura",pre-event,34.32176911810429,69.3910311689661,Open/savanna,unrecovered,0
+53,"Las Majadas de Tietar, Extremadura",drought trough,38.0664335443957,75.7868822800983,Open/savanna,unrecovered,1
+53,"Las Majadas de Tietar, Extremadura",2023 recovery,37.626684523142835,74.53547126335386,Open/savanna,unrecovered,2
+54,Landes forest (SW France),pre-event,35.721896467019036,96.05945162018165,Tree cover,not_interpretable,0
+54,Landes forest (SW France),drought trough,35.66399884169568,110.58007024037344,Tree cover,not_interpretable,1
+54,Landes forest (SW France),2023 recovery,36.65515917254797,88.95122731313266,Tree cover,not_interpretable,2
+56,Les Vosges forest - Saint-Die-des-Vosges,pre-event,39.212621938900035,89.14999873418317,Tree cover,unrecovered,0
+56,Les Vosges forest - Saint-Die-des-Vosges,drought trough,37.9728151438393,92.32531728445062,Tree cover,unrecovered,1
+56,Les Vosges forest - Saint-Die-des-Vosges,2023 recovery,37.884977975383315,89.58764371976363,Tree cover,unrecovered,2
+57,Bavarian Forest,pre-event,34.46918834368346,93.53702349388207,Tree cover,trait_only_recovered,0
+57,Bavarian Forest,drought trough,35.66095658141451,99.49656603247556,Tree cover,trait_only_recovered,1
+57,Bavarian Forest,2023 recovery,34.511733100431044,94.96973038742111,Tree cover,trait_only_recovered,2

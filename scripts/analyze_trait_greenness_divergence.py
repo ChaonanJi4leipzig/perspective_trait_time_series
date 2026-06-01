@@ -246,6 +246,16 @@ def evidence_labels(row: pd.Series, args: argparse.Namespace) -> str:
     return ";".join(labels)
 
 
+def wilson_ci(k: float, n: float, z: float = 1.96) -> tuple[float, float]:
+    if not np.isfinite(k) or not np.isfinite(n) or n <= 0:
+        return (math.nan, math.nan)
+    phat = float(k) / float(n)
+    denom = 1.0 + z * z / float(n)
+    center = (phat + z * z / (2.0 * float(n))) / denom
+    half = z * math.sqrt((phat * (1.0 - phat) + z * z / (4.0 * float(n))) / float(n)) / denom
+    return (max(0.0, center - half), min(1.0, center + half))
+
+
 def compute_site_trait_metrics(
     recovery: pd.DataFrame,
     greenness: pd.DataFrame,
@@ -394,8 +404,28 @@ def compute_trait_summary(site_metrics: pd.DataFrame, args: argparse.Namespace) 
     )
     summary["frac_interpretable_sites"] = summary["n_interpretable_sites"] / summary["n_sites"]
     consistent = site_metrics["classification"].str.contains("consistent_with_greenness", regex=False)
-    consistent_by_trait = consistent.groupby(site_metrics["trait"]).mean().rename("frac_consistent_sites")
+    consistent_by_trait = (
+        consistent.groupby(site_metrics["trait"])
+        .agg(n_consistent_sites="sum", frac_consistent_sites="mean")
+        .reset_index()
+    )
+    counts = (
+        site_metrics.groupby("trait", as_index=False)
+        .agg(
+            n_early_warning_sites=("early_warning", "sum"),
+            n_legacy_effect_sites=("legacy_effect", "sum"),
+        )
+    )
     summary = summary.merge(consistent_by_trait, on="trait", how="left")
+    summary = summary.merge(counts, on="trait", how="left")
+    for name, count_col in (
+        ("consistent", "n_consistent_sites"),
+        ("early_warning", "n_early_warning_sites"),
+        ("legacy_effect", "n_legacy_effect_sites"),
+    ):
+        cis = summary.apply(lambda row: wilson_ci(row[count_col], row["n_sites"]), axis=1, result_type="expand")
+        summary[f"{name}_wilson95_low"] = cis[0]
+        summary[f"{name}_wilson95_high"] = cis[1]
     summary["evidence_labels"] = summary.apply(lambda row: evidence_labels(row, args), axis=1)
     ordered = [
         "trait",
@@ -404,9 +434,18 @@ def compute_trait_summary(site_metrics: pd.DataFrame, args: argparse.Namespace) 
         "n_interpretable_sites",
         "frac_interpretable_sites",
         "median_spearman_greenness",
+        "n_consistent_sites",
         "frac_consistent_sites",
+        "consistent_wilson95_low",
+        "consistent_wilson95_high",
+        "n_early_warning_sites",
         "frac_early_warning_sites",
+        "early_warning_wilson95_low",
+        "early_warning_wilson95_high",
+        "n_legacy_effect_sites",
         "frac_legacy_effect_sites",
+        "legacy_effect_wilson95_low",
+        "legacy_effect_wilson95_high",
         "median_onset_lead_days",
         "median_recovery_lag_days",
         "median_abs_recovery_lag_days",
