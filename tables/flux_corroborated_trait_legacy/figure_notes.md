@@ -17,6 +17,7 @@ python docs/paper0_perspective/scripts/make_flux_corroborated_trait_legacy_figur
   - 2023 recovery readout: 2023-07-08 to 2023-08-19.
 - Main flux color/statistic: `gpp_persistence_z_2022_2023` = 2022-2023 GPP persistence anomaly (z). The z-score reference is the same day-of-year window across available non-2022/non-2023 years; the persistence metric averages the 2022 trough-window z-score and 2023 recovery-window z-score.
 - Forest-domain flux coverage: 13 sites have finite GPP; 10 have both a finite greenness--chlorophyll gap and the primary GPP metric.
+- Drought-driver sensitivity: ERA5-Land soil-water exposure is flagged when the pre-event to trough SWC drop is at least 10% of pre-event SWC. This driver-only screen is independent of GPP and trait recovery outcomes.
 - All-PFT sensitivity flux coverage: 19 sites have finite GPP; 16 have pairwise primary-metric data.
 - Marker shape: FLUXNET IGBP where available, otherwise WorldCover/PFT fallback. Open marker rings denote weak recovery denominators (`NDVI` or chlorophyll recovery not interpretable under the trait/index-specific baseline--trough contrast rule).
 - Pixel data contract: pixel-level NDVI and chlorophyll recovery are used only for the greenness--chlorophyll decoupling distribution and within-site chlorophyll heterogeneity. They are not used to increase the effective flux sample size because each eddy-covariance GPP value is a site/footprint-integrated observation.
@@ -38,6 +39,7 @@ python docs/paper0_perspective/scripts/make_flux_corroborated_trait_legacy_figur
 - Pixel display scope: 10 forest-domain pairwise flux sites.
 - Pixel recovery rows: 3000 total, 1585 interpretable for both axes.
 - Pixel legacy-quadrant share: 347 pixels = 21.9% of interpretable pixels.
+- Pixel gap median: +0.0 percentage points; positive-gap pixels: 44.7% of interpretable pixels.
 - This is a descriptive Claim-A display of greenness--chlorophyll decoupling. No flux association, correlation p value, or independent-observation claim is made at the pixel level.
 
 This supports the narrower Perspective claim that, within the forest-domain flux subset, a greenness--chlorophyll recovery gap is associated with reduced independent GPP persistence. It is not framed as a deterministic quadrant law.
@@ -45,8 +47,9 @@ This supports the narrower Perspective claim that, within the forest-domain flux
 ## Sensitivities
 
 - Strict forest sensitivity (excluding open/savanna): primary rho=-0.80, p=0.009, n=9; Mann--Whitney p=0.016.
+- Drought-exposed forest sensitivity (SWC drop >= 10%): primary rho=-0.61, p=0.148, n=7; permutation p=0.169. This is reported as a scope diagnostic because the threshold is a driver screen, not a flux outcome.
 - All-PFT sensitivity: primary rho=-0.47, p=0.063, n=16; Mann--Whitney p=0.022.
-- Evergreen counterexample check: site 44 (Bilos) has 2023 GPP anomaly +28.2% (+0.31 z) while falling in the legacy quadrant. Its chlorophyll recovery is clipped to 0.0% from raw -76.6%, with `chl_recovery_interpretable=False`. Treat it as a recovery-denominator/domain warning, not as a deterministic-law failure.
+- Evergreen counterexample check: site 44 (Bilos) has 2023 GPP anomaly +28.2% (+0.31 z) but primary persistence -1.09 z while falling in the legacy quadrant. The site-level chlorophyll recovery used in the quadrant panel is clipped to 0.0% from raw -76.6%, with `chl_recovery_interpretable=False`. The pixel violin uses only pixels with interpretable NDVI and chlorophyll denominators, so its pixel median can differ from the site-aggregate denominator flag. Treat this as a recovery-denominator/domain warning, not as a deterministic-law failure.
 
 ## Boundary
 
@@ -56,11 +59,13 @@ Keep this as an illustrative, descriptive figure. Do not frame it as formal vari
 
 - Main forest-domain figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.*`
 - Pixel decoupling figure: `figures/generated/flux_corroborated_trait_legacy/fig_pixel_greenness_chlorophyll_decoupling_hexbin.*`
-- Within-site chlorophyll figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_chl_pixel_violin.*`
+- Within-site legacy-gap figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_gap_pixel_violin.*`
+- Drought-exposed forest sensitivity figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant_drought_exposed.*`
 - All-PFT supplementary figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant_all_pft.*`
 - Recovery clocks candidate: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_recovery_clocks.*`
 - Chlorophyll-LMA trajectory candidate: `figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.*`
 - Source data: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_site_metrics.csv`
 - Pixel source data: `tables/flux_corroborated_trait_legacy/pixel_recovery_forest_pairwise.csv`
+- Drought-driver source data: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_drought_driver_exposure.csv`
 - Leave-one-out source data: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_site_level_leave_one_out.csv`
 - Diagnostic summary: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_diagnostic_summary.json`

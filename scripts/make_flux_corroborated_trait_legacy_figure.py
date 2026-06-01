@@ -48,6 +48,7 @@ TROUGH_START = pd.Timestamp("2022-07-23")
 TROUGH_END = pd.Timestamp("2022-08-20")
 RECOVERY_2023_START = pd.Timestamp("2023-07-08")
 RECOVERY_2023_END = pd.Timestamp("2023-08-19")
+DROUGHT_SWC_RELATIVE_DROP_THRESHOLD = 0.10
 
 FLUXNET_SOURCE_VARS = [
     "GPP_NT_VUT_REF",
@@ -191,6 +192,13 @@ def finite_median(values: pd.Series) -> float:
     return float(np.nanmedian(vals)) if np.isfinite(vals).any() else math.nan
 
 
+def median_in_stage(df: pd.DataFrame, variable: str, stage: str) -> float:
+    sub = df[(df["variable"] == variable) & (df["stage"] == stage)]
+    if sub.empty:
+        return math.nan
+    return finite_median(sub["value"])
+
+
 def safe_divide(num: np.ndarray, den: np.ndarray) -> np.ndarray:
     num = np.asarray(num, dtype=np.float32)
     den = np.asarray(den, dtype=np.float32)
@@ -255,6 +263,42 @@ def load_recovery_site_metrics(path: Path, threshold: float) -> pd.DataFrame:
         row["legacy_gap_pct"] = float(ndvi - chl) if np.isfinite(ndvi) and np.isfinite(chl) else math.nan
         row["quadrant"] = quadrant_label(ndvi, chl, threshold)
         rows.append(row)
+    return pd.DataFrame(rows).sort_values("site_id")
+
+
+def build_drought_driver_table(recovery_path: Path) -> pd.DataFrame:
+    recovery = pd.read_csv(recovery_path, parse_dates=["date"])
+    rows: list[dict[str, object]] = []
+    for site_id, site_df in recovery.groupby("site_id"):
+        swc_pre = median_in_stage(site_df, "SWC", "pre-event")
+        swc_trough = median_in_stage(site_df, "SWC", "drought trough")
+        tmax_pre = median_in_stage(site_df, "Tmax", "pre-event")
+        tmax_trough = median_in_stage(site_df, "Tmax", "drought trough")
+        precip_pre = median_in_stage(site_df, "P", "pre-event")
+        precip_trough = median_in_stage(site_df, "P", "drought trough")
+        swc_drop = swc_pre - swc_trough if np.isfinite(swc_pre) and np.isfinite(swc_trough) else math.nan
+        swc_relative_drop = swc_drop / abs(swc_pre) if np.isfinite(swc_drop) and np.isfinite(swc_pre) and abs(swc_pre) > 1e-12 else math.nan
+        rows.append(
+            {
+                "site_id": int(site_id),
+                "driver_swc_pre_event": swc_pre,
+                "driver_swc_trough": swc_trough,
+                "driver_swc_drop": swc_drop,
+                "driver_swc_relative_drop": swc_relative_drop,
+                "driver_tmax_delta_trough_minus_pre": (
+                    tmax_trough - tmax_pre if np.isfinite(tmax_trough) and np.isfinite(tmax_pre) else math.nan
+                ),
+                "driver_precip_delta_trough_minus_pre": (
+                    precip_trough - precip_pre if np.isfinite(precip_trough) and np.isfinite(precip_pre) else math.nan
+                ),
+                "driver_drought_exposed": bool(
+                    np.isfinite(swc_relative_drop) and swc_relative_drop >= DROUGHT_SWC_RELATIVE_DROP_THRESHOLD
+                ),
+                "driver_drought_exposure_rule": (
+                    f"ERA5-Land SWC pre-event to trough relative drop >= {DROUGHT_SWC_RELATIVE_DROP_THRESHOLD:.0%}"
+                ),
+            }
+        )
     return pd.DataFrame(rows).sort_values("site_id")
 
 
@@ -1090,6 +1134,10 @@ def build_pixel_recovery_table(
     if chl.empty or ndvi.empty:
         return pd.DataFrame(), {}
     pixel = ndvi.merge(chl, on=["site_id", "pixel_uid", "y", "x"], how="inner")
+    pixel["pixel_gap_pct_2023"] = (
+        pd.to_numeric(pixel["ndvi_recovery_pct_2023"], errors="coerce")
+        - pd.to_numeric(pixel["chl_recovery_pct_2023"], errors="coerce")
+    )
     metric_col = GPP_METRICS[metric_key]["column"]
     enrich_cols = [
         "site_id",
@@ -1097,6 +1145,8 @@ def build_pixel_recovery_table(
         "forest_type",
         "quadrant",
         "legacy_gap_pct",
+        "driver_drought_exposed",
+        "driver_swc_relative_drop",
         "ndvi_recovery_pct_2023",
         "chl_recovery_pct_2023",
         metric_col,
@@ -1119,6 +1169,10 @@ def build_pixel_recovery_table(
         "pixel_interpretable_n": int(len(desc)),
         "pixel_legacy_quadrant_n": legacy_n,
         "pixel_legacy_quadrant_fraction": float(legacy_n / len(desc)) if len(desc) else math.nan,
+        "pixel_gap_median": float(np.nanmedian(desc["pixel_gap_pct_2023"])) if len(desc) else math.nan,
+        "pixel_gap_positive_fraction": (
+            float(np.mean(pd.to_numeric(desc["pixel_gap_pct_2023"], errors="coerce") > 0)) if len(desc) else math.nan
+        ),
         "pixel_ndvi_source": str(ndvi_cache),
         "pixel_flux_inference_guardrail": (
             "Pixel counts describe greenness-chlorophyll decoupling and within-site trait heterogeneity only; "
@@ -1182,7 +1236,7 @@ def plot_pixel_decoupling_hexbin(pixel: pd.DataFrame, summary: dict[str, object]
     return save_figure(fig, out_dir, "fig_pixel_greenness_chlorophyll_decoupling_hexbin")
 
 
-def plot_chl_pixel_violin(
+def plot_pixel_gap_violin(
     pixel: pd.DataFrame,
     out_dir: Path,
     threshold: float,
@@ -1191,7 +1245,7 @@ def plot_chl_pixel_violin(
     if pixel.empty:
         return []
     metric_col = GPP_METRICS[gpp_metric]["column"]
-    plot_df = pixel[pixel["chl_recovery_interpretable"] & np.isfinite(pixel["chl_recovery_pct_2023"])].copy()
+    plot_df = pixel[pixel["pixel_recovery_interpretable"] & np.isfinite(pixel["pixel_gap_pct_2023"])].copy()
     plot_df = plot_df[np.isfinite(plot_df[metric_col])].copy()
     if plot_df.empty:
         return []
@@ -1203,18 +1257,25 @@ def plot_chl_pixel_violin(
         .tolist()
     )
     data = [
-        pd.to_numeric(plot_df.loc[plot_df["site_id"].astype(int) == site_id, "chl_recovery_pct_2023"], errors="coerce")
+        pd.to_numeric(plot_df.loc[plot_df["site_id"].astype(int) == site_id, "pixel_gap_pct_2023"], errors="coerce")
         .dropna()
         .to_numpy(dtype=float)
         for site_id in site_order
     ]
     site_metric = plot_df[["site_id", metric_col]].drop_duplicates("site_id").set_index("site_id")[metric_col].astype(float)
     site_names = plot_df[["site_id", "site_name"]].drop_duplicates("site_id").set_index("site_id")["site_name"].astype(str)
-    fig, ax = plt.subplots(figsize=(7.2, 3.2))
+    site_gap = plot_df[["site_id", "legacy_gap_pct"]].drop_duplicates("site_id").set_index("site_id")["legacy_gap_pct"].astype(float)
+    site_exposed = (
+        plot_df[["site_id", "driver_drought_exposed"]].drop_duplicates("site_id").set_index("site_id")["driver_drought_exposed"].astype(bool)
+        if "driver_drought_exposed" in plot_df.columns
+        else pd.Series(dtype=bool)
+    )
+    fig, ax = plt.subplots(figsize=(7.2, 3.35))
     cmap = LinearSegmentedColormap.from_list("suppressed_recovered", ["#D55E00", "#F7F7F7", "#0072B2"])
     finite_vals = site_metric[np.isfinite(site_metric)]
     vmax = max(1.0, min(3.0, float(np.nanpercentile(np.abs(finite_vals), 85)))) if len(finite_vals) else 2.0
     norm = TwoSlopeNorm(vmin=-vmax, vcenter=0.0, vmax=vmax)
+    ax.axhspan(0, 105, color="#F4E7CB", lw=0, alpha=0.28, zorder=0)
     parts = ax.violinplot(data, positions=np.arange(1, len(site_order) + 1), widths=0.72, showextrema=False)
     for body, site_id in zip(parts["bodies"], site_order):
         color = cmap(norm(float(site_metric.loc[site_id]))) if site_id in site_metric.index else "#BBBBBB"
@@ -1231,32 +1292,49 @@ def plot_chl_pixel_violin(
         edgecolor="black",
         linewidth=0.45,
         zorder=3,
+        label="pixel median",
     )
-    ax.axhline(threshold, color="#777777", lw=0.65, ls=":")
-    ax.set_ylim(-5, 105)
-    ax.set_ylabel("Pixel chlorophyll recovery in 2023 (%)")
+    site_gap_values = [float(site_gap.loc[site_id]) if site_id in site_gap.index else math.nan for site_id in site_order]
+    ax.scatter(
+        np.arange(1, len(site_order) + 1),
+        site_gap_values,
+        s=23,
+        marker="D",
+        color="#222222",
+        edgecolor="white",
+        linewidth=0.35,
+        zorder=4,
+        label="site-level gap",
+    )
+    if not site_exposed.empty:
+        exposed_positions = [idx + 1 for idx, site_id in enumerate(site_order) if bool(site_exposed.get(site_id, False))]
+        if exposed_positions:
+            ax.scatter(
+                exposed_positions,
+                [-99.0] * len(exposed_positions),
+                marker="^",
+                s=18,
+                color="#222222",
+                linewidth=0.0,
+                zorder=4,
+                label="SWC-drop exposed",
+            )
+    ax.axhline(0, color="#333333", lw=0.65)
+    ax.set_ylim(-105, 105)
+    ax.set_ylabel("Pixel legacy gap: NDVI - chlorophyll recovery (%)")
     ax.set_xlabel("Forest flux sites sorted by GPP persistence anomaly")
     labels = [f"{sid}\n{site_names.loc[sid].split(',')[0][:10]}" if sid in site_names.index else str(sid) for sid in site_order]
     ax.set_xticks(np.arange(1, len(site_order) + 1), labels)
     ax.tick_params(axis="x", labelsize=6.4)
-    ax.text(
-        0.01,
-        0.97,
-        "Violin width shows footprint-pixel heterogeneity;\nflux corroboration is still site-level.",
-        transform=ax.transAxes,
-        ha="left",
-        va="top",
-        fontsize=6.7,
-        bbox=dict(facecolor="white", edgecolor="none", alpha=0.86, pad=2.0),
-    )
     sm = mpl.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
     cbar = fig.colorbar(sm, ax=ax, fraction=0.035, pad=0.018)
     cbar.set_label(GPP_METRICS[gpp_metric]["label"])
     cbar.ax.tick_params(labelsize=7, width=0.5, length=3)
+    ax.legend(loc="lower left", frameon=False, fontsize=6.6, handletextpad=0.4, borderaxespad=0.2)
     style_axis(ax)
     fig.tight_layout()
-    return save_figure(fig, out_dir, "fig_flux_corroborated_chl_pixel_violin")
+    return save_figure(fig, out_dir, "fig_flux_corroborated_gap_pixel_violin")
 
 
 def plot_quadrant(
@@ -1909,6 +1987,7 @@ def write_figure_notes(
     forest = summaries["forest_main"]
     all_pft = summaries["all_pft_sensitivity"]
     strict = summaries["strict_forest_sensitivity"]
+    drought = summaries.get("drought_exposed_forest_sensitivity", {})
     primary_label = GPP_METRICS[primary_metric]["label"]
     pixel_summary = pixel_summary or {}
     primary_perm_p = forest.get(f"{primary_metric}_permutation_spearman_p_two_sided", math.nan)
@@ -1928,11 +2007,13 @@ def write_figure_notes(
         counter_text = (
             f"- Evergreen counterexample check: site {int(rec['site_id'])} ({rec['site_name']}) has "
             f"2023 GPP anomaly {rec['gpp_anomaly_pct_2023_vs_baseline']:+.1f}% "
-            f"({rec['gpp_anomaly_z_2023_vs_interannual']:+.2f} z) while falling in the legacy quadrant. "
-            f"Its chlorophyll recovery is clipped to {rec['chl_recovery_pct_2023']:.1f}% from raw "
+            f"({rec['gpp_anomaly_z_2023_vs_interannual']:+.2f} z) but primary persistence "
+            f"{rec[primary_metric]:+.2f} z while falling in the legacy quadrant. "
+            f"The site-level chlorophyll recovery used in the quadrant panel is clipped to {rec['chl_recovery_pct_2023']:.1f}% from raw "
             f"{rec['chl_recovery_pct_raw_2023']:+.1f}%, with "
-            f"`chl_recovery_interpretable={bool(rec['chl_recovery_interpretable'])}`. Treat it as a "
-            "recovery-denominator/domain warning, not as a deterministic-law failure."
+            f"`chl_recovery_interpretable={bool(rec['chl_recovery_interpretable'])}`. The pixel violin uses only "
+            "pixels with interpretable NDVI and chlorophyll denominators, so its pixel median can differ from the "
+            "site-aggregate denominator flag. Treat this as a recovery-denominator/domain warning, not as a deterministic-law failure."
         )
     text = f"""# Flux-Corroborated Trait Legacy Figure Notes
 
@@ -1953,6 +2034,7 @@ python docs/paper0_perspective/scripts/make_flux_corroborated_trait_legacy_figur
   - 2023 recovery readout: {RECOVERY_2023_START.date()} to {RECOVERY_2023_END.date()}.
 - Main flux color/statistic: `{primary_metric}` = {primary_label}. The z-score reference is the same day-of-year window across available non-2022/non-2023 years; the persistence metric averages the 2022 trough-window z-score and 2023 recovery-window z-score.
 - Forest-domain flux coverage: {forest["n_sites_with_gpp_flux"]} sites have finite GPP; {forest[f"{primary_metric}_pairwise_n"]} have both a finite greenness--chlorophyll gap and the primary GPP metric.
+- Drought-driver sensitivity: ERA5-Land soil-water exposure is flagged when the pre-event to trough SWC drop is at least {DROUGHT_SWC_RELATIVE_DROP_THRESHOLD:.0%} of pre-event SWC. This driver-only screen is independent of GPP and trait recovery outcomes.
 - All-PFT sensitivity flux coverage: {all_pft["n_sites_with_gpp_flux"]} sites have finite GPP; {all_pft[f"{primary_metric}_pairwise_n"]} have pairwise primary-metric data.
 - Marker shape: FLUXNET IGBP where available, otherwise WorldCover/PFT fallback. Open marker rings denote weak recovery denominators (`NDVI` or chlorophyll recovery not interpretable under the trait/index-specific baseline--trough contrast rule).
 - Pixel data contract: pixel-level NDVI and chlorophyll recovery are used only for the greenness--chlorophyll decoupling distribution and within-site chlorophyll heterogeneity. They are not used to increase the effective flux sample size because each eddy-covariance GPP value is a site/footprint-integrated observation.
@@ -1974,6 +2056,7 @@ python docs/paper0_perspective/scripts/make_flux_corroborated_trait_legacy_figur
 - Pixel display scope: {pixel_summary.get("pixel_scope_site_n", 0)} forest-domain pairwise flux sites.
 - Pixel recovery rows: {pixel_summary.get("pixel_total_n", 0)} total, {pixel_summary.get("pixel_interpretable_n", 0)} interpretable for both axes.
 - Pixel legacy-quadrant share: {pixel_summary.get("pixel_legacy_quadrant_n", 0)} pixels = {pixel_legacy_pct:.1f}% of interpretable pixels.
+- Pixel gap median: {pixel_summary.get("pixel_gap_median", math.nan):+.1f} percentage points; positive-gap pixels: {100.0 * float(pixel_summary.get("pixel_gap_positive_fraction", math.nan)):.1f}% of interpretable pixels.
 - This is a descriptive Claim-A display of greenness--chlorophyll decoupling. No flux association, correlation p value, or independent-observation claim is made at the pixel level.
 
 This supports the narrower Perspective claim that, within the forest-domain flux subset, a greenness--chlorophyll recovery gap is associated with reduced independent GPP persistence. It is not framed as a deterministic quadrant law.
@@ -1981,6 +2064,7 @@ This supports the narrower Perspective claim that, within the forest-domain flux
 ## Sensitivities
 
 - Strict forest sensitivity (excluding open/savanna): primary rho={strict[f"{primary_metric}_spearman_legacy_gap"]:+.2f}, p={format_p(strict[f"{primary_metric}_spearman_legacy_gap_p"])}, n={strict[f"{primary_metric}_spearman_legacy_gap_n"]}; Mann--Whitney p={format_p(strict[f"{primary_metric}_mann_whitney_p"])}.
+- Drought-exposed forest sensitivity (SWC drop >= {DROUGHT_SWC_RELATIVE_DROP_THRESHOLD:.0%}): primary rho={drought.get(f"{primary_metric}_spearman_legacy_gap", math.nan):+.2f}, p={format_p(drought.get(f"{primary_metric}_spearman_legacy_gap_p", math.nan))}, n={drought.get(f"{primary_metric}_spearman_legacy_gap_n", 0)}; permutation p={format_p(drought.get(f"{primary_metric}_permutation_spearman_p_two_sided", math.nan))}. This is reported as a scope diagnostic because the threshold is a driver screen, not a flux outcome.
 - All-PFT sensitivity: primary rho={all_pft[f"{primary_metric}_spearman_legacy_gap"]:+.2f}, p={format_p(all_pft[f"{primary_metric}_spearman_legacy_gap_p"])}, n={all_pft[f"{primary_metric}_spearman_legacy_gap_n"]}; Mann--Whitney p={format_p(all_pft[f"{primary_metric}_mann_whitney_p"])}.
 {counter_text}
 
@@ -1992,12 +2076,14 @@ Keep this as an illustrative, descriptive figure. Do not frame it as formal vari
 
 - Main forest-domain figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant.*`
 - Pixel decoupling figure: `figures/generated/flux_corroborated_trait_legacy/fig_pixel_greenness_chlorophyll_decoupling_hexbin.*`
-- Within-site chlorophyll figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_chl_pixel_violin.*`
+- Within-site legacy-gap figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_gap_pixel_violin.*`
+- Drought-exposed forest sensitivity figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant_drought_exposed.*`
 - All-PFT supplementary figure: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_trait_legacy_quadrant_all_pft.*`
 - Recovery clocks candidate: `figures/generated/flux_corroborated_trait_legacy/fig_flux_corroborated_recovery_clocks.*`
 - Chlorophyll-LMA trajectory candidate: `figures/generated/flux_corroborated_trait_legacy/fig_trait_space_trajectories_chl_lma.*`
 - Source data: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_site_metrics.csv`
 - Pixel source data: `tables/flux_corroborated_trait_legacy/pixel_recovery_forest_pairwise.csv`
+- Drought-driver source data: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_drought_driver_exposure.csv`
 - Leave-one-out source data: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_site_level_leave_one_out.csv`
 - Diagnostic summary: `tables/flux_corroborated_trait_legacy/flux_trait_legacy_diagnostic_summary.json`
 """
@@ -2019,6 +2105,8 @@ def main() -> None:
         site = site.drop(columns=["site_name_meta"])
     flux, daily_by_site = compute_flux_metrics(site[["site_id", "fluxnet_site_id"]].drop_duplicates(), args.fluxnet_zip_dir)
     site = site.merge(flux.drop(columns=["fluxnet_site_id"], errors="ignore"), on="site_id", how="left")
+    drought_driver = build_drought_driver_table(args.recovery_table)
+    site = site.merge(drought_driver, on="site_id", how="left")
     site["quadrant"] = site.apply(
         lambda r: quadrant_label(r["ndvi_recovery_pct_2023"], r["chl_recovery_pct_2023"], args.recovery_threshold),
         axis=1,
@@ -2030,6 +2118,7 @@ def main() -> None:
     )
     forest_site = site[site["forest_scope"]].copy()
     strict_forest_site = site[site["strict_forest_scope"]].copy()
+    drought_exposed_forest_site = forest_site[forest_site["driver_drought_exposed"].astype(bool)].copy()
     summaries = {
         "forest_main": build_summary(
             forest_site,
@@ -2043,6 +2132,12 @@ def main() -> None:
             scope_name="strict_forest_sensitivity",
             primary_metric=args.primary_gpp_metric,
         ),
+        "drought_exposed_forest_sensitivity": build_summary(
+            drought_exposed_forest_site,
+            threshold=args.recovery_threshold,
+            scope_name="drought_exposed_forest_sensitivity",
+            primary_metric=args.primary_gpp_metric,
+        ),
         "all_pft_sensitivity": build_summary(
             site,
             threshold=args.recovery_threshold,
@@ -2054,13 +2149,36 @@ def main() -> None:
     summaries["forest_main"].update(site_level_resampling_summary(forest_pair, args.primary_gpp_metric))
     loo = leave_one_out_table(forest_pair, args.primary_gpp_metric)
     add_leave_one_out_summary(summaries["forest_main"], loo, args.primary_gpp_metric)
+    drought_pair = paired_site_data(drought_exposed_forest_site, args.primary_gpp_metric)
+    summaries["drought_exposed_forest_sensitivity"].update(
+        site_level_resampling_summary(drought_pair, args.primary_gpp_metric)
+    )
 
     site_path = args.output_table_dir / "flux_trait_legacy_site_metrics.csv"
     summary_path = args.output_table_dir / "flux_trait_legacy_diagnostic_summary.json"
     summary_csv_path = args.output_table_dir / "flux_trait_legacy_diagnostic_summary.csv"
     loo_path = args.output_table_dir / "flux_trait_legacy_site_level_leave_one_out.csv"
+    drought_driver_path = args.output_table_dir / "flux_trait_legacy_drought_driver_exposure.csv"
     site.to_csv(site_path, index=False)
     loo.to_csv(loo_path, index=False)
+    site[
+        [
+            "site_id",
+            "site_name",
+            "forest_type",
+            "forest_scope",
+            "driver_swc_pre_event",
+            "driver_swc_trough",
+            "driver_swc_drop",
+            "driver_swc_relative_drop",
+            "driver_tmax_delta_trough_minus_pre",
+            "driver_precip_delta_trough_minus_pre",
+            "driver_drought_exposed",
+            "quadrant",
+            "legacy_gap_pct",
+            args.primary_gpp_metric,
+        ]
+    ].to_csv(drought_driver_path, index=False)
     summary_path.write_text(json.dumps(summaries, indent=2, allow_nan=True) + "\n")
     pd.DataFrame(list(summaries.values())).to_csv(summary_csv_path, index=False)
 
@@ -2080,7 +2198,7 @@ def main() -> None:
         summary_path.write_text(json.dumps(summaries, indent=2, allow_nan=True) + "\n")
         pd.DataFrame(list(summaries.values())).to_csv(summary_csv_path, index=False)
         figure_outputs.extend(plot_pixel_decoupling_hexbin(pixel, pixel_summary, args.output_figure_dir, args.recovery_threshold))
-        figure_outputs.extend(plot_chl_pixel_violin(pixel, args.output_figure_dir, args.recovery_threshold, args.primary_gpp_metric))
+        figure_outputs.extend(plot_pixel_gap_violin(pixel, args.output_figure_dir, args.recovery_threshold, args.primary_gpp_metric))
     selected = select_clock_sites(forest_site, gpp_metric=args.primary_gpp_metric)
     clock = build_recovery_clock_table(args.recovery_table, forest_site, daily_by_site, selected)
     clock_path = args.output_table_dir / "flux_recovery_clock_source_data.csv"
@@ -2093,6 +2211,17 @@ def main() -> None:
             args.output_figure_dir,
             threshold=args.recovery_threshold,
             gpp_metric=args.primary_gpp_metric,
+        )
+    )
+    figure_outputs.extend(
+        plot_quadrant(
+            drought_exposed_forest_site,
+            summaries["drought_exposed_forest_sensitivity"],
+            args.output_figure_dir,
+            threshold=args.recovery_threshold,
+            gpp_metric=args.primary_gpp_metric,
+            stem="fig_flux_corroborated_trait_legacy_quadrant_drought_exposed",
+            scope_label="Drought-exposed forest sensitivity",
         )
     )
     figure_outputs.extend(
@@ -2118,6 +2247,7 @@ def main() -> None:
         "diagnostic_summary_json": str(summary_path),
         "diagnostic_summary_csv": str(summary_csv_path),
         "leave_one_out_source_data": str(loo_path),
+        "drought_driver_source_data": str(drought_driver_path),
         "pixel_source_data": str(pixel_path) if not pixel.empty else "",
         "clock_source_data": str(clock_path),
         "trajectory_source_data": str(traj_path),
