@@ -462,6 +462,24 @@ def compute_flux_metrics(meta: pd.DataFrame, zip_dir: Path) -> tuple[pd.DataFram
             row[f"{short}_recovery_pct_raw_2023"] = rec_pct
             row[f"{short}_recovery_pct_2023"] = rec_clip
             row[f"{short}_recovery_interpretable"] = interpretable
+
+            trough_annual = same_doy_window_medians(daily, var, TROUGH_START, TROUGH_END)
+            recovery_annual = same_doy_window_medians(daily, var, RECOVERY_2023_START, RECOVERY_2023_END)
+            trough_z = interannual_anomaly(trough_annual, target_year=2022, exclude_years={2022, 2023})
+            recovery_z = interannual_anomaly(recovery_annual, target_year=2023, exclude_years={2022, 2023})
+            row[f"{short}_trough_anomaly_z_2022_vs_interannual"] = trough_z["anomaly_z"]
+            row[f"{short}_trough_anomaly_pct_2022_vs_interannual"] = trough_z["anomaly_pct"]
+            row[f"{short}_trough_interannual_mean"] = trough_z["reference_mean"]
+            row[f"{short}_trough_interannual_sd"] = trough_z["reference_sd"]
+            row[f"{short}_trough_interannual_n_years"] = trough_z["reference_n_years"]
+            row[f"{short}_anomaly_z_2023_vs_interannual"] = recovery_z["anomaly_z"]
+            row[f"{short}_anomaly_pct_2023_vs_interannual"] = recovery_z["anomaly_pct"]
+            row[f"{short}_recovery_interannual_mean"] = recovery_z["reference_mean"]
+            row[f"{short}_recovery_interannual_sd"] = recovery_z["reference_sd"]
+            row[f"{short}_recovery_interannual_n_years"] = recovery_z["reference_n_years"]
+            row[f"{short}_persistence_z_2022_2023"] = finite_nanmean(
+                [float(trough_z["anomaly_z"]), float(recovery_z["anomaly_z"])]
+            )
         rows.append(row)
     return pd.DataFrame(rows).sort_values("site_id"), daily_by_site
 
@@ -476,8 +494,19 @@ def add_empty_flux_fields(row: dict[str, object], var: str) -> None:
         "anomaly_pct_2023_vs_baseline",
         "recovery_pct_raw_2023",
         "recovery_pct_2023",
+        "trough_anomaly_z_2022_vs_interannual",
+        "trough_anomaly_pct_2022_vs_interannual",
+        "trough_interannual_mean",
+        "trough_interannual_sd",
+        "anomaly_z_2023_vs_interannual",
+        "anomaly_pct_2023_vs_interannual",
+        "recovery_interannual_mean",
+        "recovery_interannual_sd",
+        "persistence_z_2022_2023",
     ]:
         row[f"{short}_{suffix}"] = math.nan
+    row[f"{short}_trough_interannual_n_years"] = 0
+    row[f"{short}_recovery_interannual_n_years"] = 0
     row[f"{short}_recovery_interpretable"] = False
 
 
@@ -493,6 +522,32 @@ def corr_value(x: pd.Series, y: pd.Series, method: str = "pearson") -> tuple[flo
     if float(xv.std(ddof=0)) <= 1e-12 or float(yv.std(ddof=0)) <= 1e-12:
         return math.nan, int(len(pair))
     return float(np.corrcoef(xv, yv)[0, 1]), int(len(pair))
+
+
+def corr_test_value(x: pd.Series, y: pd.Series, method: str = "spearman") -> tuple[float, float, int]:
+    pair = pd.DataFrame({"x": pd.to_numeric(x, errors="coerce"), "y": pd.to_numeric(y, errors="coerce")}).dropna()
+    if len(pair) < 3:
+        return math.nan, math.nan, int(len(pair))
+    xv = pair["x"].astype(float)
+    yv = pair["y"].astype(float)
+    if float(xv.std(ddof=0)) <= 1e-12 or float(yv.std(ddof=0)) <= 1e-12:
+        return math.nan, math.nan, int(len(pair))
+    if method == "spearman":
+        result = stats.spearmanr(xv, yv)
+    elif method == "pearson":
+        result = stats.pearsonr(xv, yv)
+    else:
+        raise ValueError(f"Unknown correlation method: {method}")
+    return float(result.statistic), float(result.pvalue), int(len(pair))
+
+
+def mann_whitney_value(a: pd.Series, b: pd.Series) -> tuple[float, float, int, int]:
+    av = pd.to_numeric(a, errors="coerce").dropna().astype(float)
+    bv = pd.to_numeric(b, errors="coerce").dropna().astype(float)
+    if len(av) < 1 or len(bv) < 1:
+        return math.nan, math.nan, int(len(av)), int(len(bv))
+    result = stats.mannwhitneyu(av, bv, alternative="two-sided")
+    return float(result.statistic), float(result.pvalue), int(len(av)), int(len(bv))
 
 
 def residualize(y: pd.Series, x: pd.Series) -> pd.Series:
