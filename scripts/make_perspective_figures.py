@@ -653,8 +653,7 @@ def fig4_anomalies():
     ax_s1 = fig.add_subplot(gs[1, 0], sharex=ax_era)
     ax_s2 = fig.add_subplot(gs[2, 0], sharex=ax_era)
     ax_idx = fig.add_subplot(gs[3, :], sharex=ax_era)
-    ax_space = fig.add_subplot(gs[1, 1])
-    ax_dyn = fig.add_subplot(gs[2, 1])
+    ax_space = fig.add_subplot(gs[1:3, 1])
 
     for sid, color in [(43, BLUE), (44, ORANGE)]:
         sub = context[context["site_id"] == sid].sort_values("date")
@@ -741,8 +740,6 @@ def fig4_anomalies():
     figure_title(ax_space, "Greenness--pigment recovery")
     style_axis(ax_space)
     panel_label(ax_space, "e", x=-0.12)
-
-    draw_trait_dynamics_panel(ax_dyn, letter="f")
 
     save_publication_figure(fig, "fig4_trait_anomaly_syndromes")
 
