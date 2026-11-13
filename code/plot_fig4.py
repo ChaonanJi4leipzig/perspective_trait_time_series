@@ -1,4 +1,4 @@
-"""Adapt final v6 cuboid/trajectory renderer to two rows, climatology and rugs."""
+"""Production cuboids and continuous-time forest trajectories for two sites."""
 from common import *
 OUT=output_directory()
 import matplotlib.dates as mdates
@@ -328,46 +328,82 @@ def seasonal_dates(dates):
  d=pd.DatetimeIndex(pd.to_datetime(dates,utc=True,format='mixed'))
  return pd.to_datetime(dict(year=2000,month=d.month,day=d.day))
 
-def add_rugs(ax,frame):
- lower,upper=ax.get_ylim();span=upper-lower;band=.22*span;ax.set_ylim(lower-band,upper)
- ax.axhspan(lower-band,lower,facecolor='#FAFAFA',zorder=-1);ax.axhline(lower,color='#D9D9D9',lw=.45,zorder=1)
- for i,year in enumerate(YEARS):
-  points=frame[frame.year.eq(year)&frame['plot']];y=lower-band+(i+.7)*band/5.8
-  ax.plot(seasonal_dates(points.date_utc),np.full(len(points),y),'|',color=YEAR_COLORS[year],ms=4,mew=.65,ls='',zorder=3)
-  # Journal: year colours and bottom-to-top ordering are defined in the caption.
+def draw_continuous(ax,frame,ensemble,baseline,trait,bottom):
+ label,color=TRAIT_STYLE[trait]
+ part=ensemble[ensemble.trait.eq(trait)].copy().sort_values('date')
+ dates=pd.to_datetime(part.date,utc=True).dt.tz_localize(None)
+ ax.fill_between(dates,part.seed_min,part.seed_max,color=color,alpha=.20,lw=0,zorder=2)
+ ax.plot(dates,part['mean'],color=color,lw=1.5,marker='o',ms=4,mew=0,zorder=3)
+ reference=frame[frame.trait.eq(trait)&frame.kind.eq('EnMAP reference')]
+ rd=pd.to_datetime(reference.date,utc=True).dt.tz_localize(None)
+ ax.scatter(rd,reference['mean'],facecolor='white',edgecolor=color,s=25,lw=1,zorder=5)
+ b=baseline[baseline.trait.eq(trait)].copy();bd=pd.to_datetime(b.date)
+ for year in YEARS:
+  dd=[];vv=[]
+  for stamp,value in zip(bd,b['mean']):
+   try:date=stamp.replace(year=year)
+   except ValueError:continue
+   dd.append(date);vv.append(value)
+  dd=pd.DatetimeIndex(dd);vv=np.array(vv,float);supported=np.zeros(len(dd),bool)
+  valid=dates[part['mean'].notna()].to_numpy()
+  for a,z in zip(valid[:-1],valid[1:]):
+   if z-a<=np.timedelta64(16,'D'):supported|=(dd>=a)&(dd<=z)
+  vv[~supported]=np.nan
+  ax.plot(dd,vv,color='#777777',ls='--',lw=1.1,zorder=2)
+ for year in range(2021,2027):ax.axvspan(pd.Timestamp(year,11,1),pd.Timestamp(year+1,3,1),color='#D9D9D9',alpha=.35,lw=0,zorder=0)
+ ax.set_xlim(pd.Timestamp('2022-06-01'),pd.Timestamp('2026-09-30'))
+ ax.xaxis.set_major_locator(mdates.YearLocator());ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+ ax.set_xlabel('Date' if bottom else '',fontsize=20)
+ ax.tick_params(axis='x',labelbottom=bottom,length=2,pad=2)
+ vals=np.concatenate([part[['seed_min','seed_max']].to_numpy().ravel(),reference['mean'].to_numpy()]);vals=vals[np.isfinite(vals)]
+ margin=max(np.ptp(vals)*.1,abs(np.median(vals))*.02);ax.set_ylim(vals.min()-margin,vals.max()+margin)
+ ax.yaxis.set_major_locator(mpl.ticker.MaxNLocator(4));ax.yaxis.set_major_formatter(mpl.ticker.FormatStrFormatter('%.2f' if trait=='N' else '%g'))
+ ax.set_ylabel(UNITS[trait],fontsize=20,labelpad=4);ax.spines[['top','right']].set_visible(False);ax.grid(axis='y',color='#D3D3D3',ls='--',lw=.4)
+ title=ax.annotate(label,(.025,1),xytext=(0,3),textcoords='offset points',color=color,fontweight='bold',fontsize=20,va='bottom',ha='left',annotation_clip=False,xycoords='axes fraction')
+ return title
 
 def main():
- style(20);fig=plt.figure(figsize=(17,20),dpi=100)
- rows=fig.add_gridspec(2,1,left=.015,right=.985,bottom=.03,top=.90,hspace=.38)
- records={}
- for k,(name,source_name) in enumerate([('Hesse','Hesse'),('Castelporziano','Castelporziano')]):
-  cube_path=DATA/f'Fig4_cube_{name}.npz'
-  with np.load(cube_path) as z:
+ style(20);fig=plt.figure(figsize=(17,15.8),dpi=100)
+ trajectory_titles=[];hesse_bottom=[];second_headings=[]
+ rows=fig.add_gridspec(2,1,left=.015,right=.985,bottom=.04,top=.91,hspace=.13)
+ for k,name in enumerate(['Hesse','Castelporziano']):
+  with np.load(DATA/f'Fig4_cube_{name}.npz') as z:
    names=z['trait_names'].astype(str).tolist();cubes={t:z['data'][names.index(t)] for t in UNITS};front=int(z['t0']);assert str(z['display_dates'][front])[:10]=='2024-07-27'
-  frame=pd.read_parquet(DATA/f'Fig4_trajectories_{name}.parquet');frame.date=pd.to_datetime(frame.date,utc=True,format='mixed');frame['year']=frame.date.dt.year;frame['seasonal_date']=seasonal_dates(frame.date).to_numpy()
-  baseline=pd.read_parquet(DATA/f'Fig4_multi_year_mean_{name}.parquet');rug=pd.read_parquet(DATA/f'Fig4_S2_valid_dates_{name}.parquet')
-  blocks=rows[k].subgridspec(1,2,width_ratios=[1,2],wspace=.10);panel_a=blocks[0].subgridspec(2,1,height_ratios=[2,1],hspace=0)
-  cube_ax=fig.add_subplot(panel_a[0]);cube_ax.set(xlim=(0,3.90),ylim=(.88,4.39));cube_ax.set_aspect('equal');cube_ax.set_axis_off();colors=panel_a[1].subgridspec(2,2,wspace=.08,hspace=.30);traj=blocks[1].subgridspec(2,2,wspace=.38,hspace=.065)
+  frame=pd.read_parquet(DATA/f'Fig4_trajectories_{name}.parquet')
+  ensemble=pd.read_csv(DATA/f'Fig4_ensemble_range_{name}.csv',float_precision='round_trip')
+  baseline=pd.read_parquet(DATA/f'Fig4_multi_year_mean_{name}.parquet')
+  blocks=rows[k].subgridspec(1,2,width_ratios=[1,2],wspace=.10);panel_a=blocks[0].subgridspec(2,1,height_ratios=[2.6,1],hspace=0)
+  cube_ax=fig.add_subplot(panel_a[0]);cube_ax.set(xlim=(0,3.90),ylim=(.88,4.39));cube_ax.set_aspect('equal');cube_ax.set_axis_off()
+  colors=panel_a[1].subgridspec(2,2,wspace=.08,hspace=.30);traj=blocks[1].subgridspec(2,2,wspace=.38,hspace=.16)
   origins=((1.13,2.17),(2.61,2.17),(1.13,1.01),(2.61,1.01));norms=[None]*4
   for index in (3,2,1,0):norms[index]=draw_cuboid(cube_ax,cubes[SELECTED[index][0]],SELECTED[index],front,origins[index],10*(4-index))
   _coordinate_triad(cube_ax,np.array(origins[0]),zorder=100,fontsize=FONT_BODY);lon=next(t for t in cube_ax.texts if t.get_text()=='lon');lon.set_x(lon.get_position()[0]+.25)
-  axes={}
   for i,trait in enumerate(SELECTED):
-   short=trait[0];r,c=divmod(i,2);draw_colorbar(fig,fig.add_subplot(colors[r,c]),trait,norms[i]);ax=fig.add_subplot(traj[r,c]);axes[short]=ax;draw_trajectory(ax,frame,short,bottom=r==1)
-   b=baseline[baseline.trait.eq(short)];ax.plot(pd.to_datetime(b.date),b['mean'],color='#777777',ls='--',lw=1.2,zorder=2);ax.set_xlim(pd.Timestamp('2000-01-01'),pd.Timestamp('2000-12-31'));add_rugs(ax,rug)
+   short=trait[0];r,c=divmod(i,2);draw_colorbar(fig,fig.add_subplot(colors[r,c]),trait,norms[i]);ax=fig.add_subplot(traj[r,c]);title=draw_continuous(ax,frame,ensemble,baseline,short,r==1);trajectory_titles.append((ax,title))
+   if k==0:
+    ax.set_xlabel('')
+    if r==1:hesse_bottom.append(ax)
   top=rows[k].get_position(fig).y1
-  fig.text(.02,top+.033,f'{chr(97+2*k)}  '+('FR-Hes Hesse' if name=='Hesse' else 'IT-Cp2 Castelporziano'),fontsize=24,fontweight='bold',va='bottom');fig.text(.35,top+.033,chr(98+2*k),fontsize=24,fontweight='bold',va='bottom')
-  handles=[Line2D([],[],color=YEAR_COLORS[y],marker='o',lw=1.1,ms=5.65,label=str(y)) for y in YEARS]
-  handles += [Line2D([],[],ls='',marker='o',mfc='white',mec='#444444',color='#444444',ms=7,label='EnMAP reference'),Line2D([],[],ls='--',color='#777777',lw=1.2,label='Multi-year mean')]
-  legend=fig.legend(handles=handles,ncol=4,loc='lower right',bbox_to_anchor=(.992,top+.012),frameon=False,fontsize=18,handlelength=1.5,columnspacing=.7)
-  fig.canvas.draw();place_n_ylabel(fig,axes['EWT'],axes['N'])
+  site_heading=fig.text(.02,top+.03,f'{chr(97+2*k)}  '+('FR-Hes Hesse' if name=='Hesse' else 'IT-Cp2 Castelporziano'),fontsize=24,fontweight='bold',va='bottom')
+  panel_heading=fig.text(.35,top+.03,chr(98+2*k),fontsize=24,fontweight='bold',va='bottom')
+  if k==1:second_headings=[site_heading,panel_heading]
  normalize(fig)
  for t in fig.findobj(Text):t.set_fontsize(min(8,t.get_fontsize()))
- for leg in list(fig.legends):leg.remove()
- for k in range(2):
+ # Only the needed clearance separates Hesse ticks from the next site headings.
+ fig.canvas.draw();renderer=fig.canvas.get_renderer();millimetre=fig.dpi/25.4
+ tick_bottom=min(t.get_window_extent(renderer).y0 for ax in hesse_bottom for t in ax.get_xticklabels() if t.get_visible())
+ for text in second_headings:
+  shift=max(0,text.get_window_extent(renderer).y1-(tick_bottom-millimetre))
+  x,y=text.get_position();text.set_position((x,y-shift/fig.bbox.height))
+ def check_layout(figure):
+  renderer=figure.canvas.get_renderer();tick_bottom=min(t.get_window_extent(renderer).y0 for ax in hesse_bottom for t in ax.get_xticklabels() if t.get_visible())
+  for text in second_headings:assert tick_bottom-text.get_window_extent(renderer).y1>=figure.dpi/25.4-1e-6
+  for ax,text in trajectory_titles:assert text.get_window_extent(renderer).y0>=ax.bbox.y1+figure.dpi/25.4-1e-6
+ fig._paper_layout_check=check_layout
+ from matplotlib.patches import Patch
+ for k in [0]:
   top=rows[k].get_position(fig).y1
-  handles=[Line2D([],[],color=YEAR_COLORS[y],marker='o',lw=.6,ms=2.5,label=str(y)) for y in YEARS]
-  handles += [Line2D([],[],ls='',marker='o',mfc='white',mec='#444444',color='#444444',ms=3,label='EnMAP reference'),Line2D([],[],ls='--',color='#777777',lw=.6,label='Multi-year mean')]
-  fig.legend(handles=handles,ncol=4,loc='lower right',bbox_to_anchor=(.992,top+.012),frameon=False,fontsize=7,handlelength=1.2,columnspacing=.8,handletextpad=.5)
- journal_style();fig.canvas.draw();export_journal(fig,'Fig4',OUT)
+  handles=[Line2D([],[],color='#333333',lw=.7,label='Trait reconstruction'),Patch(facecolor='#777777',alpha=.2,label='Ensemble range'),Line2D([],[],ls='--',color='#777777',lw=.6,label='Multi-year mean'),Line2D([],[],ls='',marker='o',mfc='white',mec='#444444',ms=3,label='EnMAP reference (in-sample)'),Patch(facecolor='#D9D9D9',alpha=.35,label='Nov–Feb')]
+  fig.legend(handles=handles,ncol=3,loc='lower right',bbox_to_anchor=(.992,top+.012),frameon=False,fontsize=7,handlelength=1.2,columnspacing=.8,handletextpad=.5)
+ export_journal(fig,'Fig4',OUT)
 if __name__=='__main__':main()

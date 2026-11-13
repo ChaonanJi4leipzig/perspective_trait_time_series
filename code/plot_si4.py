@@ -69,32 +69,5 @@ fig.legend(handles=[Line2D([],[],color=colors[q],lw=1.5,label=q) for q in quanti
            [Patch(facecolor='.55',alpha=.20,edgecolor='none',label='Ensemble range')],
            loc='upper center',bbox_to_anchor=(.55,.993),frameon=False,ncol=4,fontsize=6.5,
            handlelength=1.8,columnspacing=1.9)
-# Tight export with zero padding, but enforce the final *exported* width;
-# changing the canvas width never rescales the physical font sizes.
-unit_labels=fix_units(fig)
-target_width=183/25.4
-for iteration in range(20):
-    fig.canvas.draw()
-    tight=fig.get_tightbbox(fig.canvas.get_renderer())
-    difference=target_width-tight.width
-    if abs(difference)<1e-7:break
-    fig.set_size_inches(fig.get_figwidth()+difference,fig.get_figheight(),forward=True)
-fig.canvas.draw();renderer=fig.canvas.get_renderer();tight=fig.get_tightbbox(renderer)
-assert abs(tight.width-target_width)<1e-5
-bbox=Bbox.from_bounds(tight.x0,tight.y0,target_width,tight.height)
-texts=[t for t in fig.findobj(Text) if t.get_visible() and t.get_text()]
-assert min(t.get_fontsize() for t in texts)>=6.5
-assert all(t.get_fontfamily()==['Arial'] for t in texts)
-for t in texts:
-    font=font_manager.get_font(font_manager.findfont(t.get_fontproperties(),fallback_to_default=False))
-    assert all(ord(c) in font.get_charmap() for c in t.get_text() if not c.isspace())
-assert not any(any(word in t.get_text().lower() for word in ['w7','seed','gate']) for t in texts)
-# Verify each correlation label fits its panel at its final physical size.
-for ax in axes.flat:
-    for t in ax.texts:
-        if t.get_text().startswith('ρ'):
-            assert t.get_window_extent(renderer).x1 <= ax.get_window_extent(renderer).x1
-png=OUT/'SI4_flux_consistency.png';pdf=OUT/'SI4_flux_consistency.pdf'
-fig.savefig(png,dpi=600,bbox_inches=bbox,pad_inches=0)
-fig.savefig(pdf,bbox_inches=bbox,pad_inches=0)
-plt.close(fig)
+fix_units(fig)
+save_tight(fig,'SI4_flux_consistency',OUT)

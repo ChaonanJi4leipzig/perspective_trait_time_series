@@ -25,7 +25,7 @@ def main():
         (list(COLORS).index(cl.loc[sid, 'display_class']), -int(n_events.get(sid, 0)), sid))
     assert len(sites)==41 and set(sites)==set(cl.index)
     fig, ax = plt.subplots(figsize=(183/25.4, 218/25.4))
-    fig.subplots_adjust(left=43/183, right=165/183, bottom=12/218, top=198/218)
+    fig.subplots_adjust(left=43/183, right=165/183, bottom=12/218, top=.955)
     row_counts = []
     for j, sid in enumerate(sites):
         sg = s[s.site_id.eq(sid) & s.valid_observation]
@@ -55,13 +55,6 @@ def main():
         color=color,label=LABELS[key]) for key,color in COLORS.items()],
         loc='upper center',bbox_to_anchor=(.5,.995), ncol=6, frameon=False,
         columnspacing=1, handlelength=1.1, handletextpad=.4, fontsize=7)
-    tick_legend = fig.legend(handles=[
-        Line2D([],[],marker='|',ls='',ms=14,markeredgewidth=LOCAL_WIDTH,
-               color=LOCAL_COLOR,label='S2, local valid'),
-        Line2D([],[],marker='|',ls='',ms=7.84,markeredgewidth=PC_WIDTH,
-               color=PC_COLOR,label='S2, PC cloud ≤ 50%')],
-        loc='upper center',bbox_to_anchor=(.5,.96),ncol=2,frameon=False,
-        columnspacing=1.6,handlelength=1.1,handletextpad=.4,fontsize=7)
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     # Validate actual text extents at the final physical size before exporting.
@@ -72,12 +65,6 @@ def main():
         assert text.get_fontfamily()==['Arial'] and 6.5<=text.get_fontsize()<=8
     label_boxes=[t.get_window_extent(renderer) for t in ax.get_yticklabels()]
     for a,b in zip(label_boxes,label_boxes[1:]): assert not a.overlaps(b)
-    legend_boxes=[lg.get_window_extent(renderer).transformed(fig.transFigure.inverted()) for lg in [class_legend,tick_legend]]
-    assert not legend_boxes[0].overlaps(legend_boxes[1])
-    assert legend_boxes[1].y0>ax.get_position().y1
-    for ext in ['png','pdf']:
-        # Fixed page width preserves 183 mm and 7-pt type; there is no added save padding.
-        fig.savefig(OUT/f'SI1_data_volume.{ext}',dpi=600,pad_inches=0,facecolor='white')
-    plt.close(fig)
+    save_tight(fig,'SI1_data_volume',OUT)
 
 if __name__=='__main__':main()

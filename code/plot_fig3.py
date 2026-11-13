@@ -6,8 +6,8 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 from matplotlib.legend_handler import HandlerTuple
 def main():
- journal_style();d=pd.read_parquet(DATA/'Fig3a_metrics.parquet');b=pd.read_parquet(DATA/'Fig3b_budget.parquet');p=pd.read_parquet(DATA/'Fig3a_pixel_baselines.parquet').set_index(['trait','model'])
- fig=plt.figure(figsize=(WIDTH,122/25.4));ar=fig.add_axes((.078,.095,.205,.735));ae=fig.add_axes((.310,.095,.205,.735),sharey=ar);ab=fig.add_axes((.625,.095,.355,.735))
+ journal_style();totals=pd.read_parquet(DATA/'Fig3b_totals.parquet').set_index('trait');d=pd.read_parquet(DATA/'Fig3a_metrics.parquet');b=pd.read_parquet(DATA/'Fig3b_budget.parquet');p=pd.read_parquet(DATA/'Fig3a_pixel_baselines.parquet').set_index(['trait','model'])
+ fig=plt.figure(figsize=(WIDTH,122/25.4));ar=fig.add_axes((.078,.095,.205,.735));ae=fig.add_axes((.310,.095,.205,.735),sharey=ar)
  score=lambda t,s,m,k:float(d.loc[d.trait.eq(t)&d.scope.eq(s)&d.model.eq(m)&d.metric.eq(k),'mean'].iloc[0])
  vals=[score(t,s,'NN','r2') for t in ORDER for s in ['temporal','spatial']]+[score(t,'temporal',m,'r2') for t in ORDER for m in ['pixel_mean','pixel_seasonal_mean']]
  limits=(min(-.08,min(vals)-.035),max(.75,max(vals)+.035));err=(.16,.45)
@@ -29,17 +29,43 @@ def main():
  for tick in ar.get_yticklabels():tick.set(color='black',fontweight='normal',fontsize=7)
  handles=[Line2D([],[],marker='o',ms=3,color='#009E73',lw=0,label='Temporal'),Line2D([],[],marker='s',ms=3,color='#009E73',lw=0,label='Spatial'),Line2D([],[],marker='o',ms=3,mfc='white',mec='#363B3E',lw=0,label='Pixel mean'),Line2D([],[],marker=(8,2,0),ms=4,color='#828B90',lw=0,label='Pixel seasonal mean')]
  fig.legend(handles=handles,loc='upper left',bbox_to_anchor=(.065,.944),ncol=2,frameon=False,fontsize=7,columnspacing=1,handletextpad=.4)
- pales=['#D5DEE8','#D8D8D8','#E5D9CB'];dark=['#496882','#676767','#997049']
- for j,t in enumerate(ORDER):
-  left=0
-  for i,l in enumerate(['site','date','scene']):
-   r=b[b.trait.eq(t)&b.level.eq(l)].iloc[0];ab.barh(j,r.share,left=left,height=.62,color=pales[i],edgecolor='white',linewidth=.3);ab.barh(j,r.recovered,left=left,height=.62,color=dark[i]);ab.plot([left+r.recovered_low,left+r.recovered_high],[j,j],color='black',lw=.5);ab.plot([left+r.recovered]*2,[j-.08,j+.08],color='black',lw=.5)
-   if l=='date':ab.plot(left+r.pixel_seasonal_recovered_date,j-.44,marker='^',ms=3.5,mfc='white',mec='black',mew=.5,ls='',zorder=6)
-   left+=r.share
- ab.set(ylim=(10.5,-.5),xlim=(0,1),xlabel='Reference variance (%)');ab.set_yticks(range(11),ORDER,fontsize=7,fontweight='normal',color='black');ab.set_xticks([0,.25,.5,.75,1],['0','25','50','75','100']);ab.tick_params(axis='y',length=0,pad=2);ab.tick_params(axis='x',length=2,pad=2);ab.spines[['left','top','right']].set_visible(False)
- pairs=[(Patch(facecolor=c),Patch(facecolor=pale)) for c,pale in zip(dark,pales)]
- fig.legend(handles=pairs+[Line2D([],[],marker='^',ms=3.5,mfc='white',mec='black',lw=0)],labels=['Between sites','Between dates','Within scenes','Pixel seasonal mean'],handler_map={tuple:HandlerTuple(ndivide=None,pad=.15)},loc='upper left',bbox_to_anchor=(.605,.944),ncol=2,frameon=False,fontsize=7,columnspacing=.6,handletextpad=.4,handlelength=1.8)
- for x,letter,title in [(.038,'a','Held-out evaluation'),(.555,'b','Variance recovered (temporal)')]:
+ # All four x-scales are percentages of the same reference variance.
+ # Extra headroom allows the right-hand value labels without narrowing panel a.
+ levels=['site','date','scene','total'];titles=['Between\nsites','Between\ndates','Within\nscenes','Total\nrecovered']
+ ranges=[float(np.ceil(max(b[b.level.eq(l)].share.max(),b[b.level.eq(l)].recovered_high.max())*100/5)*5+30) for l in levels[:3]]+[100.]
+ ranges[2]+=10
+ left=.550;right=.985;gap=.010;unit=(right-left-3*gap)/sum(ranges);budget_axes=[];labels=[]
+ for k,(level,title,span) in enumerate(zip(levels,titles,ranges)):
+  ax=fig.add_axes((left,.095,span*unit,.735),sharey=ar);budget_axes.append(ax)
+  ax.set(xlim=(0,span),ylim=(10.5,-.5));ax.tick_params(axis='y',left=False,labelleft=False);ax.tick_params(axis='x',length=2,pad=2)
+  ax.spines[['left','top','right']].set_visible(False);ax.set_title(title,fontsize=7,pad=5)
+  ax.set_xticks(([0,20,40] if k<2 else [0,50,100]));ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda v,p:f'{v:g}'))
+  for j,t in enumerate(ORDER):
+   if level=='total':
+    share=100.;rec=100*totals.loc[t,'total_recovered'];lo=100*totals.loc[t,'total_low'];hi=100*totals.loc[t,'total_high']
+   else:
+    row=b[b.trait.eq(t)&b.level.eq(level)].iloc[0];share=100*row.share;rec=100*row.recovered;lo=100*row.recovered_low;hi=100*row.recovered_high
+   ax.barh(j,share,height=.62,color='#E6E6E6',zorder=1);ax.barh(j,rec,height=.62,color=TC[t],zorder=2)
+   ax.plot([lo,hi],[j,j],color='black',lw=.5,zorder=3)
+   if level=='total':ax.plot(100*totals.loc[t,'pixel_seasonal_total'],j,marker='|',ms=5,mew=.8,color='black',ls='',zorder=4)
+   text=ax.annotate(f'{rec:.0f}/{share:.0f}%',(share,j+.24),xytext=(1.1,0),textcoords='offset points',ha='left',va='center',fontsize=7,color='#666666',annotation_clip=False)
+   # Total background reaches 100%; keep its value label just past the recovered bar.
+   if level=='total':text.xy=(rec,j+.24)
+   labels.append((k,text))
+  left+=span*unit+gap
+ fig.text(.770,.025,'Share of total variance (%)',fontsize=7,ha='center')
+ bh=[Patch(facecolor=TC['LAI'],label='Recovered'),Patch(facecolor='#E6E6E6',label='Not recovered'),Line2D([],[],color='black',lw=.5,label='95% CI'),Line2D([],[],marker='|',ms=5,mew=.8,color='black',lw=0,label='Pixel seasonal mean')]
+ fig.legend(handles=bh,loc='upper left',bbox_to_anchor=(.535,.944),ncol=4,frameon=False,fontsize=7,columnspacing=.5,handletextpad=.3,handlelength=.8)
+ # sharey guarantees exact vertical alignment with both evaluation axes.
+ assert all(ax.get_ylim()==ar.get_ylim() for ax in budget_axes)
+ def check_alignment(figure):
+  renderer=figure.canvas.get_renderer();ys=ar.transData.transform(np.column_stack([np.zeros(11),np.arange(11)]))[:,1]
+  for ax in budget_axes:assert np.allclose(ax.transData.transform(np.column_stack([np.zeros(11),np.arange(11)]))[:,1],ys,atol=1e-9)
+  for k,text in labels:
+   if k<3:assert text.get_window_extent(renderer).x1<budget_axes[k+1].bbox.x0,(k,text.get_text())
+ fig._paper_layout_check=check_alignment
+ fig._fixed_width_axes=[ar,ae]
+ for x,letter,title in [(.038,'a','Held-out evaluation'),(.535,'b','Variance recovered (temporal)')]:
   fig.text(x,.976,letter,fontsize=9,fontweight='bold',va='top');fig.text(x+.033,.976,title,fontsize=8,va='top')
  export_journal(fig,'Fig3',OUT)
 if __name__=='__main__':main()

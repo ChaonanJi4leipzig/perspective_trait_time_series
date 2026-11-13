@@ -26,3 +26,5 @@ Original derivation bodies reused; only location bindings/import names/CLI/write
 | make_icos_cp2 | flux_compare/work_v3/process_three.py | 1e7aa4e5d5d83e9afe6f75e029f894a3655a886dbe43594ca5f075b2cc41e849 |
 | make_formal_metrics | prepare_panel_a.py | aedb6077e40b9dc84832e991208b8dfaccc90d9faea9b382f647319051bbd395 |
 | make_production_hesse | adapt_production_fig4.py | 589b849e939724462b84956de27b7d6d1c3904bee7c07b8e7c3eee9be3bd34ce |
+
+Update 1: `make_update1_data.py` reuses `make_metrics_core.evaluate` with the original pixel-seasonal rows, aggregates the stored per-draw recovered components for Total CIs, and applies the forest/support means from `make_icos_align.py` to the frozen production per-seed cubes. It neither draws a new bootstrap nor reads teacher stores. Input/output SHA256 receipts are local-only.

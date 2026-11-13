@@ -6,7 +6,7 @@ Original files were copied, never moved; raw stores, training arrays and model w
 ## Layout and redraw
 
 - Public repository: `code/`, this README, `requirements.txt` and `.gitignore`.
-- `data/` (39.04 MB) and `figures/` (17.09 MB) are local-only and git-ignored.
+- `data/` (39.14 MB) and `figures/` (16.94 MB) are local-only and git-ignored.
 - Figure data and final figures are held by the authors and will be deposited separately: **DOI: TBD**.
 - The data deposit includes lossless plot inputs, `numbers_for_text.csv` (293 results) and six captions.
 
@@ -21,7 +21,7 @@ python code/check_reproduction.py            # independent redraw + audit
 ```
 
 Renderers use relative paths and only `data/`; exports are 183 mm wide, 600 dpi PNG and embedded-font PDF.
-`common.py` holds Arial, mathtext and style. Numeric values/selections match the frozen final figures.
+`common.py` holds Arial, mathtext, style and 1-mm outer padding. Numeric values/selections match the frozen final figures.
 Local checks and the SHA256 manifest are retained by the authors and git-ignored.
 
 ## Data-processing pipeline
@@ -91,3 +91,9 @@ The separate data deposit contains derived maps/cubes/tables, not original spect
 ICOS citations: FR-Hes [flux](https://hdl.handle.net/11676/3FV_P_h69OveJojAgQKrPEZD), [ancillary](https://hdl.handle.net/11676/hnh5IHKw9yDIC3RbGWvvFidz); IT-Cp2 [flux](https://hdl.handle.net/11676/Wc9LMp9RCv59Jkmc2tDR7ilP), [ancillary](https://hdl.handle.net/11676/fFH_pQ3l3LLjQpw2QEGv2hWF).
 No sealed teacher values are in the local figure data; arbitrary prediction dates and independent S2/ICOS observations are not teacher labels.
 No Git repository was initialized and nothing was uploaded.
+
+## Paper figures update 1
+
+Fig. 3b uses separate component bars; Total and the pixel-seasonal tick sum all three share × max(R², 0) terms (baseline on its defined subset). Component CIs reuse stored draws; Total CI sums each draw before taking percentiles (1,000 site-cluster draws, seed 20261111).
+Fig. 4 uses continuous dates, five-network min–max forest-mean bands and fixed Nov–Feb winter shading, not measured error.
+`make_update1_data.py --run` creates the small totals/range inputs from frozen exports and cubes; no training or inference. Caption definitions remain with the author-held figures.

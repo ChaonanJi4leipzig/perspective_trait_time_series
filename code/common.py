@@ -66,7 +66,7 @@ def fix_units(fig):
 def export_journal(fig,name,outdir):
  journal_style();fix_units(fig)
  for text in fig.findobj(Text):text.set_fontfamily('Arial');text.set_math_fontfamily('custom')
- fig.canvas.draw();fig.savefig(outdir/(name+'.pdf'),dpi=600,facecolor='white');fig.savefig(outdir/(name+'.png'),dpi=600,facecolor='white');plt.close(fig)
+ save_tight(fig,name,outdir)
 
 def read_plot_table(path,parse_dates=()):
  frame=pd.read_parquet(path)
@@ -123,3 +123,45 @@ IGBP_COLORS = {'forest':'#009E73', 'grassland':'#E69F00', 'cropland':'#0072B2',
           'wetland':'#56B4E9', 'shrubland_savanna':'#D55E00', 'other':'#CC79A7'}
 
 SIGNAL_COLORS = {'Chl':'#D55E00','CCC':'#009E73','LAI':'#0072B2'}
+
+def content_bbox(fig):
+ """Bounds of visible content; empty off-axis canvases do not add whitespace."""
+ from matplotlib.transforms import Bbox
+ from matplotlib.spines import Spine
+ from matplotlib.axis import Axis
+ renderer=fig.canvas.get_renderer();boxes=[]
+ for ax in fig.axes:
+  if not ax.get_visible():continue
+  if ax.axison:
+   box=ax.get_tightbbox(renderer)
+   if box is not None:boxes.append(box)
+  else:
+   for artist in ax.get_children():
+    if artist is ax.patch or isinstance(artist,(Spine,Axis)) or not artist.get_visible():continue
+    if isinstance(artist,Text) and not artist.get_text():continue
+    try:box=artist.get_tightbbox(renderer)
+    except (AttributeError,TypeError):continue
+    if box is not None and np.isfinite(box.extents).all() and box.width+box.height>0:boxes.append(box)
+ for artist in list(fig.texts)+list(fig.legends):
+  if artist.get_visible():boxes.append(artist.get_window_extent(renderer))
+ return Bbox.union(boxes).transformed(fig.dpi_scale_trans.inverted())
+
+def save_tight(fig,name,outdir,pad_mm=1):
+ """Crop visible content with 1-mm padding, retaining 183-mm exported width."""
+ from matplotlib.transforms import Bbox
+ pad=pad_mm/25.4;target=WIDTH-2*pad
+ fixed=[(ax,ax.get_position().x0*fig.get_figwidth(),ax.get_position().width*fig.get_figwidth()) for ax in getattr(fig,'_fixed_width_axes',[])]
+ for iteration in range(40):
+  fig.canvas.draw();box=content_bbox(fig);difference=target-box.width
+  if abs(difference)<2e-7:break
+  fig.set_size_inches(fig.get_figwidth()+difference,fig.get_figheight(),forward=True)
+  for ax,x,width in fixed:
+   pos=ax.get_position();ax.set_position((x/fig.get_figwidth(),pos.y0,width/fig.get_figwidth(),pos.height))
+ fig.canvas.draw();box=content_bbox(fig)
+ if hasattr(fig,'_paper_layout_check'):fig._paper_layout_check(fig)
+ assert abs(box.width-target)<1e-5,(name,box.width,target)
+ bounds=Bbox.from_bounds(box.x0-pad,box.y0-pad,WIDTH,box.height+2*pad)
+ texts=[t for t in fig.findobj(Text) if t.get_visible() and t.get_text()]
+ assert min(t.get_fontsize() for t in texts)>=6.5,(name,min(t.get_fontsize() for t in texts))
+ for suffix in ['pdf','png']:fig.savefig(outdir/(name+'.'+suffix),dpi=600,bbox_inches=bounds,pad_inches=0,facecolor='white')
+ plt.close(fig)
