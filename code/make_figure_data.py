@@ -21,6 +21,11 @@ for name,cols in columns.items():
  frame=pd.read_csv(F/'source_data'/name)
  if name=='Fig3a_metrics.csv':frame=frame[frame.model.isin(['NN','pixel_mean','pixel_seasonal_mean'])].reset_index(drop=True)
  frame[cols].to_parquet(D/Path(name).with_suffix('.parquet'),index=False)
+fold0=pd.read_parquet(paths.ASSIGNMENT,columns=['event_id','site_id','date','new_role'])
+fold0=fold0[fold0.new_role.eq('fold0')].reset_index(drop=True)
+development=pd.read_parquet(D/'SI1_development_events.parquet',columns=['site_id','date'])
+assert fold0.date.dtype==development.date.dtype and set(fold0.site_id)<=set(development.site_id)
+fold0.to_parquet(D/'SI1_fold0_events.parquet',index=False)
 for site in ['Hesse','Castelporziano']:
  for prefix,cols in [('Fig4_trajectories',['date','trait','kind','mean']),('Fig4_multi_year_mean',['trait','date','mean']),('Fig4_S2_valid_dates',['year','plot','date_utc','valid_fraction'])]:
   name=f'{prefix}_{site}.csv';pd.read_csv(F/'source_data'/name)[cols].to_parquet(D/Path(name).with_suffix('.parquet'),index=False)

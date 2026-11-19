@@ -1,6 +1,6 @@
 'frozen production cubes and development teacher windows;writes trajectories,refs,cubes;production run.\nInputs: code/paths.py; outputs: explicit derivation work directory, never upstream.\nOriginal: upstream://V6/production_nn/new_sites_20261113/assemble_fig4_inputs.py.\nRun IDs: cap2048_v3_nested11_20261108; cap2048_spatial_gsingle_20261112; cap2048_production_nn_temporal_20261112.\nHeavy derivation was not rerun when packaging. Use --help before --run.'
 from __future__ import annotations
-import paths,sys
+import paths,sys,os
 if __name__=="__main__":
  from make_runtime import cli
  cli(__doc__)
@@ -24,7 +24,8 @@ def main(name):
     spec = SITES[name]
     sid = spec['site_id']
     folder = paths.WORK / 'production' / name
-    if not (folder/'manifest.json').exists():folder=PROD/name
+    if name=='Castelporziano' and os.environ.get('ECOSPECTRA_CP2_PRODUCTION'):folder=paths.production_site(name)
+    if not (folder/'manifest.json').exists():folder=paths.production_site(name)
     output_folder=paths.WORK/'production'/name;output_folder.mkdir(parents=True,exist_ok=True)
     m = read(folder / 'manifest.json')
     require(m['state'] == 'complete' and m['run_id'] == CFG['run_id'], 'New site completion')
@@ -119,7 +120,7 @@ def main(name):
             runs.append((i - begin, begin, i - 1))
             begin = None
     gap = max(runs, default=(0, 0, 0))
-    record = dict(name=name, station=spec['station'], site_id=sid, production_run=CFG['run_id'], window=spec, forest_pixels=int(forest.sum()), forest_fraction=float(forest.mean()), n_dates_passing=int(good[fortnight].sum()), n_product_dates=113, front_face_date=str(tt[front].date()), front_face_coverage=float(coverage[front]), front_index=front_index, front_face_rule='2024-07-27 if forest W7>=80%; otherwise nearest passing June-August2024 product date; ties earlier', reference_dates_used=used, reference_dates_omitted=sorted(refs[~refs['plot']].date.unique().tolist()), references_in_sample=True, reference_count_expected=int(candidate.n_forest_ref80), reference_count_actual=len(used), reference_expectation_matches=used == expected, reference_difference_explanation='' if used == expected else 'New references additionally require all11 finite; the frozen alternatives audit used valid_mask only', sealed_dates_metadata_only=sorted(a[a.site_id.eq(sid) & a.new_role.eq('fold0')].date.tolist()), longest_gap_dates=int(gap[0]), longest_gap_days=int(gap[0] * 14), longest_gap_start=str(regular_dates[gap[1]].date()) if gap[0] else None, longest_gap_end=str(regular_dates[gap[2]].date()) if gap[0] else None, source_cube_sha256=cube_hash, model_sha256=m['model_sha256'], feature_wall_seconds=read(folder / 'FEATURES_DONE.json')['elapsed_wall_seconds'], inference_wall_seconds=m['elapsed_wall_seconds'], feature_CPU_seconds=read(folder / 'FEATURES_DONE.json')['CPU_seconds'], inference_CPU_seconds=m['CPU_seconds'], GPU_hours=0, source_csvs={p.name: sha(p) for p in (FIG / 'source_data').glob(f'Fig4_*_{name}.csv')}, sealed_values_read=0)
+    record = dict(name=name, station=spec['station'], site_id=sid, production_run=CFG['run_id'], window=spec, forest_pixels=int(forest.sum()), forest_fraction=float(forest.mean()), n_dates_passing=int(good[fortnight].sum()), n_product_dates=113, front_face_date=str(tt[front].date()), front_face_coverage=float(coverage[front]), front_index=front_index, front_face_rule='2024-07-27 if forest W7>=80%; otherwise nearest passing June-August2024 product date; ties earlier', reference_dates_used=used, reference_dates_omitted=sorted(refs[~refs['plot']].date.unique().tolist()), references_in_sample=True, reference_count_expected=int(candidate.n_forest_ref80), reference_count_actual=len(used), reference_expectation_matches=used == expected, reference_difference_explanation='' if used == expected else 'New references additionally require all11 finite; the frozen alternatives audit used valid_mask only', sealed_dates_metadata_only=sorted(a[a.site_id.eq(sid) & a.new_role.eq('fold0')].date.tolist()), longest_gap_dates=int(gap[0]), longest_gap_days=int(gap[0] * 14), longest_gap_start=str(regular_dates[gap[1]].date()) if gap[0] else None, longest_gap_end=str(regular_dates[gap[2]].date()) if gap[0] else None, source_cube_sha256=cube_hash, model_sha256=m['model_sha256'], feature_wall_seconds=read(folder / 'FEATURES_DONE.json')['elapsed_wall_seconds'], inference_wall_seconds=m['elapsed_wall_seconds'], feature_CPU_seconds=read(folder / 'FEATURES_DONE.json')['CPU_seconds'], inference_CPU_seconds=m['CPU_seconds'], GPU_hours=0, source_csvs={p.name: sha(p) for p in paths.DERIVED.glob(f'Fig4_*_{name}.csv')}, sealed_values_read=0)
     save(output_folder / 'FIG4_DATA_DONE.json', dict(sites={name: record}))
     print(json.dumps(record, indent=2), flush=True)
 if __name__ == '__main__':

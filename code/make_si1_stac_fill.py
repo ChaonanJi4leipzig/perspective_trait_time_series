@@ -59,9 +59,12 @@ class PoliteIO(StacApiIO):
             log({'event': 'request', 'endpoint': href.split('?')[0], 'method': method or 'GET', 'seconds': round(time.monotonic() - t, 3)})
             time.sleep(0.3)
 
-def inventory():
+def inventory(site_ids=None):
     c = pd.read_csv(paths.derived_input('SI1_counts_site_year.csv'))
     s = pd.read_csv(paths.derived_input('SI1_S2_observations.csv'))
+    if site_ids is not None:
+        c=c[c.site_id.isin(site_ids)].copy()
+        s=s[s.site_id.isin(site_ids)].copy()
     s['date_utc'] = pd.to_datetime(s.date_utc, utc=True, format='mixed')
     names = c.groupby('site_id').site_name.first().to_dict()
     coverage = []
@@ -69,10 +72,10 @@ def inventory():
     centres = []
     gaps = []
     for sid in sorted(names):
-        paths = sorted((PROJECT / f'input_data/s2/region/site_{sid}').glob(f'site_{sid}_s2_region_*.zarr'))
-        assert paths, sid
+        store_paths = sorted((PROJECT / f'input_data/s2/region/site_{sid}').glob(f'site_{sid}_s2_region_*.zarr'))
+        assert store_paths, sid
         centre_candidates = []
-        for p in paths:
+        for p in store_paths:
             year = int(re.search('_(\\d{4})\\.zarr$', p.name).group(1))
             attrs = json.loads((p / '.zattrs').read_text())
             b = attrs.get('bounds_utm') or attrs['grid_reference_bounds_utm']

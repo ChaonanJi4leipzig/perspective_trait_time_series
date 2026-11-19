@@ -5,6 +5,9 @@ from matplotlib.colors import to_rgba
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 from matplotlib.legend_handler import HandlerTuple
+def tint(color,white=.72):
+ """Opaque light tint: mix the trait colour with white (one factor for all traits)."""
+ return tuple((1-white)*np.array(to_rgba(color)[:3])+white)
 def main():
  journal_style();totals=pd.read_parquet(DATA/'Fig3b_totals.parquet').set_index('trait');d=pd.read_parquet(DATA/'Fig3a_metrics.parquet');b=pd.read_parquet(DATA/'Fig3b_budget.parquet');p=pd.read_parquet(DATA/'Fig3a_pixel_baselines.parquet').set_index(['trait','model'])
  fig=plt.figure(figsize=(WIDTH,122/25.4));ar=fig.add_axes((.078,.095,.205,.735));ae=fig.add_axes((.310,.095,.205,.735),sharey=ar)
@@ -45,7 +48,7 @@ def main():
     share=100.;rec=100*totals.loc[t,'total_recovered'];lo=100*totals.loc[t,'total_low'];hi=100*totals.loc[t,'total_high']
    else:
     row=b[b.trait.eq(t)&b.level.eq(level)].iloc[0];share=100*row.share;rec=100*row.recovered;lo=100*row.recovered_low;hi=100*row.recovered_high
-   ax.barh(j,share,height=.62,color='#E6E6E6',zorder=1);ax.barh(j,rec,height=.62,color=TC[t],zorder=2)
+   ax.barh(j,share,height=.62,color=tint(TC[t]),zorder=1);ax.barh(j,rec,height=.62,color=TC[t],zorder=2)
    ax.plot([lo,hi],[j,j],color='black',lw=.5,zorder=3)
    if level=='total':ax.plot(100*totals.loc[t,'pixel_seasonal_total'],j,marker='|',ms=5,mew=.8,color='black',ls='',zorder=4)
    text=ax.annotate(f'{rec:.0f}/{share:.0f}%',(share,j+.24),xytext=(1.1,0),textcoords='offset points',ha='left',va='center',fontsize=7,color='#666666',annotation_clip=False)
@@ -53,8 +56,11 @@ def main():
    if level=='total':text.xy=(rec,j+.24)
    labels.append((k,text))
   left+=span*unit+gap
- fig.text(.770,.025,'Share of total variance (%)',fontsize=7,ha='center')
- bh=[Patch(facecolor=TC['LAI'],label='Recovered'),Patch(facecolor='#E6E6E6',label='Not recovered'),Line2D([],[],color='black',lw=.5,label='95% CI'),Line2D([],[],marker='|',ms=5,mew=.8,color='black',lw=0,label='Pixel seasonal mean')]
+ # Panel-b x title is a real x-label, so matplotlib places it at the same height as panel-a labels
+ # (same tick-label font and axes bottom); its x is moved to the centre of the four budget panels.
+ first=budget_axes[0].get_position();centre=(first.x0+budget_axes[-1].get_position().x1)/2
+ budget_axes[0].set_xlabel('Share of total variance (%)');budget_axes[0].xaxis.label.set_x((centre-first.x0)/first.width)
+ bh=[Patch(facecolor=TC['LAI'],label='Recovered'),Patch(facecolor=tint(TC['LAI']),label='Not recovered'),Line2D([],[],color='black',lw=.5,label='95% CI'),Line2D([],[],marker='|',ms=5,mew=.8,color='black',lw=0,label='Pixel seasonal mean')]
  fig.legend(handles=bh,loc='upper left',bbox_to_anchor=(.535,.944),ncol=4,frameon=False,fontsize=7,columnspacing=.5,handletextpad=.3,handlelength=.8)
  # sharey guarantees exact vertical alignment with both evaluation axes.
  assert all(ax.get_ylim()==ar.get_ylim() for ax in budget_axes)
@@ -63,6 +69,8 @@ def main():
   for ax in budget_axes:assert np.allclose(ax.transData.transform(np.column_stack([np.zeros(11),np.arange(11)]))[:,1],ys,atol=1e-9)
   for k,text in labels:
    if k<3:assert text.get_window_extent(renderer).x1<budget_axes[k+1].bbox.x0,(k,text.get_text())
+  top=lambda ax:ax.xaxis.label.get_window_extent(renderer).y1
+  assert abs(top(budget_axes[0])-top(ae))<=.1/25.4*figure.dpi and abs(top(ar)-top(ae))<=.1/25.4*figure.dpi,(top(ar),top(ae),top(budget_axes[0]))
  fig._paper_layout_check=check_alignment
  fig._fixed_width_axes=[ar,ae]
  for x,letter,title in [(.038,'a','Held-out evaluation'),(.535,'b','Variance recovered (temporal)')]:

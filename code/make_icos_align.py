@@ -33,7 +33,7 @@ def sha(p):
             h.update(b)
     return h.hexdigest()
 
-def field_data():
+def field_data(sites=None):
     h = pd.read_csv(V / 'hesse_drought_2022_2026/ancillary_LAI_wide.csv', na_values=-9999)
     archive = F / 'icos_download_20261113/IT-Cp2_ancillary_archive/ICOSETC_IT-Cp2_ARCHIVE_INTERIM_L2.zip'
     with zipfile.ZipFile(archive) as z:
@@ -50,6 +50,7 @@ def field_data():
     excluded = []
     result = {}
     for site, wide, method in [('Hesse', h, 'SunScan'), ('Castelporziano', cp, 'DHP / hemispherical photo')]:
+        if sites is not None and site not in sites:continue
         assert wide.LAI_TYPE.dropna().eq('PAI').all()
         w = wide[wide.LAI_TYPE.eq('PAI') & wide.LAI_CANOPY_TYPE.eq('Overstory')].copy()
         w['LAI'] = pd.to_numeric(w.LAI, errors='coerce')
@@ -78,7 +79,7 @@ def field_data():
     return result
 
 def model(site, geometry, seedrows):
-    path = V / f'production_nn/{site}/trait_cube.npz'
+    path = paths.production_site(site) / 'trait_cube.npz'
     manifest = json.loads((path.parent / 'manifest.json').read_text())
     assert sha(path) == manifest['files']['trait_cube.npz']
     m = manifest['grid']
@@ -191,19 +192,20 @@ def timing(site, f):
                 rows.append(row)
     return rows
 
-def main():
+def main(sites=None):
+    sites = list(SITES) if sites is None else sites
     protected = {str(p): sha(p) for p in F.rglob('*') if p.is_file() and p.suffix in ['.csv', '.png', '.py', '.json', '.md'] and ('IT-Cp2_ancillary_archive' not in p.parts) and (p.name != 'download_manifest.csv')}
     (O / 'protected_input_hashes.json').write_text(json.dumps(protected, indent=2))
-    inputs = [V / f'production_nn/{s}/{f}' for s in SITES for f in ['trait_cube.npz', 'manifest.json']]
+    inputs = [paths.production_site(s)/f for s in sites for f in ['trait_cube.npz', 'manifest.json']]
     inputs += [V / 'hesse_drought_2022_2026/ancillary_LAI_wide.csv', V / 'hesse_lai_compare/plot_hesse_lai.py', V / 'hesse_lai_compare/plot_hesse_canopy_gpp.py']
     hashes = {str(p): sha(p) for p in inputs}
-    field = field_data()
+    field = field_data(sites)
     geometry = []
     seedrows = []
     stats = []
     events = []
     available = []
-    for site in SITES:
+    for site in sites:
         data = model(site, geometry, seedrows)
         if site == 'Hesse':
             flux = pd.read_csv(F / 'flux_vs_traits_aligned_Hesse.csv', parse_dates=['product_date']).set_index('product_date').GPP_NT_VUT_REF_mean
@@ -244,4 +246,8 @@ def main():
     print(pd.DataFrame(stats).to_string(index=False), flush=True)
     print(pd.DataFrame(events)[['site', 'year', 'quantity', 'metric', 'GPP_date', 'trait_date', 'delta_days', 'flag']].to_string(index=False), flush=True)
 if __name__ == '__main__':
-    main()
+    import argparse
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--site',choices=list(SITES))
+    args=parser.parse_args()
+    main([args.site] if args.site else None)

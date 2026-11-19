@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from make_production_common import *
 from make_production_sites import SITES
 
-def stage(name):
+def stage(name, refresh_from=None):
     import make_production_features as pf
     verify_code()
     require(read(PROD / 'FEATURE_VALIDATION_DONE.json')['passed'], 'Frozen feature gate')
@@ -43,6 +43,15 @@ def stage(name):
     px = np.arange(*spec['cols'])
     yy, xx = np.meshgrid(py, px, indexing='ij')
     f = pf.Features(sid, yy.ravel(), xx.ravel())
+    if refresh_from:
+        require(name == 'Castelporziano', 'Only authorized CP2 refresh')
+        baseline = read(refresh_from/'FEATURES_DONE.json')
+        previous_stores = baseline['provenance']['stores']
+        new_stores = set(f.stores)-set(previous_stores)
+        require(len(new_stores)==1 and next(iter(new_stores)).endswith('site_32_s2_region_2022.zarr'), 'Only the new 2022 S2 input')
+        for path,record in previous_stores.items():
+            require(f.stores[path]['attrs_sha256']==record['attrs_sha256'], 'Existing S2 metadata unchanged')
+        added_times=np.asarray([s['time'] for s in f.scenes if s['path'] in new_stores],dtype='datetime64[ns]')
     forest = f.lc[yy - f.y0, xx - f.x0] == 10
     candidate = pd.read_csv(PROD.parent / 'site_alternatives/candidate_table.csv')
     candidate = candidate[candidate.site_id.eq(sid)].iloc[0]
@@ -64,6 +73,18 @@ def stage(name):
         else:
             begin = time.monotonic()
             x, support, boundary = f.features(stamp)
+            if refresh_from:
+                # Independent support-only algebra: any finite native 10m
+                # subpixel, all six nearest20m bands, advanced mask, ±7 days.
+                independent=np.zeros(len(f.y),bool)
+                dt=(f.times-np.datetime64(date.tz_localize(None)))/np.timedelta64(1,'D')
+                for si in np.flatnonzero(abs(dt)<=7):
+                    a,b,mask=f.load(int(si))
+                    af=np.isfinite(a).all(-1)
+                    any10=af.reshape(a.shape[0]//3,3,a.shape[1]//3,3).any((1,3))
+                    y20=np.rint((f.y+.5)*1.5-.5).astype(int);x20=np.rint((f.x+.5)*1.5-.5).astype(int)
+                    independent|=any10[f.y,f.x]&np.isfinite(b[y20,x20]).all(-1)&mask[y20,x20]
+                require(np.array_equal(support,independent),'Independent refreshed W7 support identity')
             np.save(path, x)
             sp = ff / f'support{i:03}.npy'
             np.save(sp, support.reshape(50, 50))
@@ -79,16 +100,20 @@ def stage(name):
     regular_rows = frame[frame.is_fortnightly]
     require(len(screen) == len(regular_rows) == 113, 'Independent screening rows')
     require(np.array_equal(regular_rows.date.str[:10], screen.date), 'Screening date identity')
-    require(np.allclose(regular_rows.supported_pixels / 2500, screen.window_fraction, atol=1e-12, rtol=0), 'Exact window W7 screening identity')
-    require(np.allclose(regular_rows.forest_supported_pixels / int(forest.sum()), screen.forest_fraction, atol=1e-12, rtol=0), 'Exact forest W7 screening identity')
+    unchanged=np.ones(len(regular_rows),bool)
+    if refresh_from:
+        unchanged=np.asarray([not np.any(abs((added_times-np.datetime64(pd.Timestamp(d).tz_localize(None)))/np.timedelta64(1,'D'))<=28) for d in regular_rows.date])
+    require(np.allclose((regular_rows.supported_pixels / 2500).to_numpy()[unchanged], screen.window_fraction.to_numpy()[unchanged], atol=1e-12, rtol=0), 'Unchanged window W7 screening identity')
+    require(np.allclose((regular_rows.forest_supported_pixels / int(forest.sum())).to_numpy()[unchanged], screen.forest_fraction.to_numpy()[unchanged], atol=1e-12, rtol=0), 'Unchanged forest W7 screening identity')
     grid = dict(crs=f.grid[0].to_string(), transform=list(f.grid[1]), rows=spec['rows'], cols=spec['cols'])
-    save(folder / 'FEATURES_DONE.json', dict(site_id=sid, name=name, grid=grid, n_dates=len(dates), n_fortnightly_dates=113, n_development_events=len(events), n_development_acquisition_times=len(refs), forest_pixels=int(forest.sum()), date_records=records, provenance=f.provenance(), sealed_value_reads=0, independent_screening_exact=True, elapsed_wall_seconds=time.monotonic() - start, CPU_seconds=time.process_time() - cpu, original_feature_kernel=str(Path(pf.__file__)), original_feature_kernel_sha256=sha(Path(pf.__file__))))
+    save(folder / 'FEATURES_DONE.json', dict(site_id=sid, name=name, grid=grid, n_dates=len(dates), n_fortnightly_dates=113, n_development_events=len(events), n_development_acquisition_times=len(refs), forest_pixels=int(forest.sum()), date_records=records, provenance=f.provenance(), sealed_value_reads=0, independent_screening_exact=True, refresh_from=str(refresh_from) if refresh_from else None, support_audit='independent native support on all dates; frozen screening on unaffected dates' if refresh_from else 'frozen screening', elapsed_wall_seconds=time.monotonic() - start, CPU_seconds=time.process_time() - cpu, original_feature_kernel=str(Path(pf.__file__)), original_feature_kernel_sha256=sha(Path(pf.__file__))))
     print('FEATURES_DONE', name, flush=True)
 
 def inference(name):
     import torch
     from nn_model import predict
     torch.set_num_threads(2)
+    torch.set_num_interop_threads(1)
     verify_code()
     require(read(PROD / 'EQUIVALENCE_GATE.json')['passed'], 'Frozen equivalence gate')
     require(read(CONTROL / 'NN_POSITIVE_CONTROL.json')['passed'], 'Local NN positive control')
@@ -139,6 +164,7 @@ def inference(name):
     coverage.to_csv(folder / 'coverage.csv', index=False)
     files = {n: sha(folder / n) for n in ['trait_cube.npz', 'dates.csv', 'coverage.csv', 'forest_mask.npy', 'parent_y.npy', 'parent_x.npy', 'development_acquisitions.csv', 'FEATURES_DONE.json']}
     rec = dict(run_id=CFG['run_id'], state='complete', production_artifact=True, accuracy_claim=None, model_sha256=training['model_sha256'], selected_epochs=training['selected_epochs'], files=files, grid=fr['grid'], summary=dict(site_id=spec['site_id'], name=name, n_dates=len(dates), n_fortnightly_dates=113, forest_pixels=int(forest.sum()), forest_fraction=float(forest.mean()), fortnightly_forest_dates_coverage80=int(coverage.loc[coverage.is_fortnightly, 'forest_coverage80'].sum())), elapsed_wall_seconds=time.monotonic() - start, CPU_seconds=time.process_time() - cpu, sealed_value_reads=0, GPU_hours=0, new_fits=0, soil_extraction_receipt_sha256=sha(CONTROL / 'soil_extraction_receipt.json'), original_inference_kernel_sha256=sha(PROD / 'vendor/nn_model.py'))
+    rec['runtime']=dict(python=sys.executable,torch_version=torch.__version__,threads=torch.get_num_threads(),interop_threads=torch.get_num_interop_threads())
     save(folder / 'manifest.json', rec)
     save(folder / 'INFERENCE_DONE.json', rec)
     print('INFERENCE_DONE', name, flush=True)
@@ -146,5 +172,7 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('site', choices=SITES)
     p.add_argument('stage', choices=['features', 'inference'])
+    p.add_argument('--refresh-from', type=Path, help='Frozen CP2 product to extend after adding its 2022 store')
     args = p.parse_args()
-    (stage if args.stage == 'features' else inference)(args.site)
+    if args.stage == 'features':stage(args.site,args.refresh_from)
+    else:inference(args.site)

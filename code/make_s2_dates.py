@@ -12,7 +12,7 @@ zarr.config.set({'async.concurrency': 1, 'threading.max_workers': 1})
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import make_site_support as fs
 
-def main():
+def inventory():
     old = V6.parent / 'figures_v4/tables'
     obs = pd.read_csv(old / 's2_observations.csv')
     inv = pd.read_csv(old / 's2_store_metadata_inventory.csv')
@@ -43,7 +43,9 @@ def main():
             counts.append(dict(site_id=sid, site_name=e.site_name.iloc[0] if len(e) else events[events.site_id.eq(sid)].site_name.iloc[0], year=year, n_enmap_development=len(e), n_s2_valid=int(s.valid_observation.sum()) if present else np.nan, S2_store_present=present, start='2022-04-01' if year == 2022 else f'{year}-01-01', end='2026-09-30' if year == 2026 else f'{year}-12-31'))
     pd.DataFrame(counts).to_csv(DATA / 'SI1_counts_site_year.csv', index=False)
     save(DATA / 'SI1_inventory_validation.json', dict(old_inventory_reused=True, source_inventory_sha256=sha(old / 's2_store_metadata_inventory.csv'), source_observation_sha256=sha(old / 's2_observations.csv'), all_store_metadata_hashes_match=True, stores=inventory, sealed_events_excluded_metadata_only=int(a.new_role.eq('fold0').sum()), events=len(events), start='2022-04-01', end='2026-09-30', valid_definition='advanced_valid_mask>=1 on nearest20m at30m trait centres; >=50% of AOI WorldCover vegetation10/20/30/40/90/95; unchanged inventories.py definition'))
+def ticks(names=None):
     for name, sid, y0, x0 in [('Hesse', 45, 480, 460), ('Castelporziano', 32, 475, 475)]:
+        if names is not None and name not in names:continue
         forest = fs.land(sid)[y0:y0 + 50, x0:x0 + 50] == 10
         yy = np.floor((np.arange(y0, y0 + 50) + 0.5) * 1.5).astype(int)
         xx = np.floor((np.arange(x0, x0 + 50) + 0.5) * 1.5).astype(int)
@@ -67,5 +69,14 @@ def main():
             assert sha(p / '.zattrs') == h
         pd.DataFrame(rows).to_csv(DATA / f'Fig4_S2_valid_dates_{name}.csv', index=False)
         print('S2_TICKS', name, len(rows), sum((r['plot'] for r in rows)), flush=True)
+def main(names=None,ticks_only=False):
+    if not ticks_only:inventory()
+    ticks(names)
+
 if __name__ == '__main__':
-    main()
+    import argparse
+    p=argparse.ArgumentParser()
+    p.add_argument('--site',choices=['Hesse','Castelporziano'])
+    p.add_argument('--ticks-only',action='store_true')
+    args=p.parse_args()
+    main([args.site] if args.site else None,args.ticks_only)

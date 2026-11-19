@@ -7,23 +7,25 @@ OUT=output_directory()
 COLORS = IGBP_COLORS
 LABELS = {'forest':'Forest', 'grassland':'Grassland', 'cropland':'Cropland',
           'wetland':'Wetland', 'shrubland_savanna':'Shrubland/savanna', 'other':'Other'}
-LOCAL_COLOR, LOCAL_WIDTH, LOCAL_HEIGHT = '#C4C4C4', .35, .25
-PC_COLOR, PC_WIDTH, PC_HEIGHT = '#DEDEDE', .55, .14
+S2_COLOR, S2_WIDTH, S2_HEIGHT = '#C4C4C4', .35, .25
 
 def main():
     font_path = fm.findfont(fm.FontProperties(family='Arial'), fallback_to_default=False)
     si1_initial_style()
     s = pd.read_parquet(DATA / 'SI1_S2_observations.parquet')
     e = pd.read_parquet(DATA / 'SI1_development_events.parquet')
+    f = pd.read_parquet(DATA / 'SI1_fold0_events.parquet')
     pc = pd.read_parquet(DATA / 'SI1_pc_fill_dates.parquet')
     cl = pd.read_parquet(DATA / 'SI1_site_classes_filled.parquet').set_index('site_id')
     s.date_utc = pd.to_datetime(s.date_utc, utc=True, format='mixed')
     pc.date_utc = pd.to_datetime(pc.date_utc, utc=True)
     e.date = pd.to_datetime(e.date, utc=True)
+    f.date = pd.to_datetime(f.date, utc=True)
     n_events = e.groupby('site_id').size()
     sites = sorted(set(e.site_id) | set(s.site_id), key=lambda sid:
         (list(COLORS).index(cl.loc[sid, 'display_class']), -int(n_events.get(sid, 0)), sid))
     assert len(sites)==41 and set(sites)==set(cl.index)
+    assert f.new_role.eq('fold0').all() and set(f.site_id)<=set(sites)
     fig, ax = plt.subplots(figsize=(183/25.4, 218/25.4))
     fig.subplots_adjust(left=43/183, right=165/183, bottom=12/218, top=.955)
     row_counts = []
@@ -31,11 +33,14 @@ def main():
         sg = s[s.site_id.eq(sid) & s.valid_observation]
         pg = pc[pc.site_id.eq(sid)]
         eg = e[e.site_id.eq(sid)]
-        # Same timestamps, row-relative lengths, colours and point linewidths as before.
-        ax.vlines(pg.date_utc, j-PC_HEIGHT, j+PC_HEIGHT, color=PC_COLOR, lw=PC_WIDTH)
-        ax.vlines(sg.date_utc, j-LOCAL_HEIGHT, j+LOCAL_HEIGHT, color=LOCAL_COLOR, lw=LOCAL_WIDTH)
+        fg = f[f.site_id.eq(sid)]
+        ax.vlines(pd.concat([pg.date_utc, sg.date_utc], ignore_index=True),
+            j-S2_HEIGHT, j+S2_HEIGHT, color=S2_COLOR, lw=S2_WIDTH, alpha=1)
         ax.scatter(eg.date, np.full(len(eg), j), s=9,
             color=COLORS[cl.loc[sid, 'display_class']], linewidth=0, zorder=3)
+        ax.scatter(fg.date, np.full(len(fg), j), s=9, marker='o',
+            facecolors='white', edgecolors=COLORS[cl.loc[sid, 'display_class']],
+            linewidth=.6, zorder=4)
         ax.text(1.01, j, f'{len(eg):2d} / {len(sg)+len(pg):3d}',
             transform=ax.get_yaxis_transform(), fontsize=7, va='center')
         row_counts.append(dict(site_id=int(sid), plot_label=cl.loc[sid,'plot_label'],
@@ -55,6 +60,12 @@ def main():
         color=color,label=LABELS[key]) for key,color in COLORS.items()],
         loc='upper center',bbox_to_anchor=(.5,.995), ncol=6, frameon=False,
         columnspacing=1, handlelength=1.1, handletextpad=.4, fontsize=7)
+    fig.legend(handles=[Line2D([],[],marker='o',ls='',ms=3.4,color='black',
+        label='Development events'), Line2D([],[],marker='o',ls='',ms=3.4,
+        markerfacecolor='white', markeredgecolor='black', markeredgewidth=.6,
+        color='black',label='Sealed test events (fold 0)')],
+        loc='upper center',bbox_to_anchor=(.5,.977),ncol=2,frameon=False,
+        columnspacing=1,handlelength=1.1,handletextpad=.4,fontsize=7)
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     # Validate actual text extents at the final physical size before exporting.

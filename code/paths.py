@@ -49,6 +49,11 @@ def teacher_store(site):return RAW/f'enmap/traits_region_v2/site_{site}_enmap_tr
 def s2_store(site,year):return RAW/f's2/region/site_{site}/site_{site}_s2_region_{year}.zarr'
 def worldcover_store(site):return WORLD_COVER/f'site_{site}_worldcover2021_30m.zarr'
 
+def production_site(name):
+    """Select an explicitly versioned CP2 product; other sites keep frozen paths."""
+    override = os.environ.get('ECOSPECTRA_CP2_PRODUCTION') if name == 'Castelporziano' else None
+    return Path(override).expanduser().resolve() if override else PRODUCTION/name
+
 INVENTORY_SOURCE=V6.parent/'figures_v4/tables'
 V4_CONFIG=V6.parent/'figures_v4/config.json'
 
